@@ -30,7 +30,7 @@ data "aws_iam_policy_document" "allow_lambda_logging" {
 }
 
 resource "aws_iam_policy" "function_logging_policy" {
-  name        = "AllowLambdaLoggingPolicy"
+  name        = "Allow${title(local.function_name)}LambdaLoggingPolicy"
   description = "Policy for lambda cloudwatch logging"
   policy      = data.aws_iam_policy_document.allow_lambda_logging.json
 }
