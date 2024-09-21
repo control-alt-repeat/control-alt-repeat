@@ -13,7 +13,7 @@
 # }
 
 resource "aws_lambda_function" "function" {
-  function_name    = "ebay-lambda-ingester"
+  function_name    = "control-alt-repeat-poc"
   description      = "Indexes eBay listings into Control Alt Repeats asset inventory S3 bucket"
   role             = aws_iam_role.lambda.arn
   handler          = "bootstrap"
