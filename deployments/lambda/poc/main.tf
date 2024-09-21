@@ -20,7 +20,7 @@ resource "aws_lambda_function" "function" {
   memory_size      = 128
   filename         = local.archive_path
   source_code_hash = data.archive_file.function_archive.output_base64sha256
-  runtime          = "go1.x"
+  runtime          = "provided.al2023"
 }
 
 resource "aws_cloudwatch_log_group" "log_group" {
