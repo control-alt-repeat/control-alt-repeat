@@ -26,49 +26,49 @@ jobs:
           role-session-name: OIDCRoleSession
 
       - name: TEST Terraform Init
-        id: init
+        id: init-test
         run: terraform init
         working-directory: configs/test
         continue-on-error: false
 
       - name: TEST Terraform Validate
-        id: validate
+        id: validate-test
         run: terraform validate -no-color
         working-directory: configs/test
         continue-on-error: false
 
       - name: TEST Terraform Plan
-        id: plan
+        id: plan-test
         run: terraform plan -no-color
         working-directory: configs/test
         continue-on-error: false
 
       - name: LIVE Terraform Init
-        id: init
+        id: init-live
         run: terraform init
         working-directory: configs/live
         continue-on-error: false
 
       - name: LIVE Terraform Validate
-        id: validate
+        id: validate-live
         run: terraform validate -no-color
         working-directory: configs/live
         continue-on-error: false
 
       - name: LIVE Terraform Plan
-        id: plan
+        id: plan-live
         run: terraform plan -no-color
         working-directory: configs/live
         continue-on-error: false
 
       - name: TEST Terraform Deploy
-        id: plan
+        id: apply-test
         run: terraform apply -auto-approve
         working-directory: configs/test
         continue-on-error: false
 
       - name: LIVE Terraform Deploy
-        id: plan
+        id: apply-live
         run: terraform apply -auto-approve
         working-directory: configs/live
         continue-on-error: false
