@@ -10,7 +10,7 @@ data "aws_iam_policy_document" "assume_lambda_role" {
 }
 
 resource "aws_iam_role" "lambda" {
-  name               = "EbayListingIngesterAssumeLambdaRole"
+  name               = "${title(local.function_name)}AssumeLambdaRole"
   description        = "Role for the ebay-listing-ingester to assume"
   assume_role_policy = data.aws_iam_policy_document.assume_lambda_role.json
 }
