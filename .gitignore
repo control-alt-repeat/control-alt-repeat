@@ -1,3 +1,5 @@
+*.zip
+
 # Created by https://www.toptal.com/developers/gitignore/api/terraform,go
 # Edit at https://www.toptal.com/developers/gitignore?templates=terraform,go
 

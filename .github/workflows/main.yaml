@@ -20,13 +20,9 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubOIDC
           aws-region: eu-west-2
-          role-session-name: OIDCRoleSession      
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubOIDC
-          aws-region: eu-west-2
-          role-session-name: OIDCRoleSession
+          role-session-name: OIDCRoleSessions
+
+      - run: ./scripts/build-lambda-functions.sh
 
       - run: terraform fmt -check
 
