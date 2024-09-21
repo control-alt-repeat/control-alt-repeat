@@ -25,38 +25,50 @@ jobs:
           aws-region: eu-west-2
           role-session-name: OIDCRoleSession
 
-      - name: [TEST] Terraform Init
+      - name: TEST Terraform Init
         id: init
         run: terraform init
         working-directory: configs/test
         continue-on-error: false
 
-      - name: [TEST] Terraform Validate
+      - name: TEST Terraform Validate
         id: validate
         run: terraform validate -no-color
         working-directory: configs/test
         continue-on-error: false
 
-      - name: [TEST] Terraform Plan
+      - name: TEST Terraform Plan
         id: plan
         run: terraform plan -no-color
         working-directory: configs/test
         continue-on-error: false
 
-      - name: [LIVE] Terraform Init
+      - name: LIVE Terraform Init
         id: init
         run: terraform init
         working-directory: configs/live
         continue-on-error: false
 
-      - name: [LIVE] Terraform Validate
+      - name: LIVE Terraform Validate
         id: validate
         run: terraform validate -no-color
         working-directory: configs/live
         continue-on-error: false
 
-      - name: [LIVE] Terraform Plan
+      - name: LIVE Terraform Plan
         id: plan
         run: terraform plan -no-color
+        working-directory: configs/live
+        continue-on-error: false
+
+      - name: TEST Terraform Deploy
+        id: plan
+        run: terraform apply -auto-approve
+        working-directory: configs/test
+        continue-on-error: false
+
+      - name: LIVE Terraform Deploy
+        id: plan
+        run: terraform apply -auto-approve
         working-directory: configs/live
         continue-on-error: false
