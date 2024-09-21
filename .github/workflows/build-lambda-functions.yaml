@@ -16,5 +16,5 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '1.23.x'
-      - name: Build ${{ matrix.version }}
-        run: go build -o ./cmd/aws/lambda/${{ matrix.version }}/bootstrap ./cmd/aws/lambda/${{ matrix.version }}/main.go
+      - name: Build ${{ matrix.function-names }}
+        run: go build -o ./cmd/aws/lambda/${{ matrix.function-names }}/bootstrap ./cmd/aws/lambda/${{ matrix.function-names }}/main.go
