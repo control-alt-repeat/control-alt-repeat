@@ -3,7 +3,7 @@ variable "stage_name" {
   description = "The name of the stage. Must be either 'test' or 'live'"
 
   validation {
-    condition     = contains(["test", "live"], var.test_variable)
-    error_message = "Valid values for var: test_variable are (test, live)."
+    condition     = contains(["test", "live"], var.stage_name)
+    error_message = "Valid values for var: stage_name are (test, live)."
   } 
 }
