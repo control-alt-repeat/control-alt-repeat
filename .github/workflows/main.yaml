@@ -1,6 +1,6 @@
 name: Deploy Control Alt Repeat
 on:
-  workflow_dispatch
+  push
 env:
   AWS_REGION : eu-west-2
 permissions:
@@ -11,9 +11,9 @@ jobs:
     runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v4
-  job-build-lambda-functions:
-    needs: checkout
-    uses: ./.github/workflows/build-lambda-functions.yml
+  # job-build-lambda-functions:
+  #   needs: checkout
+  #   uses: ./.github/workflows/build-lambda-functions.yaml
   # main-pipeline:
   #   runs-on: ubuntu-latest
   #   steps:
