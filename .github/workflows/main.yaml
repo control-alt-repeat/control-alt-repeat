@@ -19,7 +19,12 @@ jobs:
         run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bootstrap ./cmd/aws/lambda/poc/main.go
       - uses: montudor/action-zip@v1
         with:
-          args: zip lambda-poc.zip bootstrap
+          args: zip lambda-handler-poc.zip bootstrap
+      - name: Build
+        run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bootstrap ./cmd/aws/lambda/poc-two/main.go
+      - uses: montudor/action-zip@v1
+        with:
+          args: zip lambda-handler-poc-two.zip bootstrap
       - uses: hashicorp/setup-terraform@v3
       
       - name: Terraform fmt
