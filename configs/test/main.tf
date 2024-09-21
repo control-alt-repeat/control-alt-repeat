@@ -15,3 +15,20 @@ module "terraform_state_backend" {
   terraform_backend_config_file_name = "backend.tf"
   force_destroy                      = false
 }
+
+output "module" {
+  value = path.module
+}
+
+output "root" {
+  value = path.root
+}
+
+output "cwd" {
+  value = path.cwd
+}
+
+output "aBSmodule" {
+  value = abspath(path.module)
+}
+
