@@ -17,6 +17,6 @@ module "terraform_state_backend" {
 }
 
 module "deployment" {
-  source = "../../deployments"
+  source = "./../../deployments"
   stage_name = reverse(split("/", path.cwd))[0]
 }
