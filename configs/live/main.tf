@@ -15,3 +15,8 @@ module "terraform_state_backend" {
   terraform_backend_config_file_name = "backend.tf"
   force_destroy                      = false
 }
+
+module "deployment" {
+  source = "./../../deployments"
+  stage_name = reverse(split("/", path.cwd))[0]
+}

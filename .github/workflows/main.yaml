@@ -7,7 +7,7 @@ permissions:
   id-token: write
   contents: read
 jobs:
-  Test:
+  MainPipeline:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,20 +25,38 @@ jobs:
           aws-region: eu-west-2
           role-session-name: OIDCRoleSession
 
-      - name: Terraform Init
+      - name: [TEST] Terraform Init
         id: init
         run: terraform init
         working-directory: configs/test
         continue-on-error: false
 
-      - name: Terraform Validate
+      - name: [TEST] Terraform Validate
         id: validate
         run: terraform validate -no-color
         working-directory: configs/test
         continue-on-error: false
 
-      - name: Terraform Plan
+      - name: [TEST] Terraform Plan
         id: plan
         run: terraform plan -no-color
         working-directory: configs/test
+        continue-on-error: false
+
+      - name: [LIVE] Terraform Init
+        id: init
+        run: terraform init
+        working-directory: configs/live
+        continue-on-error: false
+
+      - name: [LIVE] Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+        working-directory: configs/live
+        continue-on-error: false
+
+      - name: [LIVE] Terraform Plan
+        id: plan
+        run: terraform plan -no-color
+        working-directory: configs/live
         continue-on-error: false
