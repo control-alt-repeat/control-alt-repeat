@@ -1,4 +1,4 @@
-name: Deploy eBay Listing Ingester
+name: Deploy Control Alt Repeat
 on:
   push
 env:
@@ -9,8 +9,6 @@ permissions:
 jobs:
   validate_terraform:
     runs-on: ubuntu-latest
-    strategy:
-      matrix: { dir: ['deployments/test', 'deployments/live'] }
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
@@ -19,26 +17,22 @@ jobs:
         id: fmt
         run: terraform fmt -check
         continue-on-error: false
-        working-directory: ${{ matrix.dir }}
 
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubOIDC
           role-session-name: OIDCRoleSession
-          aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Init
         id: init
         run: terraform init
         continue-on-error: false
-        working-directory: ${{ matrix.dir }}
 
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
         continue-on-error: false
-        working-directory: ${{ matrix.dir }}
 
       - name: Terraform Plan
         id: plan
