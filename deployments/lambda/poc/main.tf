@@ -17,11 +17,8 @@ resource "aws_lambda_function" "function" {
   description      = "Indexes eBay listings into Control Alt Repeats asset inventory S3 bucket"
   role             = aws_iam_role.lambda.arn
   handler          = "bootstrap"
-  memory_size      = 128
   filename         = local.archive_path
-  # source_code_hash = data.archive_file.function_archive.output_base64sha256
   source_code_hash = filebase64sha256(local.archive_path)
-  architectures    = ["arm64"]
   runtime          = "provided.al2023"
 }
 
