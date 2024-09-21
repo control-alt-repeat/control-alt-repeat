@@ -2,30 +2,6 @@ module "lambda_poc" {
     source = "./lambda/poc"
 }
 
-provider "aws" {
-  region = "eu-west-2"
-
-  default_tags {
-    tags = {
-      github_repository = "control-alt-repeat"
-      github_organisation = "Control-Alt-Repeat"
-      stage_name = "test"
-    }
-  }
-}
-
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-    }
-    archive = {
-      source = "hashicorp/archive"
-    }
-    null = {
-      source = "hashicorp/null"
-    }
-  }
-
-  required_version = ">= 1.9.6"
+module "lambda_poc_two" {
+    source = "./lambda/poc-two"
 }
