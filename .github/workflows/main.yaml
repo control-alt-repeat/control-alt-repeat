@@ -1,6 +1,6 @@
 name: Deploy Control Alt Repeat
 on:
-  push
+  workflow_dispatch
 env:
   AWS_REGION : eu-west-2
 permissions:

@@ -1,0 +1,20 @@
+name: Build Go Lambda Function Code
+on:
+  push
+env:
+  GOOS: linux
+  GOARCH: amd64
+  CGO_ENABLED: 0
+jobs:
+  BuildFunctions:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        function-names: ["poc", "poc-two"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.x'
+      - name: Build ${{ matrix.version }}
+        run: go build -o ./cmd/aws/lambda/${{ matrix.version }}/bootstrap ./cmd/aws/lambda/${{ matrix.version }}/main.go
