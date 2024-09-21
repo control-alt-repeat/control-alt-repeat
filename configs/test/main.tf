@@ -16,6 +16,7 @@ module "terraform_state_backend" {
   force_destroy                      = false
 }
 
-output "cwd" {
-  value = reverse(split("/", path.cwd))[0]
+module "deployment" {
+  source = "../../deployments"
+  stage_name = reverse(split("/", path.cwd))[0]
 }
