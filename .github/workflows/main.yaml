@@ -19,7 +19,7 @@ jobs:
         run: GOOS=linux GOARC=amd64 CGO_ENABLED=0 GOFLAGS=-trimpath go build -tags lambda.norpc -mod=readonly -o ./cmd/aws/lambda/poc/bootstrap ./cmd/aws/lambda/poc
       - uses: montudor/action-zip@v1
         with:
-          args: zip ./cmd/aws/lambda/poc/bootstrap.zip ./cmd/aws/lambda/poc/bootstrap
+          args: zip -j ./cmd/aws/lambda/poc/bootstrap.zip ./cmd/aws/lambda/poc/bootstrap
       - uses: hashicorp/setup-terraform@v3
       
       - name: Terraform fmt
