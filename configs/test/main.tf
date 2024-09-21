@@ -16,19 +16,6 @@ module "terraform_state_backend" {
   force_destroy                      = false
 }
 
-output "module" {
-  value = path.module
-}
-
-output "root" {
-  value = path.root
-}
-
 output "cwd" {
-  value = path.cwd
+  value = reverse(split("/", path.cwd))[0]
 }
-
-output "aBSmodule" {
-  value = abspath(path.module)
-}
-
