@@ -4,7 +4,7 @@ resource "aws_lambda_function" "function" {
   role             = aws_iam_role.lambda.arn
   handler          = "bootstrap"
   filename         = local.archive_path
-  source_code_hash = filebase64sha256(local.archive_path)
+  # source_code_hash = filebase64sha256(local.archive_path)
   runtime          = "provided.al2023"
 }
 
