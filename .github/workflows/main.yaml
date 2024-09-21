@@ -7,12 +7,7 @@ permissions:
   id-token: write
   contents: read
 jobs:
-  checkout:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
   job-build-lambda-functions:
-    needs: checkout
     uses: ./.github/workflows/build-lambda-functions.yaml
   # main-pipeline:
   #   runs-on: ubuntu-latest

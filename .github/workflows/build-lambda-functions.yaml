@@ -12,6 +12,7 @@ jobs:
       matrix:
         function-names: ["poc", "poc-two"]
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version: '1.23.x'
@@ -19,5 +20,5 @@ jobs:
         run: go build -o ./cmd/aws/lambda/${{ matrix.function-names }}/bootstrap ./cmd/aws/lambda/${{ matrix.function-names }}/main.go
       - uses: montudor/action-zip@v1
         with:
-          args: zip lambda-handler-${{ matrix.function-names }}.zip bootstrap  
+          args: zip --junk lambda-handler-${{ matrix.function-names }}.zip ./cmd/aws/lambda/${{ matrix.function-names }}/bootstrap  
       
