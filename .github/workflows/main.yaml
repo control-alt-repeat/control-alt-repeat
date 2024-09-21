@@ -9,18 +9,18 @@ permissions:
 jobs:
   main-pipeline:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        function-names: ["poc", "poc-two"]
-        deployment-stages: ["test", "live"]
     steps:
       - uses: hashicorp/setup-terraform@v3
-      - uses: actions/setup-go@v5
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version: '1.23.x'
-
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubOIDC
+          aws-region: eu-west-2
+          role-session-name: OIDCRoleSession      
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
@@ -28,73 +28,22 @@ jobs:
           aws-region: eu-west-2
           role-session-name: OIDCRoleSession
 
-      - name: Build ${{ matrix.function-names }}
-        run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ./cmd/aws/lambda/${{ matrix.function-names }}/bootstrap ./cmd/aws/lambda/${{ matrix.function-names }}/main.go
-      - uses: montudor/action-zip@v1
-        with:
-          args: zip -j lambda-handler-${{ matrix.function-names }}.zip ./cmd/aws/lambda/${{ matrix.function-names }}/bootstrap  
-      
+      - run: terraform fmt -check
 
-  # job-build-lambda-functions:
-  #   uses: ./.github/workflows/build-lambda-functions.yaml
-  
-      
-  #     - name: Terraform fmt
-  #       id: fmt
-  #       run: terraform fmt -check
-  #       continue-on-error: false
+      - run: terraform init
+        working-directory: configs/test
+      - run: terraform validate -no-color
+        working-directory: configs/test
+      - run: terraform plan -no-color
+        working-directory: configs/test
+      - run: terraform apply -auto-approve
+        working-directory: configs/test
 
-  #     - name: configure aws credentials
-  #       uses: aws-actions/configure-aws-credentials@v3
-  #       with:
-  #         role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubOIDC
-  #         aws-region: eu-west-2
-  #         role-session-name: OIDCRoleSession
-
-  #     - name: TEST Terraform Init
-  #       id: init-test
-  #       run: terraform init
-  #       working-directory: configs/test
-  #       continue-on-error: false
-
-  #     - name: TEST Terraform Validate
-  #       id: validate-test
-  #       run: terraform validate -no-color
-  #       working-directory: configs/test
-  #       continue-on-error: false
-
-  #     - name: TEST Terraform Plan
-  #       id: plan-test
-  #       run: terraform plan -no-color
-  #       working-directory: configs/test
-  #       continue-on-error: false
-
-  #     - name: LIVE Terraform Init
-  #       id: init-live
-  #       run: terraform init
-  #       working-directory: configs/live
-  #       continue-on-error: false
-
-  #     - name: LIVE Terraform Validate
-  #       id: validate-live
-  #       run: terraform validate -no-color
-  #       working-directory: configs/live
-  #       continue-on-error: false
-
-  #     - name: LIVE Terraform Plan
-  #       id: plan-live
-  #       run: terraform plan -no-color
-  #       working-directory: configs/live
-  #       continue-on-error: false
-
-  #     - name: TEST Terraform Deploy
-  #       id: apply-test
-  #       run: terraform apply -auto-approve
-  #       working-directory: configs/test
-  #       continue-on-error: false
-
-  #     - name: LIVE Terraform Deploy
-  #       id: apply-live
-  #       run: terraform apply -auto-approve
-  #       working-directory: configs/live
-  #       continue-on-error: false
+      - run: terraform init
+        working-directory: configs/live
+      - run: terraform validate -no-color
+        working-directory: configs/live
+      - run: terraform plan -no-color
+        working-directory: configs/live
+      - run: terraform apply -auto-approve
+        working-directory: configs/live
