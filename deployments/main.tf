@@ -27,5 +27,5 @@ provider "aws" {
 }
 
 module "lambda_poc" {
-    source = "${path.module}/lambda/poc"
+    source = "./lambda/poc"
 }
