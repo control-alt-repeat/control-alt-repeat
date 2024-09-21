@@ -1,10 +1,6 @@
 name: Build Go Lambda Function Code
 on:
   workflow_call
-env:
-  GOOS: linux
-  GOARCH: amd64
-  CGO_ENABLED: 0
 jobs:
   BuildFunctions:
     runs-on: ubuntu-latest
