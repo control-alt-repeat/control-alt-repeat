@@ -15,8 +15,6 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '1.23.x'
-      - name: Install dependencies
-        run: go get .
       - name: Build
         run: GOOS=linux GOARC=amd64 CGO_ENABLED=0 GOFLAGS=-trimpath go build -tags lambda.norpc -mod=readonly -o ./cmd/aws/lambda/poc/bootstrap ./cmd/aws/lambda/poc
       - uses: montudor/action-zip@v1
