@@ -5,6 +5,7 @@ terraform {
     region  = "eu-west-2"
     bucket  = "control-alt-repeat-live-terraform-state"
     key     = "terraform.tfstate"
+    profile = ""
     encrypt = "true"
 
     dynamodb_table = "control-alt-repeat-live-terraform-state-lock"
