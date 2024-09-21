@@ -3,6 +3,6 @@ locals {
   src_path      = "${path.module}/../../../cmd/aws/lambda/${local.function_name}"
 
   binary_name  = local.function_name
-  binary_path  = "${local.src_path}/tf_generated/${local.binary_name}/bootstrap"
-  archive_path = "${local.src_path}/tf_generated/${local.function_name}/bootstrap.zip"
+  binary_path  = "${local.src_path}/${local.binary_name}/bootstrap"
+  archive_path = "${local.src_path}/${local.function_name}/bootstrap.zip"
 }
