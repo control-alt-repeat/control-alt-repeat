@@ -1,15 +1,3 @@
-provider "aws" {
-  region = "eu-west-2"
-
-  default_tags {
-    tags = {
-      github_repository = "control-alt-repeat"
-      github_organisation = "Control-Alt-Repeat"
-      stage_name = "test"
-    }
-  }
-}
-
 terraform {
   required_providers {
     aws = {
@@ -24,4 +12,16 @@ terraform {
   }
 
   required_version = ">= 1.9.6"
+}
+
+provider "aws" {
+  region = "eu-west-2"
+
+  default_tags {
+    tags = {
+      github_repository = "control-alt-repeat"
+      github_organisation = "Control-Alt-Repeat"
+      stage_name = "test"
+    }
+  }
 }

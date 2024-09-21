@@ -1,3 +1,7 @@
+module "lambda_poc" {
+    source = "./lambda/poc"
+}
+
 provider "aws" {
   region = "eu-west-2"
 
