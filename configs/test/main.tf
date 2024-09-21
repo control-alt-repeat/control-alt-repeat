@@ -16,10 +16,10 @@ module "terraform_state_backend" {
   force_destroy                      = false
 }
 
-# module "v1" {
-#   source = "./../../deployments/v1"
-#   stage_name = reverse(split("/", path.cwd))[0]
-# }
+module "v1" {
+  source = "./../../deployments/v1"
+  stage_name = reverse(split("/", path.cwd))[0]
+}
 
 provider "aws" {
   region = "eu-west-2"
