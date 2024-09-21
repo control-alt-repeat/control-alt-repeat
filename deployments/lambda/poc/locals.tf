@@ -4,5 +4,5 @@ locals {
 
   binary_name  = local.function_name
   binary_path  = "${local.src_path}/${local.binary_name}/bootstrap"
-  archive_path = "${local.src_path}/bootstrap.zip"
+  archive_path = "${local.src_path}.zip"
 }
