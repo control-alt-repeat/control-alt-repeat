@@ -16,7 +16,7 @@ jobs:
         with:
           go-version: '1.23.x'
       - name: Build
-        run: GOOS=linux GOARCH=amd64 go build -o bootstrap ./cmd/aws/lambda/poc/main.go
+        run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bootstrap ./cmd/aws/lambda/poc/main.go
       - uses: montudor/action-zip@v1
         with:
           args: zip lambda-poc.zip bootstrap

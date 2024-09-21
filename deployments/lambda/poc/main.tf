@@ -14,7 +14,7 @@
 
 resource "aws_lambda_function" "function" {
   function_name    = "control-alt-repeat-poc"
-  description      = "Indexes eBay listings into Control Alt Repeats asset inventory S3 bucket"
+  description      = "It's a function to prove deployment capability"
   role             = aws_iam_role.lambda.arn
   handler          = "bootstrap"
   filename         = local.archive_path
