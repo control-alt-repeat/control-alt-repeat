@@ -35,7 +35,19 @@ resource "aws_iam_policy" "function_logging_policy" {
   policy      = data.aws_iam_policy_document.allow_lambda_logging.json
 }
 
+
+
 resource "aws_iam_role_policy_attachment" "lambda_logging_policy_attachment" {
   role       = aws_iam_role.lambda.id
   policy_arn = aws_iam_policy.function_logging_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "function_read_listings_policy_attachment" {
+  role       = aws_iam_role.lambda.id
+  policy_arn = var.read_listings_policy_arn
+}
+
+resource "aws_iam_role_policy_attachment" "function_write_listings_policy_attachment" {
+  role       = aws_iam_role.lambda.id
+  policy_arn = var.write_listings_policy_arn
 }

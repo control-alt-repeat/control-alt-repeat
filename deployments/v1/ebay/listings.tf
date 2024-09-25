@@ -1,0 +1,63 @@
+resource "aws_s3_bucket" "listings" {
+  bucket = "control-alt-repeat-v1-listings"
+}
+
+data "aws_iam_policy_document" "allow_listings_read" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      aws_s3_bucket.listings.arn
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.listings.arn}/*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "allow_listings_write" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      aws_s3_bucket.listings.arn
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:*Object",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.listings.arn}/*",
+    ]
+  }
+}
+
+resource "aws_iam_policy" "function_read_listings" {
+  name        = "AllowReadEbayListingPolicy"
+  description = "Policy for lambda reading listings"
+  policy      = data.aws_iam_policy_document.allow_listings_read.json
+}
+
+resource "aws_iam_policy" "function_write_listings" {
+  name        = "AllowWriteEbayListingPolicy"
+  description = "Policy for lambda writing listings"
+  policy      = data.aws_iam_policy_document.allow_listings_write.json
+}
