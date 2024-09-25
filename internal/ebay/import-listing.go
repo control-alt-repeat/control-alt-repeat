@@ -8,14 +8,14 @@ import (
 	"strings"
 )
 
-func ImportListing() error {
+func ImportListing(eBayAuthToken string) error {
 	url := "https://api.ebay.com/ws/api.dll"
 	method := "POST"
 
 	payload := GetItemRequest{
 		Xmlns: "urn:ebay:apis:eBLBaseComponents",
 		RequesterCredentials: RequesterCredentials{
-			EBayAuthToken: "abc123",
+			EBayAuthToken: eBayAuthToken,
 		},
 		ItemID: "387372844761",
 	}
