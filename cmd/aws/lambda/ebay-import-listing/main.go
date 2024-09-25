@@ -1,22 +1,21 @@
 package main
 
 import (
-	"bytes"
+	"context"
 	"fmt"
 	"os"
 
+	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 func handler(ctx context.Context) error {
-	ebayToken, err := internal.aws.ReadS3Object(
-		ctx, 
-		os.Getenv("EBAY_TOKEN_S3_BUCKET"), 
+	ebayToken, err := aws.ReadS3Object(
+		ctx,
+		os.Getenv("EBAY_TOKEN_S3_BUCKET"),
 		os.Getenv("EBAY_TOKEN_S3_KEY"),
-		"eu-west-2"
+		"eu-west-2",
 	)
 
 	if err != nil {
