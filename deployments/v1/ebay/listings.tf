@@ -51,13 +51,13 @@ data "aws_iam_policy_document" "allow_listings_write" {
 }
 
 resource "aws_iam_policy" "allow_read_listings" {
-  name        = "AllowReadEbayListingPolicy"
+  name        = "AllowReadEbayListingPolicy2"
   description = "Policy for lambda reading listings"
   policy      = data.aws_iam_policy_document.allow_listings_read.json
 }
 
 resource "aws_iam_policy" "allow_write_listings" {
-  name        = "AllowWriteEbayListingPolicy"
+  name        = "AllowWriteEbayListingPolicy2"
   description = "Policy for lambda writing listings"
   policy      = data.aws_iam_policy_document.allow_listings_write.json
 }
