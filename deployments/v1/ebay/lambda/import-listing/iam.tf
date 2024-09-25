@@ -51,3 +51,13 @@ resource "aws_iam_role_policy_attachment" "function_write_listings_policy_attach
   role       = aws_iam_role.lambda.id
   policy_arn = var.write_listings_policy_arn
 }
+
+resource "aws_iam_role_policy_attachment" "function_read_tokens_policy_attachment" {
+  role       = aws_iam_role.lambda.id
+  policy_arn = var.read_tokens_policy_arn
+}
+
+resource "aws_iam_role_policy_attachment" "function_write_tokens_policy_attachment" {
+  role       = aws_iam_role.lambda.id
+  policy_arn = var.write_tokens_policy_arn
+}
