@@ -1,8 +1,9 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -11,7 +12,7 @@ import (
 )
 
 // Lambda handler function
-func ReadS3Object(ctx context, bucket string, key string, region string) (string, error) {
+func ReadS3Object(ctx context.Context, bucket string, key string, region string) (string, error) {
 	// Create a new AWS session
 	sess, err := session.NewSession(&aws.Config{
 		Region: aws.String(region), // Replace with your region
@@ -34,7 +35,7 @@ func ReadS3Object(ctx context, bucket string, key string, region string) (string
 	defer result.Body.Close()
 
 	// Read the object's content
-	body, err := ioutil.ReadAll(result.Body)
+	body, err := io.ReadAll(result.Body)
 	if err != nil {
 		return "", fmt.Errorf("failed to read object content: %v", err)
 	}
