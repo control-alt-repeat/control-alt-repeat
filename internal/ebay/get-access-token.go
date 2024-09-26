@@ -60,9 +60,9 @@ func getAccessToken() (string, error) {
 	expiryTime := access_token_last_modified.Add(time.Duration(access_token_expiry_seconds * int(time.Second)))
 
 	fmt.Printf("Access token expires at: %s\n", expiryTime)
-	fmt.Printf("Access now is: %s\n", time.Now())
+	fmt.Printf("Time now is: %s\n", time.Now())
 
-	if expiryTime.After(time.Now()) {
+	if time.Now().UTC().After(expiryTime) {
 		fmt.Printf("Access token expired, getting a new one\n")
 
 		return refreshOAuthToken()
