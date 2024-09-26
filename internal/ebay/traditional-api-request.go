@@ -2,6 +2,7 @@ package ebay
 
 import (
 	"encoding/xml"
+	"fmt"
 	"net/http"
 	"strings"
 )
@@ -23,6 +24,8 @@ func (s *RequesterCredentials) SetEBayAuthToken() error {
 	}
 
 	s.EBayAuthToken = ebayAccessToken
+
+	fmt.Println("Access token added to 'EBayAuthToken'")
 
 	return nil
 }

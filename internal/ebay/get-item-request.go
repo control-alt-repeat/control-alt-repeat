@@ -8,6 +8,7 @@ import (
 )
 
 func GetItem(itemId string) error {
+	fmt.Printf("Getting eBay listing with ID: %s", itemId)
 	// ebayAccessToken, err := getAccessToken()
 
 	// if err != nil {
@@ -23,11 +24,15 @@ func GetItem(itemId string) error {
 		ItemID: itemId,
 	}
 
+	fmt.Println("Generating a new eBay 'Traditional API' request instance")
+
 	request, err := newTraditionalAPIRequest("GetItem", payload, payload.RequesterCredentials)
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
+
+	fmt.Println("Adding eBay access token to the reqest payload")
 
 	err = payload.RequesterCredentials.SetEBayAuthToken()
 	if err != nil {
@@ -53,11 +58,7 @@ func GetItem(itemId string) error {
 
 	client := &http.Client{}
 
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-
+	fmt.Println("Sending HTTP request to eBay")
 	res, err := client.Do(&request.HttpRequest)
 	if err != nil {
 		fmt.Println(err)
@@ -65,11 +66,15 @@ func GetItem(itemId string) error {
 	}
 	defer res.Body.Close()
 
+	fmt.Println("Reading response from HTTP request")
+
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
+
+	fmt.Println("Unmarshal response")
 
 	var getItemResponse GetItemResponse
 	err = xml.Unmarshal(body, &getItemResponse)
