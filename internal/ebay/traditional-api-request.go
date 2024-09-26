@@ -3,13 +3,16 @@ package ebay
 import (
 	"encoding/xml"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 )
 
 type TraditionalAPIRequest struct {
-	HttpRequest http.Request
-	Payload     TraditionalAPIRequestPayload
+	CallName             string
+	HttpRequest          http.Request
+	AuthToken            string
+	requesterCredentials RequesterCredentials
 }
 
 type TraditionalAPIRequestPayload interface {
@@ -30,18 +33,7 @@ func (s *RequesterCredentials) SetEBayAuthToken() error {
 	return nil
 }
 
-type RequesterCredentials struct {
-	EBayAuthToken string `xml:"eBayAuthToken"`
-}
-
-func newTraditionalAPIRequest(callName string, payload interface{}, requesterCredentials RequesterCredentials) (*TraditionalAPIRequest, error) {
-	err := requesterCredentials.SetEBayAuthToken()
-	if err != nil {
-		return nil, err
-	}
-
-	traditionalAPIRequest := &TraditionalAPIRequest{}
-
+func (r *TraditionalAPIRequest) Post(payload interface{}) ([]byte, error) {
 	xmlData, err := xml.MarshalIndent(payload, "", "  ")
 	if err != nil {
 		return nil, err
@@ -53,17 +45,47 @@ func newTraditionalAPIRequest(callName string, payload interface{}, requesterCre
 
 	reader := strings.NewReader(xmlString)
 
-	req, err := http.NewRequest("POST", "https://api.ebay.com/ws/api.dll", reader)
+	request, err := http.NewRequest("POST", "https://api.ebay.com/ws/api.dll", reader)
 
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Add("X-EBAY-API-COMPATIBILITY-LEVEL", "1193")
-	req.Header.Add("X-EBAY-API-SITEID", "3")
-	req.Header.Add("X-EBAY-API-CALL-NAME", callName)
+	request.Header.Add("X-EBAY-API-COMPATIBILITY-LEVEL", "1193")
+	request.Header.Add("X-EBAY-API-SITEID", "3")
+	request.Header.Add("X-EBAY-API-CALL-NAME", r.CallName)
 
-	traditionalAPIRequest.HttpRequest = *req
+	client := &http.Client{}
 
-	return traditionalAPIRequest, nil
+	fmt.Println("Sending HTTP request to eBay")
+	res, err := client.Do(request)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	fmt.Println("Reading response from HTTP request")
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	return body, nil
+}
+
+type RequesterCredentials struct {
+	EBayAuthToken string `xml:"eBayAuthToken"`
+}
+
+func newTraditionalAPIRequest(callName string) (*TraditionalAPIRequest, *RequesterCredentials, error) {
+	accessToken, err := getAccessToken()
+
+	return &TraditionalAPIRequest{
+			CallName: callName,
+		}, &RequesterCredentials{
+			EBayAuthToken: accessToken,
+		}, err
 }

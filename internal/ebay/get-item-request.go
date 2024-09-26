@@ -3,86 +3,39 @@ package ebay
 import (
 	"encoding/xml"
 	"fmt"
-	"io"
-	"net/http"
 )
 
 func GetItem(itemId string) error {
-	fmt.Printf("Getting eBay listing with ID: %s", itemId)
-	// ebayAccessToken, err := getAccessToken()
-
-	// if err != nil {
-	// 	fmt.Println("Error getting eBay access token:", err)
-	// 	return err
-	// }
-
-	payload := GetItemRequest{
-		Xmlns: "urn:ebay:apis:eBLBaseComponents",
-		// RequesterCredentials: RequesterCredentials{
-		// 	EBayAuthToken: ebayAccessToken,
-		// },
-		ItemID: itemId,
-	}
+	fmt.Printf("Getting eBay listing with ID: %s\n", itemId)
 
 	fmt.Println("Generating a new eBay 'Traditional API' request instance")
 
-	request, err := newTraditionalAPIRequest("GetItem", payload, payload.RequesterCredentials)
+	request, requesterCredentials, err := newTraditionalAPIRequest("GetItem")
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
 
-	fmt.Println("Adding eBay access token to the reqest payload")
+	fmt.Println("Adding eBay access token to the request payload")
 
-	err = payload.RequesterCredentials.SetEBayAuthToken()
-	if err != nil {
-		fmt.Println(err)
-		return err
+	payload := GetItemRequest{
+		Xmlns:                "urn:ebay:apis:eBLBaseComponents",
+		RequesterCredentials: *requesterCredentials,
+		ItemID:               itemId,
 	}
 
-	// xmlData, err := xml.MarshalIndent(payload, "", "  ")
-	// if err != nil {
-	// 	fmt.Println("Error marshalling XML:", err)
-	// 	return err
-	// }
-
-	// xmlData = append([]byte(xml.Header), xmlData...)
-
-	// xmlString := string(xmlData)
-	// fmt.Println("Marshalled XML:")
-	// fmt.Println(xmlString)
-
-	// reader := strings.NewReader(xmlString)
-
-	// req, err := http.NewRequest("POST", "https://api.ebay.com/ws/api.dll", reader)
-
-	client := &http.Client{}
-
-	fmt.Println("Sending HTTP request to eBay")
-	res, err := client.Do(&request.HttpRequest)
+	resp, err := request.Post(payload)
 	if err != nil {
 		fmt.Println(err)
-		return err
-	}
-	defer res.Body.Close()
-
-	fmt.Println("Reading response from HTTP request")
-
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println(err)
-		return err
 	}
 
 	fmt.Println("Unmarshal response")
 
 	var getItemResponse GetItemResponse
-	err = xml.Unmarshal(body, &getItemResponse)
+	err = xml.Unmarshal(resp, &getItemResponse)
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	fmt.Print(string(body))
 
 	fmt.Println(getItemResponse.Ack)
 	fmt.Println(getItemResponse.Errors.LongMessage)
