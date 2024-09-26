@@ -84,6 +84,8 @@ func GetItem(itemId string) error {
 
 	fmt.Print(string(body))
 
+	fmt.Println(getItemResponse.Ack)
+	fmt.Println(getItemResponse.Errors.LongMessage)
 	fmt.Println(getItemResponse.Item.SKU)
 
 	return nil
@@ -106,7 +108,15 @@ type GetItemResponse struct {
 	Version               string   `xml:"Version"`
 	Build                 string   `xml:"Build"`
 	HardExpirationWarning string   `xml:"HardExpirationWarning"`
-	Item                  struct {
+	Errors                struct {
+		Text                string `xml:",chardata"`
+		ShortMessage        string `xml:"ShortMessage"`
+		LongMessage         string `xml:"LongMessage"`
+		ErrorCode           string `xml:"ErrorCode"`
+		SeverityCode        string `xml:"SeverityCode"`
+		ErrorClassification string `xml:"ErrorClassification"`
+	} `xml:"Errors"`
+	Item struct {
 		Text            string `xml:",chardata"`
 		AutoPay         string `xml:"AutoPay"`
 		BuyerProtection string `xml:"BuyerProtection"`

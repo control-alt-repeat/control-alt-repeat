@@ -53,21 +53,22 @@ func getAccessToken() (string, error) {
 		}
 	}
 
-	fmt.Printf("Access token is: '%s...'", access_token[0:30])
-	fmt.Printf("Access token last modified: %s", access_token_last_modified)
-	fmt.Printf("Access token expiry seconds: %d", access_token_expiry_seconds)
+	fmt.Printf("Access token is: '%s...'\n", access_token[0:30])
+	fmt.Printf("Access token last modified: %s\n", access_token_last_modified)
+	fmt.Printf("Access token expiry seconds: %d\n", access_token_expiry_seconds)
 
 	expiryTime := access_token_last_modified.Add(time.Duration(access_token_expiry_seconds * int(time.Second)))
 
-	fmt.Printf("Access token expires at: %s", expiryTime)
+	fmt.Printf("Access token expires at: %s\n", expiryTime)
+	fmt.Printf("Access now is: %s\n", time.Now())
 
-	if time.Now().After(expiryTime) {
-		fmt.Printf("Access token expired, getting a new one")
+	if expiryTime.After(time.Now()) {
+		fmt.Printf("Access token expired, getting a new one\n")
 
 		return refreshOAuthToken()
 	}
 
-	fmt.Printf("Access token is valid, returning it for use.")
+	fmt.Printf("Access token is valid, returning it for use.\n")
 
 	return access_token, nil
 }
