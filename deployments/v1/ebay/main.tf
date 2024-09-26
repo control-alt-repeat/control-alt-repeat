@@ -8,6 +8,5 @@ module "lambda_import_listing" {
     read_listings_policy_arn = aws_iam_policy.allow_read_listings.arn
     write_listings_policy_arn = aws_iam_policy.allow_write_listings.arn
 
-    read_tokens_policy_arn = module.auth.allow_read_tokens_policy_arn
-    write_tokens_policy_arn = module.auth.allow_write_tokens_policy_arn
+    ebay_auth_ssm_access_policy_arn = aws_iam_policy.ebay_auth_ssm_access_policy.arn
 }
