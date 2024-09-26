@@ -2,7 +2,6 @@ package ebay
 
 import (
 	"encoding/xml"
-	"fmt"
 	"net/http"
 	"strings"
 )
@@ -31,8 +30,6 @@ func newTraditionalAPIRequest(callName string, payload interface{}) (*Traditiona
 	xmlData = append([]byte(xml.Header), xmlData...)
 
 	xmlString := string(xmlData)
-	fmt.Println("Marshalled XML:")
-	fmt.Println(xmlString)
 
 	reader := strings.NewReader(xmlString)
 
