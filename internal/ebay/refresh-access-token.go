@@ -80,6 +80,8 @@ func refreshOAuthToken() (string, error) {
 		return "", fmt.Errorf("failed to parse token response: %v", err)
 	}
 
+	fmt.Print(body)
+
 	aws.CreateOrUpdateSSMParameter(map[string]string{
 		"/control_alt_repeat/ebay/live/access_token": tokenResp.AccessToken,
 		"/control_alt_repeat/ebay/live/expires_in":   string(tokenResp.ExpiresIn),

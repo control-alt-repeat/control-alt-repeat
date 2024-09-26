@@ -12,7 +12,7 @@ import (
 // createOrUpdateSSMParameter creates or updates an SSM parameter with a secure string value
 func CreateOrUpdateSSMParameter(parameters map[string]string) error {
 	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String("us-east-1"), // Specify your AWS region
+		Region: aws.String("eu-west-2"),
 	})
 	if err != nil {
 		log.Fatalf("failed to create session: %v", err)
