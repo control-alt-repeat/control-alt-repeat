@@ -31,7 +31,12 @@ type RequesterCredentials struct {
 	EBayAuthToken string `xml:"eBayAuthToken"`
 }
 
-func newTraditionalAPIRequest(callName string, payload interface{}) (*TraditionalAPIRequest, error) {
+func newTraditionalAPIRequest(callName string, requesterCredentials RequesterCredentials) (*TraditionalAPIRequest, error) {
+	err := requesterCredentials.SetEBayAuthToken()
+	if err != nil {
+		return nil, err
+	}
+
 	traditionalAPIRequest := &TraditionalAPIRequest{}
 
 	xmlData, err := xml.MarshalIndent(payload, "", "  ")

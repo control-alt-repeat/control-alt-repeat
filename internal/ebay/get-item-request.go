@@ -23,7 +23,7 @@ func GetItem(itemId string) error {
 		ItemID: itemId,
 	}
 
-	request, err := newTraditionalAPIRequest("GetItem", payload)
+	request, err := newTraditionalAPIRequest("GetItem", payload.RequesterCredentials)
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -76,6 +76,8 @@ func GetItem(itemId string) error {
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	fmt.Println(getItemResponse.Item.SKU)
 
 	return nil
 }
