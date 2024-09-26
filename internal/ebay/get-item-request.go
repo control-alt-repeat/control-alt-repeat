@@ -5,54 +5,50 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 )
 
 func GetItem(itemId string) error {
-	ebayAccessToken, err := getAccessToken()
+	// ebayAccessToken, err := getAccessToken()
 
-	if err != nil {
-		fmt.Println("Error getting eBay access token:", err)
-		return err
-	}
-
-	url := "https://api.ebay.com/ws/api.dll"
-	method := "POST"
+	// if err != nil {
+	// 	fmt.Println("Error getting eBay access token:", err)
+	// 	return err
+	// }
 
 	payload := GetItemRequest{
 		Xmlns: "urn:ebay:apis:eBLBaseComponents",
-		RequesterCredentials: RequesterCredentials{
-			EBayAuthToken: ebayAccessToken,
-		},
+		// RequesterCredentials: RequesterCredentials{
+		// 	EBayAuthToken: ebayAccessToken,
+		// },
 		ItemID: itemId,
 	}
 
-	xmlData, err := xml.MarshalIndent(payload, "", "  ")
-	if err != nil {
-		fmt.Println("Error marshalling XML:", err)
-		return err
-	}
+	request, err := newTraditionalAPIRequest("GetItem", payload)
 
-	xmlData = append([]byte(xml.Header), xmlData...)
+	// xmlData, err := xml.MarshalIndent(payload, "", "  ")
+	// if err != nil {
+	// 	fmt.Println("Error marshalling XML:", err)
+	// 	return err
+	// }
 
-	xmlString := string(xmlData)
-	fmt.Println("Marshalled XML:")
-	fmt.Println(xmlString)
+	// xmlData = append([]byte(xml.Header), xmlData...)
 
-	reader := strings.NewReader(xmlString)
+	// xmlString := string(xmlData)
+	// fmt.Println("Marshalled XML:")
+	// fmt.Println(xmlString)
+
+	// reader := strings.NewReader(xmlString)
+
+	// req, err := http.NewRequest("POST", "https://api.ebay.com/ws/api.dll", reader)
 
 	client := &http.Client{}
-	req, err := http.NewRequest(method, url, reader)
 
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
-	req.Header.Add("X-EBAY-API-COMPATIBILITY-LEVEL", "1193")
-	req.Header.Add("X-EBAY-API-SITEID", "3")
-	req.Header.Add("X-EBAY-API-CALL-NAME", "GetItem")
 
-	res, err := client.Do(req)
+	res, err := client.Do(&request.HttpRequest)
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -70,8 +66,6 @@ func GetItem(itemId string) error {
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	fmt.Println(getItemResponse.Item.SKU)
 
 	return nil
 }
