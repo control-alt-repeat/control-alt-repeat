@@ -86,6 +86,7 @@ func refreshOAuthToken() (string, error) {
 	aws.CreateOrUpdateSSMParameter(map[string]string{
 		"/control_alt_repeat/ebay/live/access_token": tokenResp.AccessToken,
 		"/control_alt_repeat/ebay/live/expires_in":   strconv.Itoa(tokenResp.ExpiresIn),
+		"/control_alt_repeat/ebay/live/timestamp":   strconv.Itoa(tokenResp.ExpiresIn),
 	})
 
 	// Return the new access token
