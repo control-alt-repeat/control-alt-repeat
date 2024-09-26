@@ -7,20 +7,32 @@ import (
 )
 
 type TraditionalAPIRequest struct {
-	AccessToken string
 	HttpRequest http.Request
+	Payload     TraditionalAPIRequestPayload
+}
+
+type TraditionalAPIRequestPayload interface {
+	SetEbayAccessToken()
+}
+
+func (s *RequesterCredentials) SetEBayAuthToken() error {
+	ebayAccessToken, err := getAccessToken()
+
+	if err != nil {
+		return err
+	}
+
+	s.EBayAuthToken = ebayAccessToken
+
+	return nil
+}
+
+type RequesterCredentials struct {
+	EBayAuthToken string `xml:"eBayAuthToken"`
 }
 
 func newTraditionalAPIRequest(callName string, payload interface{}) (*TraditionalAPIRequest, error) {
 	traditionalAPIRequest := &TraditionalAPIRequest{}
-
-	ebayAccessToken, err := getAccessToken()
-
-	if err != nil {
-		return nil, err
-	}
-
-	traditionalAPIRequest.AccessToken = ebayAccessToken
 
 	xmlData, err := xml.MarshalIndent(payload, "", "  ")
 	if err != nil {

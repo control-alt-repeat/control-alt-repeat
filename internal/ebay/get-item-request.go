@@ -24,6 +24,16 @@ func GetItem(itemId string) error {
 	}
 
 	request, err := newTraditionalAPIRequest("GetItem", payload)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	err = payload.RequesterCredentials.SetEBayAuthToken()
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
 
 	// xmlData, err := xml.MarshalIndent(payload, "", "  ")
 	// if err != nil {
@@ -76,10 +86,6 @@ type GetItemRequest struct {
 	Xmlns                string               `xml:"xmlns,attr"`
 	RequesterCredentials RequesterCredentials `xml:"RequesterCredentials"`
 	ItemID               string               `xml:"ItemID"`
-}
-
-type RequesterCredentials struct {
-	EBayAuthToken string `xml:"eBayAuthToken"`
 }
 
 type GetItemResponse struct {
