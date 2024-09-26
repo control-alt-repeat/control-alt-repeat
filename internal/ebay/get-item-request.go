@@ -82,6 +82,8 @@ func GetItem(itemId string) error {
 		fmt.Println(err)
 	}
 
+	fmt.Print(string(body))
+
 	fmt.Println(getItemResponse.Item.SKU)
 
 	return nil
