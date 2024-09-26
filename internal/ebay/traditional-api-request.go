@@ -9,10 +9,7 @@ import (
 )
 
 type TraditionalAPIRequest struct {
-	CallName             string
-	HttpRequest          http.Request
-	AuthToken            string
-	requesterCredentials RequesterCredentials
+	CallName string
 }
 
 type TraditionalAPIRequestPayload interface {
@@ -81,11 +78,12 @@ type RequesterCredentials struct {
 }
 
 func newTraditionalAPIRequest(callName string) (*TraditionalAPIRequest, *RequesterCredentials, error) {
-	accessToken, err := getAccessToken()
+	traditionalAPIRequest := &TraditionalAPIRequest{
+		CallName: callName,
+	}
+	requesterCredentials := &RequesterCredentials{}
 
-	return &TraditionalAPIRequest{
-			CallName: callName,
-		}, &RequesterCredentials{
-			EBayAuthToken: accessToken,
-		}, err
+	err := requesterCredentials.SetEBayAuthToken()
+
+	return traditionalAPIRequest, requesterCredentials, err
 }
