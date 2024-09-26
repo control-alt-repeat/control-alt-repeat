@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
 	ssmconfig "github.com/ianlopshire/go-ssm-config"
@@ -84,7 +85,7 @@ func refreshOAuthToken() (string, error) {
 
 	aws.CreateOrUpdateSSMParameter(map[string]string{
 		"/control_alt_repeat/ebay/live/access_token": tokenResp.AccessToken,
-		"/control_alt_repeat/ebay/live/expires_in":   string(tokenResp.ExpiresIn),
+		"/control_alt_repeat/ebay/live/expires_in":   strconv.Itoa(tokenResp.ExpiresIn),
 	})
 
 	// Return the new access token
