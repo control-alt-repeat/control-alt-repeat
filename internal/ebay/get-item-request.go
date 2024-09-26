@@ -65,7 +65,13 @@ func GetItem(itemId string) error {
 		return err
 	}
 
-	fmt.Println(string(body))
+	var getItemResponse GetItemResponse
+	err = xml.Unmarshal(body, &getItemResponse)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(getItemResponse.Item.SKU)
 
 	return nil
 }
