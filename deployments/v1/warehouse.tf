@@ -51,13 +51,13 @@ data "aws_iam_policy_document" "allow_warehouse_write" {
 }
 
 resource "aws_iam_policy" "allow_read_warehouse" {
-  name        = "AllowReadEbayListingPolicy"
+  name        = "AllowReadWarehouseItemsPolicy"
   description = "Policy for lambda reading warehouse"
   policy      = data.aws_iam_policy_document.allow_warehouse_read.json
 }
 
 resource "aws_iam_policy" "allow_write_warehouse" {
-  name        = "AllowWriteEbayListingPolicy"
+  name        = "AllowWriteWarehouseItemsPolicy"
   description = "Policy for lambda writing warehouse"
   policy      = data.aws_iam_policy_document.allow_warehouse_write.json
 }

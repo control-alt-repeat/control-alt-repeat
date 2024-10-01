@@ -1,7 +1,6 @@
 package ebay
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
@@ -17,7 +16,7 @@ type EbayAccessToken struct {
 
 func getAccessToken() (string, error) {
 	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String("eu-west-2"), // Specify your region
+		Region: aws.String("eu-west-2"),
 	})
 	if err != nil {
 		return "", err
@@ -53,22 +52,11 @@ func getAccessToken() (string, error) {
 		}
 	}
 
-	fmt.Printf("Access token is: '%s...'\n", access_token[0:30])
-	fmt.Printf("Access token last modified: %s\n", access_token_last_modified)
-	fmt.Printf("Access token expiry seconds: %d\n", access_token_expiry_seconds)
-
 	expiryTime := access_token_last_modified.Add(time.Duration(access_token_expiry_seconds * int(time.Second)))
 
-	fmt.Printf("Access token expires at: %s\n", expiryTime)
-	fmt.Printf("Time now is: %s\n", time.Now())
-
 	if time.Now().UTC().After(expiryTime) {
-		fmt.Printf("Access token expired, getting a new one\n")
-
 		return refreshOAuthToken()
 	}
-
-	fmt.Printf("Access token is valid, returning it for use.\n")
 
 	return access_token, nil
 }
