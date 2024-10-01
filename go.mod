@@ -29,4 +29,5 @@ require (
 	github.com/aws/smithy-go v1.21.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/pkg/errors v0.8.1 // indirect
+	github.com/stretchr/testify v1.8.2 // indirect
 )
