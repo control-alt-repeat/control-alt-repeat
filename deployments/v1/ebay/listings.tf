@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "listings" {
-  bucket = "control-alt-repeat-v1-listings"
+  bucket = "control-alt-repeat-ebay-listings"
 }
 
 data "aws_iam_policy_document" "allow_listings_read" {
