@@ -78,6 +78,8 @@ type RequesterCredentials struct {
 }
 
 func newTraditionalAPIRequest(callName string) (*TraditionalAPIRequest, *RequesterCredentials, error) {
+	fmt.Println("Generating a new eBay 'Traditional API' request instance")
+
 	traditionalAPIRequest := &TraditionalAPIRequest{
 		CallName: callName,
 	}

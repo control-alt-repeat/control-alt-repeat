@@ -1,5 +1,6 @@
 package ebay
 
 func ImportListing() error {
-	return GetItem("387372844761")
+	_, err := GetItem("387372844761")
+	return err
 }
