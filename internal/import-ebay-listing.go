@@ -95,6 +95,8 @@ func ImportEbayListing(ebayListingID string) error {
 		return err
 	}
 
+	fmt.Printf("Successfully imported eBay listing %s with ID %s\n", ebayListingID, warehouseItem.ControlAltRepeatID)
+
 	return err
 }
 

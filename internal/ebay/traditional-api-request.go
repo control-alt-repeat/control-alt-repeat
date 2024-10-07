@@ -25,8 +25,6 @@ func (s *RequesterCredentials) SetEBayAuthToken() error {
 
 	s.EBayAuthToken = ebayAccessToken
 
-	fmt.Println("Access token added to 'EBayAuthToken'")
-
 	return nil
 }
 
@@ -54,15 +52,12 @@ func (r *TraditionalAPIRequest) Post(payload interface{}) ([]byte, error) {
 
 	client := &http.Client{}
 
-	fmt.Println("Sending HTTP request to eBay")
 	res, err := client.Do(request)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
 	defer res.Body.Close()
-
-	fmt.Println("Reading response from HTTP request")
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
@@ -78,8 +73,6 @@ type RequesterCredentials struct {
 }
 
 func newTraditionalAPIRequest(callName string) (*TraditionalAPIRequest, *RequesterCredentials, error) {
-	fmt.Println("Generating a new eBay 'Traditional API' request instance")
-
 	traditionalAPIRequest := &TraditionalAPIRequest{
 		CallName: callName,
 	}

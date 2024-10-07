@@ -7,15 +7,13 @@ import (
 )
 
 func ReviseSKU(ebayListingID string, sku string) error {
-	fmt.Printf("Getting eBay listing with ID: %s\n", ebayListingID)
+	fmt.Printf("Updating SKU to '%s' on eBay listing '%s'\n", sku, ebayListingID)
 
 	request, requesterCredentials, err := newTraditionalAPIRequest("ReviseItem")
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
-
-	fmt.Println("Adding eBay access token to the request payload")
 
 	payload := ReviseItemRequest{
 		Xmlns:                "urn:ebay:apis:eBLBaseComponents",
@@ -42,7 +40,7 @@ func ReviseSKU(ebayListingID string, sku string) error {
 	}
 
 	if reviseItemResponse.Ack == "Warning" {
-		fmt.Println(reviseItemResponse.Errors.LongMessage)
+		fmt.Printf("eBay API Warning: %s\n", reviseItemResponse.Errors.LongMessage)
 	}
 
 	return err

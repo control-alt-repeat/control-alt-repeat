@@ -15,8 +15,6 @@ func GetItem(ebayListingID string) (*EbayItem, error) {
 		return &EbayItem{}, err
 	}
 
-	fmt.Println("Adding eBay access token to the request payload")
-
 	payload := GetItemRequest{
 		Xmlns:                "urn:ebay:apis:eBLBaseComponents",
 		RequesterCredentials: *requesterCredentials,

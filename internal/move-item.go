@@ -16,7 +16,7 @@ func MoveItem(itemID string, newShelf string) error {
 		return err
 	}
 
-	fmt.Printf("Loaded from S3 warehouse item with ID '%s'\n", warehouseItem.ControlAltRepeatID)
+	fmt.Printf("Loaded item '%s' from warehouse\n", warehouseItem.ControlAltRepeatID)
 
 	warehouseItem.Shelf = newShelf
 
