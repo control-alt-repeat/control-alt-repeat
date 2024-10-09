@@ -50,7 +50,7 @@ data "aws_iam_policy_document" "allow_label_print_buffer_write" {
   }
 }
 
-data "aws_iam_policy_document" "allow_label_print_buffer_delete_object" {
+data "aws_iam_policy_document" "allow_label_print_buffer_delete" {
   statement {
     effect = "Allow"
     actions = [
