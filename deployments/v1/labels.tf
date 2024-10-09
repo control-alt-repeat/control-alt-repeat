@@ -64,15 +64,21 @@ data "aws_iam_policy_document" "allow_label_print_buffer_delete_object" {
 }
 
 resource "aws_iam_policy" "allow_read_label_print_buffer" {
-  name        = "AllowReadlabel_print_bufferItemsPolicy"
+  name        = "AllowReadLabelPrintBufferItemsPolicy"
   description = "Policy for lambda reading label_print_buffer"
   policy      = data.aws_iam_policy_document.allow_label_print_buffer_read.json
 }
 
 resource "aws_iam_policy" "allow_write_label_print_buffer" {
-  name        = "AllowWritelabel_print_bufferItemsPolicy"
+  name        = "AllowWriteLabelPrintBufferItemsPolicy"
   description = "Policy for lambda writing label_print_buffer"
   policy      = data.aws_iam_policy_document.allow_label_print_buffer_write.json
+}
+
+resource "aws_iam_policy" "allow_delete_label_print_buffer" {
+  name        = "AllowDeleteLabelPrintBufferItemsPolicy"
+  description = "Policy for lambda writing label_print_buffer"
+  policy      = data.aws_iam_policy_document.allow_label_print_buffer_delete.json
 }
 
 resource "aws_ssm_parameter" "label_printer_host_domain" {
