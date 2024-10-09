@@ -190,5 +190,5 @@ resource "aws_iam_user_policy_attachment" "label_printer_read_print_buffer" {
 
 resource "aws_iam_user_policy_attachment" "label_printer_delete_print_buffer" {
   user       = aws_iam_user.label_printer.name
-  policy_arn = aws_iam_policy.allow_label_print_buffer_delete_object.arn
+  policy_arn = aws_iam_policy.allow_delete_label_print_buffer.arn
 }
