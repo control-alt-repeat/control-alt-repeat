@@ -19,9 +19,9 @@ provider "aws" {
 
   default_tags {
     tags = {
-      github_repository = "control-alt-repeat"
+      github_repository   = "control-alt-repeat"
       github_organisation = "Control-Alt-Repeat"
-      stage_name = "test"
+      stage_name          = "test"
     }
   }
 }

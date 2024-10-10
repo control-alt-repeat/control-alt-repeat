@@ -11,6 +11,7 @@ import (
 
 	aws "github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay"
+	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/labels"
 )
 
 const (
@@ -28,8 +29,9 @@ type WarehouseItem struct {
 }
 
 type EbayListingItem struct {
-	ID    string `json:"id"`
-	Title string `json:"title"`
+	ID          string `json:"id"`
+	Title       string `json:"title"`
+	ViewItemURL string `json:"viewItemURL"`
 }
 
 func ImportEbayListing(ebayListingID string) error {
@@ -37,11 +39,6 @@ func ImportEbayListing(ebayListingID string) error {
 	if err != nil {
 		return err
 	}
-
-	// err = checkListingAlreadyImported(ebayListingID)
-	// if err != nil {
-	// 	return err
-	// }
 
 	fmt.Printf("Importing eBay listing with ID: %s\n", ebayListingID)
 
@@ -71,8 +68,9 @@ func ImportEbayListing(ebayListingID string) error {
 	}
 
 	ebayListingItem := &EbayListingItem{
-		ID:    ebayListing.ItemID,
-		Title: ebayListing.Title,
+		ID:          ebayListing.ItemID,
+		Title:       ebayListing.Title,
+		ViewItemURL: ebayListing.ListingDetails.ViewItemURL,
 	}
 
 	err = aws.SaveJsonObjectS3(
@@ -96,6 +94,16 @@ func ImportEbayListing(ebayListingID string) error {
 	}
 
 	fmt.Printf("Successfully imported eBay listing %s with ID %s\n", ebayListingID, warehouseItem.ControlAltRepeatID)
+
+	label, err := labels.Create62mmItemLabel(warehouseItem.ControlAltRepeatID, ebayListingItem.ViewItemURL)
+	if err != nil {
+		return err
+	}
+
+	err = aws.SaveBytesToS3("control-alt-repeat-label-print-buffer", fmt.Sprintf("62-%s.png", warehouseItem.ControlAltRepeatID), label)
+	if err != nil {
+		return err
+	}
 
 	return err
 }

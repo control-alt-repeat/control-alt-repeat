@@ -116,7 +116,7 @@ data "aws_iam_policy_document" "allow_label_print_host_read" {
 }
 
 data "aws_iam_policy_document" "allow_label_print_host_write" {
-    statement {
+  statement {
     actions = [
       "ssm:GetParameter",
       "ssm:GetParameters",
@@ -131,8 +131,8 @@ data "aws_iam_policy_document" "allow_label_print_host_write" {
   }
 
   statement {
-    actions = [ 
-      "ssm:PutParameter" 
+    actions = [
+      "ssm:PutParameter"
     ]
 
     resources = [

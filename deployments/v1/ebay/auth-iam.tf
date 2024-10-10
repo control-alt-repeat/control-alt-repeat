@@ -14,8 +14,8 @@ data "aws_iam_policy_document" "ebay_auth_ssm_access_policy" {
   }
 
   statement {
-    actions = [ 
-      "ssm:PutParameter" 
+    actions = [
+      "ssm:PutParameter"
     ]
 
     resources = [

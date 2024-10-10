@@ -8,7 +8,11 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.31.0
 	github.com/aws/aws-sdk-go-v2/config v1.27.39
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.63.3
+	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/ianlopshire/go-ssm-config v1.0.2
+	github.com/yeqown/go-qrcode/v2 v2.2.4
+	github.com/yeqown/go-qrcode/writer/standard v1.2.4
+	golang.org/x/image v0.21.0
 )
 
 require (
@@ -27,7 +31,9 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.27.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.31.3 // indirect
 	github.com/aws/smithy-go v1.21.0 // indirect
+	github.com/fogleman/gg v1.3.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	github.com/pkg/errors v0.8.1 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/stretchr/testify v1.8.2 // indirect
+	github.com/yeqown/reedsolomon v1.0.0 // indirect
 )
