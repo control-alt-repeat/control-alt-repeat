@@ -16,7 +16,7 @@ func GetSecrets(region string, keynames []*string) (*map[string]interface{}, err
 		return nil, err
 	}
 
-	ssmsvc := ssm.New(sess, aws.NewConfig().WithRegion("us-east-1"))
+	ssmsvc := ssm.New(sess, aws.NewConfig().WithRegion(region))
 
 	withDecryption := true
 	param, err := ssmsvc.GetParameters(&ssm.GetParametersInput{
@@ -44,15 +44,12 @@ func GetParameterValue(region string, keyname string) (string, error) {
 		return "", err
 	}
 
-	ssmsvc := ssm.New(sess, aws.NewConfig().WithRegion("us-east-1"))
+	ssmsvc := ssm.New(sess, aws.NewConfig().WithRegion(region))
 
 	param, err := ssmsvc.GetParameter(&ssm.GetParameterInput{
 		Name:           aws.String(keyname),
 		WithDecryption: aws.Bool(false),
 	})
-	if err != nil {
-		return "", err
-	}
 
-	return param.String(), nil
+	return *param.Parameter.Value, err
 }

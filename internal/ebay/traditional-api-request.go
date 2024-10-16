@@ -38,8 +38,11 @@ func (r *TraditionalAPIRequest) Post(payload interface{}) ([]byte, error) {
 
 	xmlString := string(xmlData)
 
+	fmt.Println(xmlString)
+
 	reader := strings.NewReader(xmlString)
 
+	fmt.Println("Sending request to https://api.ebay.com/ws/api.dll")
 	request, err := http.NewRequest("POST", "https://api.ebay.com/ws/api.dll", reader)
 
 	if err != nil {
