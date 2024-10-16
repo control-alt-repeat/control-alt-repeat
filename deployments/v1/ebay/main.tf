@@ -8,3 +8,7 @@ module "lambda_import_listing" {
 
   write_label_print_buffer_policy_arn = var.write_label_print_buffer_policy_arn
 }
+
+module "lambda_notification_endpoint" {
+  source = "./lambda/notification-endpoint"
+}
