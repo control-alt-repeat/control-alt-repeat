@@ -1,9 +1,7 @@
 package ebay
 
 import (
-	"encoding/xml"
-	"fmt"
-	"log"
+	"time"
 
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
 )
@@ -16,23 +14,15 @@ type Notification struct {
 const notificationBucket = "control-alt-repeat-live-ebay-incoming-notifications"
 
 func HandleNotification(notificationXml string) error {
-	notificationBytes := []byte(notificationXml)
+	// Get the current time in UTC
+	currentTime := time.Now().UTC()
 
-	var notification Notification
-
-	fmt.Println(notificationXml)
-
-	if err := xml.Unmarshal(notificationBytes, &notification); err != nil {
-		log.Fatalf("Error unmarshalling XML: %v", err)
-	}
-
-	key := fmt.Sprintf("%s %s", notification.Timestamp, notification.NotificationEventName)
-
-	fmt.Printf("Saving %s to %s\r", key, notificationBucket)
+	// Format the time as a human-readable string
+	timestamp := currentTime.Format("2006-01-02T15:04:05Z") // ISO 8601 format
 
 	return aws.SaveBytesToS3(
 		notificationBucket,
-		key,
-		notificationBytes,
+		timestamp,
+		[]byte(notificationXml),
 	)
 }

@@ -58,6 +58,7 @@ type GetItemResponse struct {
 	Version               string   `xml:"Version"`
 	Build                 string   `xml:"Build"`
 	HardExpirationWarning string   `xml:"HardExpirationWarning"`
+	NotificationEventName string   `xml:"NotificationEventName"`
 	Errors                struct {
 		Text                string `xml:",chardata"`
 		ShortMessage        string `xml:"ShortMessage"`
