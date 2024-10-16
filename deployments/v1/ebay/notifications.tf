@@ -8,7 +8,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "ebay_incoming_notifications_li
     status = "Enabled"
     id     = "expire_all_files"
     expiration {
-        days = 7
+      days = 7
     }
   }
 }
