@@ -62,13 +62,13 @@ data "aws_iam_policy_document" "allow_ebay_incoming_notifications_write" {
 }
 
 resource "aws_iam_policy" "allow_read_ebay_incoming_notifications" {
-  name        = "AllowReadLabelPrintBufferItemsPolicy"
+  name        = "AllowReadEbayIncomingNotificationsPolicy"
   description = "Policy for lambda reading ebay_incoming_notifications"
   policy      = data.aws_iam_policy_document.allow_ebay_incoming_notifications_read.json
 }
 
 resource "aws_iam_policy" "allow_write_ebay_incoming_notifications" {
-  name        = "AllowWriteLabelPrintBufferItemsPolicy"
+  name        = "AllowWriteEbayIncomingNotificationsPolicy"
   description = "Policy for lambda writing ebay_incoming_notifications"
   policy      = data.aws_iam_policy_document.allow_ebay_incoming_notifications_write.json
 }
