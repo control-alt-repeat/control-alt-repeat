@@ -20,6 +20,8 @@ func HandleNotification(notificationXml string) error {
 
 	var notification Notification
 
+	fmt.Println(notificationXml)
+
 	if err := xml.Unmarshal(notificationBytes, &notification); err != nil {
 		log.Fatalf("Error unmarshalling XML: %v", err)
 	}
