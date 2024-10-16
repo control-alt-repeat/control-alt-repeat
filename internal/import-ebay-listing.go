@@ -104,7 +104,7 @@ func ImportEbayListing(ebayListingID string) error {
 		return err
 	}
 
-	err = aws.SaveBytesToS3("control-alt-repeat-label-print-buffer", fmt.Sprintf("102x152-%s.png", warehouseItem.ControlAltRepeatID), label)
+	err = aws.SaveBytesToS3("control-alt-repeat-label-print-buffer", fmt.Sprintf("102x152-%s.png", warehouseItem.ControlAltRepeatID), label, "image/png")
 	if err != nil {
 		return err
 	}

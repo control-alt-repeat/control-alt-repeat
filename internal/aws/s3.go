@@ -15,7 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 )
 
-func SaveBytesToS3(bucket, key string, data []byte) error {
+func SaveBytesToS3(bucket, key string, data []byte, contentType string) error {
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("eu-west-2"))
 	if err != nil {
 		return fmt.Errorf("unable to load SDK config: %w", err)
@@ -26,10 +26,9 @@ func SaveBytesToS3(bucket, key string, data []byte) error {
 
 	// Create the S3 PutObjectInput
 	_, err = svc.PutObject(context.TODO(), &s3.PutObjectInput{
-		Bucket:      aws.String(bucket),
-		Key:         aws.String(key),
-		Body:        bytes.NewReader(data),
-		ContentType: aws.String("image/png"),
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+		Body:   bytes.NewReader(data),
 	})
 	if err != nil {
 		return fmt.Errorf("failed to upload file to S3: %w", err)

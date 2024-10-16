@@ -24,5 +24,6 @@ func HandleNotification(notificationXml string) error {
 		notificationBucket,
 		timestamp,
 		[]byte(notificationXml),
+		"application/xml",
 	)
 }
