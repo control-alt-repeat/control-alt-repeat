@@ -95,12 +95,12 @@ func ImportEbayListing(ebayListingID string) error {
 
 	fmt.Printf("Successfully imported eBay listing %s with ID %s\n", ebayListingID, warehouseItem.ControlAltRepeatID)
 
-	label, err := labels.Create62mmItemLabel(warehouseItem.ControlAltRepeatID, ebayListingItem.ViewItemURL)
+	label, err := labels.Create102x152mmItemLabel(warehouseItem.ControlAltRepeatID, ebayListingItem.ViewItemURL)
 	if err != nil {
 		return err
 	}
 
-	err = aws.SaveBytesToS3("control-alt-repeat-label-print-buffer", fmt.Sprintf("62-%s.png", warehouseItem.ControlAltRepeatID), label)
+	err = aws.SaveBytesToS3("control-alt-repeat-label-print-buffer", fmt.Sprintf("102x152-%s.png", warehouseItem.ControlAltRepeatID), label)
 	if err != nil {
 		return err
 	}

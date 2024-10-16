@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	"log"
 	"os"
 
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/labels"
@@ -16,13 +16,14 @@ var (
 func main() {
 	flag.Parse()
 
-	imageBytes, err := labels.Create62mmItemLabel(*text, *qr)
+	// imageBytes, err := labels.Create62mmItemLabel(*text, *qr)
+	imageBytes, err := labels.Create102x152mmItemLabel(*text, *qr)
 	if err != nil {
-		fmt.Errorf("Failed to create 62mm label", err)
+		log.Fatal(err)
 	}
 
 	err = os.WriteFile("out.png", imageBytes, 0644)
 	if err != nil {
-		fmt.Errorf("Failed to write 62mm label to file", err)
+		log.Fatal(err)
 	}
 }
