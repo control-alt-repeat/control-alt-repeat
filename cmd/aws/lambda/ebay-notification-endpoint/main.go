@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay"
@@ -11,6 +12,8 @@ import (
 
 func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	ebay.HandleNotification(req.Body)
+
+	fmt.Println("Responding that everything is OK.")
 
 	// Return the message or default response
 	return events.APIGatewayProxyResponse{
