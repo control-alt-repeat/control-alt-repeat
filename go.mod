@@ -36,4 +36,5 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/stretchr/testify v1.8.2 // indirect
 	github.com/yeqown/reedsolomon v1.0.0 // indirect
+	golang.org/x/text v0.19.0 // indirect
 )

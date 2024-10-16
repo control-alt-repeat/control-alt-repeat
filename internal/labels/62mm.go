@@ -1,12 +1,8 @@
 package labels
 
 import (
-	"bufio"
-	"bytes"
-	"fmt"
 	"image"
 	"image/color"
-	"image/png"
 	"math"
 
 	"github.com/golang/freetype/truetype"
@@ -14,9 +10,6 @@ import (
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/gofont/gomonobold"
 	"golang.org/x/image/math/fixed"
-
-	"github.com/yeqown/go-qrcode/v2"
-	"github.com/yeqown/go-qrcode/writer/standard"
 )
 
 func Create62mmItemLabel(text string, qrValue string) ([]byte, error) {
@@ -101,75 +94,5 @@ func Create62mmItemLabel(text string, qrValue string) ([]byte, error) {
 
 	rotatedImg := rot90(resizedImg)
 
-	return writePNG(rotatedImg)
-}
-
-func rot90(inputImage *image.RGBA) *image.RGBA {
-	bounds := inputImage.Bounds()
-	width, height := bounds.Max.X, bounds.Max.Y
-	bounds.Max.X, bounds.Max.Y = bounds.Max.Y, bounds.Max.X
-
-	outputImage := image.NewRGBA(bounds)
-
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
-			org := inputImage.At(x, y)
-			outputImage.Set(height-y, x, org)
-		}
-	}
-
-	return outputImage
-}
-
-type QrWriter struct {
-}
-
-func newQRCode(destination string) (image.Image, error) {
-	qrc, err := qrcode.New(destination)
-	qrc.Dimension()
-	if err != nil {
-		return nil, err
-	}
-
-	buffer := new(bytes.Buffer)
-
-	bw := bufio.NewWriter(buffer)
-
-	mwc := &MyWriteCloser{bw}
-
-	w := standard.NewWithWriter(mwc,
-		standard.WithQRWidth(20),
-		// standard.WithCircleShape(),
-		// standard.WithBorderWidth(3),
-		// standard.WithHalftone("logo.png"),
-	)
-
-	if err = qrc.Save(w); err != nil {
-		fmt.Printf("could not save image: %v\n", err)
-	}
-
-	image, _, err := image.Decode(buffer)
-
-	return image, err
-}
-
-func writePNG(img *image.RGBA) ([]byte, error) {
-	var buf bytes.Buffer
-	// Create a buffered writer that writes to the bytes.Buffer.
-	b := bufio.NewWriter(&buf)
-
-	// Encode the image to the buffered writer.
-	err := png.Encode(b, img)
-	if err != nil {
-		return nil, err
-	}
-
-	// Flush the buffered writer to ensure all data is written.
-	err = b.Flush()
-	if err != nil {
-		return nil, err
-	}
-
-	// Return the bytes.Buffer contents as a byte slice.
-	return buf.Bytes(), nil
+	return writeRGBAtoPNG(rotatedImg)
 }

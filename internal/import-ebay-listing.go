@@ -95,7 +95,11 @@ func ImportEbayListing(ebayListingID string) error {
 
 	fmt.Printf("Successfully imported eBay listing %s with ID %s\n", ebayListingID, warehouseItem.ControlAltRepeatID)
 
-	label, err := labels.Create102x152mmItemLabel(warehouseItem.ControlAltRepeatID, ebayListingItem.ViewItemURL)
+	label, err := labels.Create102x152mmItemLabel(
+		warehouseItem.ControlAltRepeatID,
+		ebayListing.Title,
+		strings.Join([]string{"https://www.ebay.co.uk/itm", ebayListingID}, "/"),
+	)
 	if err != nil {
 		return err
 	}
@@ -104,6 +108,8 @@ func ImportEbayListing(ebayListingID string) error {
 	if err != nil {
 		return err
 	}
+
+	labels.NotifyLabelPrintServer()
 
 	return err
 }

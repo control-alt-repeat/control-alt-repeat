@@ -11,4 +11,6 @@ module "lambda_import_listing" {
 
 module "lambda_notification_endpoint" {
   source = "./lambda/notification-endpoint"
+
+  allow_write_ebay_incoming_notifications_arn = allow_write_ebay_incoming_notifications.arn
 }
