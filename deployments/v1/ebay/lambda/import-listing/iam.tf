@@ -72,4 +72,7 @@ resource "aws_iam_role_policy_attachment" "function_read_notifications_bucket_po
   policy_arn = var.read_notifications_bucket_policy_arn
 }
 
-
+resource "aws_iam_role_policy_attachment" "function_print_buffer_policy_attachment" {
+  role       = aws_iam_role.lambda.id
+  policy_arn = var.write_label_print_buffer_policy_arn
+}
