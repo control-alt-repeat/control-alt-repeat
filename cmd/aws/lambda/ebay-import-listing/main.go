@@ -28,6 +28,8 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 		bucket := record.S3.Bucket.Name
 		key := record.S3.Object.Key
 
+		fmt.Println("Processing event: ", key)
+
 		// Get the object from S3
 		result, err := svc.GetObject(&s3.GetObjectInput{
 			Bucket: aws.String(bucket),
@@ -50,7 +52,7 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 			return fmt.Errorf("failed to Unmarshal body: %v", err)
 		}
 
-		return internal.ImportEbayListing(notification.Body.GetItemResponse.Item.Item.ItemID)
+		return internal.ImportEbayListing(notification.Body.GetItemResponse.Item.ItemID)
 	}
 
 	return nil

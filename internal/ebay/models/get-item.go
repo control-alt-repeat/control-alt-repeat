@@ -22,20 +22,8 @@ type ItemNotificationEnvelope struct {
 		} `xml:"RequesterCredentials"`
 	} `xml:"Header"`
 	Body struct {
-		Text            string `xml:",chardata"`
-		GetItemResponse struct {
-			Text                  string          `xml:",chardata"`
-			Xmlns                 string          `xml:"xmlns,attr"`
-			Timestamp             string          `xml:"Timestamp"`
-			Ack                   string          `xml:"Ack"`
-			CorrelationID         string          `xml:"CorrelationID"`
-			Version               string          `xml:"Version"`
-			Build                 string          `xml:"Build"`
-			NotificationEventName string          `xml:"NotificationEventName"`
-			RecipientUserID       string          `xml:"RecipientUserID"`
-			EIASToken             string          `xml:"EIASToken"`
-			Item                  GetItemResponse `xml:"Item`
-		} `xml:"GetItemResponse"`
+		Text            string          `xml:",chardata"`
+		GetItemResponse GetItemResponse `xml:"GetItemResponse"`
 	} `xml:"Body"`
 }
 
@@ -52,10 +40,13 @@ type GetItemResponse struct {
 	Xmlns                 string   `xml:"xmlns,attr"`
 	Timestamp             string   `xml:"Timestamp"`
 	Ack                   string   `xml:"Ack"`
+	CorrelationID         string   `xml:"CorrelationID"`
 	Version               string   `xml:"Version"`
 	Build                 string   `xml:"Build"`
 	HardExpirationWarning string   `xml:"HardExpirationWarning"`
 	NotificationEventName string   `xml:"NotificationEventName"`
+	RecipientUserID       string   `xml:"RecipientUserID"`
+	EIASToken             string   `xml:"EIASToken"`
 	Errors                struct {
 		Text                string `xml:",chardata"`
 		ShortMessage        string `xml:"ShortMessage"`
