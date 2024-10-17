@@ -14,7 +14,7 @@ resource "aws_lambda_function_url" "latest" {
   authorization_type = "NONE"
 }
 
-resource "aws_ssm_parameter" "label_printer_host_domain" {
+resource "aws_ssm_parameter" "notification_endpoint_parameter" {
   name  = "/control_alt_repeat/ebay/live/notification/endpoint"
   type  = "String"
   value = aws_lambda_function_url.latest.function_url

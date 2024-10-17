@@ -81,11 +81,15 @@ resource "aws_iam_policy" "allow_delete_label_print_buffer" {
   policy      = data.aws_iam_policy_document.allow_label_print_buffer_delete.json
 }
 
-resource "aws_ssm_parameter" "label_printer_host_domain" {
+data "aws_ssm_parameter" "label_printer_host_domain" {
   name      = "/control_alt_repeat/ebay/live/label_printer/host_domain"
   type      = "String"
   value     = "not_yet_defined"
-  overwrite = false
+  lifecycle {
+    ignore_changes = [
+      "value"
+    ]
+  }
 }
 
 data "aws_iam_policy_document" "allow_label_print_host_read" {
