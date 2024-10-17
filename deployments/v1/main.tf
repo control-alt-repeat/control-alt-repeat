@@ -9,8 +9,8 @@ module "lambda_poc_two" {
 module "ebay" {
   source = "./ebay"
 
-  read_warehouse_policy_arn  = var.allow_read_warehouse.arn
-  write_warehouse_policy_arn = var.allow_write_warehouse.arn
+  read_warehouse_policy_arn  = aws_iam_policy.allow_read_warehouse.arn
+  write_warehouse_policy_arn = aws_iam_policy.allow_write_warehouse.arn
 
   write_label_print_buffer_policy_arn = aws_iam_policy.allow_write_label_print_buffer.arn
 }
