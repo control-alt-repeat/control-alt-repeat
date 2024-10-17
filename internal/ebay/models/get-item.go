@@ -2,6 +2,43 @@ package models
 
 import "encoding/xml"
 
+type ItemNotificationEnvelope struct {
+	XMLName xml.Name `xml:"Envelope"`
+	Text    string   `xml:",chardata"`
+	Soapenv string   `xml:"soapenv,attr"`
+	Xsd     string   `xml:"xsd,attr"`
+	Xsi     string   `xml:"xsi,attr"`
+	Header  struct {
+		Text                 string `xml:",chardata"`
+		RequesterCredentials struct {
+			Text                  string `xml:",chardata"`
+			MustUnderstand        string `xml:"mustUnderstand,attr"`
+			Ns                    string `xml:"ns,attr"`
+			Ebl                   string `xml:"ebl,attr"`
+			NotificationSignature struct {
+				Text string `xml:",chardata"`
+				Ebl  string `xml:"ebl,attr"`
+			} `xml:"NotificationSignature"`
+		} `xml:"RequesterCredentials"`
+	} `xml:"Header"`
+	Body struct {
+		Text            string `xml:",chardata"`
+		GetItemResponse struct {
+			Text                  string          `xml:",chardata"`
+			Xmlns                 string          `xml:"xmlns,attr"`
+			Timestamp             string          `xml:"Timestamp"`
+			Ack                   string          `xml:"Ack"`
+			CorrelationID         string          `xml:"CorrelationID"`
+			Version               string          `xml:"Version"`
+			Build                 string          `xml:"Build"`
+			NotificationEventName string          `xml:"NotificationEventName"`
+			RecipientUserID       string          `xml:"RecipientUserID"`
+			EIASToken             string          `xml:"EIASToken"`
+			Item                  GetItemResponse `xml:"Item`
+		} `xml:"GetItemResponse"`
+	} `xml:"Body"`
+}
+
 type GetItemRequest struct {
 	XMLName              xml.Name             `xml:"GetItemRequest"`
 	Xmlns                string               `xml:"xmlns,attr"`
