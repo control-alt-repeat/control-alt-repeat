@@ -1,4 +1,4 @@
-package ebay
+package access_tokens
 
 import (
 	"bytes"
