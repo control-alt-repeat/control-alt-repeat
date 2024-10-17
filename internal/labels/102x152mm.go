@@ -1,7 +1,6 @@
 package labels
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -21,7 +20,6 @@ func Create102x152mmItemLabel(warehouseID string, itemDescription string, qrValu
 	draw.Draw(img, img.Bounds(), &image.Uniform{bgColor}, image.Point{}, draw.Src)
 
 	// Draw the QR code on the right-hand side
-	fmt.Println("qrValue", qrValue)
 	qrCode, err := newQRCode(qrValue) // QR Code content
 	if err != nil {
 		return nil, err

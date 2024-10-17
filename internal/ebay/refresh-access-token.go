@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
@@ -31,6 +32,9 @@ type EbayAuthSecretsConfig struct {
 // Function to refresh the OAuth token using the refresh token
 func refreshOAuthToken() (string, error) {
 	var ebayAuthSecrets EbayAuthSecretsConfig
+
+	os.Setenv("AWS_REGION", "eu-west-2")
+	os.Setenv("AWS_DEFAULT_REGION", "eu-west-2")
 
 	err := ssmconfig.Process("/control_alt_repeat/ebay/live/", &ebayAuthSecrets)
 	if err != nil {

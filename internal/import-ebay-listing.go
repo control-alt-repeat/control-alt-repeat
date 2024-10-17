@@ -40,7 +40,7 @@ func ImportEbayListing(ebayListingID string) error {
 		return err
 	}
 
-	fmt.Printf("Importing eBay listing with ID: %s\n", ebayListingID)
+	fmt.Printf("Listing ID valid: %s\n", ebayListingID)
 
 	ebayListing, err := ebay.GetItem(ebayListingID)
 	if err != nil {

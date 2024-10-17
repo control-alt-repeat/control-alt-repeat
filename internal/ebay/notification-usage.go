@@ -8,7 +8,7 @@ import (
 
 func GetNotificationUsage(itemID string) error {
 
-	fmt.Println("Setting notification preferences")
+	fmt.Println("Getting notification usage")
 
 	request, requesterCredentials, err := newTraditionalAPIRequest("GetNotificationsUsage")
 	if err != nil {
@@ -20,8 +20,6 @@ func GetNotificationUsage(itemID string) error {
 		RequesterCredentials: *requesterCredentials,
 		ItemID:               itemID,
 	}
-
-	fmt.Println(payload)
 
 	resp, err := request.Post(payload)
 	if err != nil {
