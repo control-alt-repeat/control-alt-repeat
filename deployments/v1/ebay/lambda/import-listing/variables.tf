@@ -14,6 +14,10 @@ variable "write_label_print_buffer_policy_arn" {
   type = string
 }
 
+variable "read_notifications_bucket_policy_arn" {
+  type = string
+}
+
 variable "notifications_bucket_id" {
   type = string
 }

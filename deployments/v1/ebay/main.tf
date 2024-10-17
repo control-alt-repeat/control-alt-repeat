@@ -8,6 +8,7 @@ module "lambda_import_listing" {
 
   write_label_print_buffer_policy_arn = var.write_label_print_buffer_policy_arn
 
+  read_notifications_bucket_policy_arn = aws_iam_policy.allow_read_ebay_incoming_notifications.arn
   notifications_bucket_arn = aws_s3_bucket.ebay_incoming_notifications.arn
   notifications_bucket_id  = aws_s3_bucket.ebay_incoming_notifications.id
 }
