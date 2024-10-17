@@ -6,7 +6,7 @@ resource "aws_lambda_function" "function" {
   filename         = local.archive_path
   source_code_hash = filebase64sha256(local.archive_path)
   runtime          = "provided.al2023"
-  timeout          = 5
+  timeout          = 10
 }
 
 resource "aws_cloudwatch_log_group" "log_group" {
