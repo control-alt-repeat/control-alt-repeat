@@ -4,13 +4,16 @@ module "lambda_import_listing" {
   read_listings_policy_arn  = aws_iam_policy.allow_read_listings.arn
   write_listings_policy_arn = aws_iam_policy.allow_write_listings.arn
 
+  read_warehouse_policy_arn  = var.allow_read_warehouse_arn
+  write_warehouse_policy_arn = var.allow_write_warehouse_arn
+
   ebay_auth_ssm_access_policy_arn = aws_iam_policy.ebay_auth_ssm_access_policy.arn
 
   write_label_print_buffer_policy_arn = var.write_label_print_buffer_policy_arn
 
   read_notifications_bucket_policy_arn = aws_iam_policy.allow_read_ebay_incoming_notifications.arn
-  notifications_bucket_arn = aws_s3_bucket.ebay_incoming_notifications.arn
-  notifications_bucket_id  = aws_s3_bucket.ebay_incoming_notifications.id
+  notifications_bucket_arn             = aws_s3_bucket.ebay_incoming_notifications.arn
+  notifications_bucket_id              = aws_s3_bucket.ebay_incoming_notifications.id
 }
 
 module "lambda_notification_endpoint" {

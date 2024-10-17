@@ -52,6 +52,16 @@ resource "aws_iam_role_policy_attachment" "function_write_listings_policy_attach
   policy_arn = var.write_listings_policy_arn
 }
 
+resource "aws_iam_role_policy_attachment" "function_read_warehouse_policy_attachment" {
+  role       = aws_iam_role.lambda.id
+  policy_arn = var.read_warehouse_policy_arn
+}
+
+resource "aws_iam_role_policy_attachment" "function_write_warehouse_policy_attachment" {
+  role       = aws_iam_role.lambda.id
+  policy_arn = var.write_warehouse_policy_arn
+}
+
 resource "aws_iam_role_policy_attachment" "function_ebay_auth_ssm_access" {
   role       = aws_iam_role.lambda.id
   policy_arn = var.ebay_auth_ssm_access_policy_arn
