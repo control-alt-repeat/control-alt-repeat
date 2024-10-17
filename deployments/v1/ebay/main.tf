@@ -7,6 +7,9 @@ module "lambda_import_listing" {
   ebay_auth_ssm_access_policy_arn = aws_iam_policy.ebay_auth_ssm_access_policy.arn
 
   write_label_print_buffer_policy_arn = var.write_label_print_buffer_policy_arn
+
+  notifications_bucket_arn = aws_s3_bucket.ebay_incoming_notifications.arn
+  notifications_bucket_id  = aws_s3_bucket.ebay_incoming_notifications.id
 }
 
 module "lambda_notification_endpoint" {
