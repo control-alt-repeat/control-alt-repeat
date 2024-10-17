@@ -23,18 +23,21 @@ func NotifyLabelPrintServer() error {
 	if err != nil {
 		return fmt.Errorf("error creating POST request: %v", err)
 	}
+	go func() {
+		// Send the request
+		client := &http.Client{}
+		resp, err := client.Do(req)
+		if err != nil {
+			fmt.Printf("error sending POST request: %v", err)
+			return
+		}
+		defer resp.Body.Close()
 
-	// Send the request
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return fmt.Errorf("error sending POST request: %v", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("received non-200 response: %d", resp.StatusCode)
-	}
+		if resp.StatusCode != http.StatusOK {
+			fmt.Printf("received non-200 response: %d", resp.StatusCode)
+			return
+		}
+	}()
 
 	return nil
 }
