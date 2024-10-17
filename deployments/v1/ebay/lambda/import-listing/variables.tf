@@ -6,11 +6,11 @@ variable "write_listings_policy_arn" {
   type = string
 }
 
-variable "read_warehouse_policy_arn" {
+variable "allow_read_warehouse_policy_arn" {
   type = string
 }
 
-variable "write_warehouse_policy_arn" {
+variable "allow_write_warehouse_policy_arn" {
   type = string
 }
 
