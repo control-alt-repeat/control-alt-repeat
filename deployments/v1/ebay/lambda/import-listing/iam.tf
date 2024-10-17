@@ -56,3 +56,10 @@ resource "aws_iam_role_policy_attachment" "function_ebay_auth_ssm_access" {
   role       = aws_iam_role.lambda.id
   policy_arn = var.ebay_auth_ssm_access_policy_arn
 }
+
+resource "aws_iam_role_policy_attachment" "function_read_notifications_bucket_policy_attachment" {
+  role       = aws_iam_role.lambda.id
+  policy_arn = var.read_notifications_bucket_policy_arn
+}
+
+
