@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
+	"net/url"
 
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal"
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay/models"
@@ -26,7 +27,10 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 
 	for _, record := range s3Event.Records {
 		bucket := record.S3.Bucket.Name
-		key := record.S3.Object.Key
+		key, err := url.QueryUnescape(record.S3.Object.Key)
+		if err != nil {
+			return fmt.Errorf("failed to unescape key %s: %v", key, err)
+		}
 
 		fmt.Println("Processing event: ", key)
 
