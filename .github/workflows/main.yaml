@@ -30,16 +30,12 @@ jobs:
         working-directory: configs/test
       - run: terraform validate -no-color
         working-directory: configs/test
-      - run: terraform plan -no-color
-        working-directory: configs/test
       - run: terraform apply -auto-approve
         working-directory: configs/test
 
       - run: terraform init
         working-directory: configs/live
       - run: terraform validate -no-color
-        working-directory: configs/live
-      - run: terraform plan -no-color
         working-directory: configs/live
       - run: terraform apply -auto-approve
         working-directory: configs/live
