@@ -9,4 +9,12 @@ module "ebay" {
 
 module "web" {
   source = "./web"
+
+  read_listings_policy_arn  = ebay.allow_read_listings.arn
+  write_listings_policy_arn = ebay.allow_write_listings.arn
+
+  allow_read_warehouse_policy_arn  = aws_iam_policy.allow_read_warehouse.arn
+  allow_write_warehouse_policy_arn = aws_iam_policy.allow_write_warehouse.arn
+
+  ebay_auth_ssm_access_policy_arn = aws_iam_policy.ebay_auth_ssm_access_policy.arn
 }
