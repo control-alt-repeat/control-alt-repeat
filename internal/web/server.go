@@ -23,12 +23,10 @@ func (r *CustomRenderer) Render(w io.Writer, name string, data interface{}, c ec
 //go:embed templates/*
 var templates embed.FS
 
-func Init() (*echo.Echo, error) {
-	e := echo.New()
-
+func Init(e *echo.Echo) error {
 	t, err := template.ParseFS(templates, "templates/*")
 	if err != nil {
-		return e, err
+		return err
 	}
 
 	e.Renderer = &CustomRenderer{templates: t}
@@ -46,7 +44,7 @@ func Init() (*echo.Echo, error) {
 	e.GET("/item-move", showItemMoveForm)
 	e.POST("/item-move-submit", submitItemMoveForm)
 
-	return e, nil
+	return nil
 }
 
 func showIndex(c echo.Context) error {
