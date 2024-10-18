@@ -42,7 +42,9 @@ func Init(e *echo.Echo) error {
 	// Routes
 	e.GET("/", showIndex)
 	e.GET("/item-move", showItemMoveForm)
-	e.POST("/item-move-submit", submitItemMoveForm)
+	e.POST("/item-move-submit", submitItemMoveSubmit)
+	e.GET("/item-lookup", showItemLookup)
+	e.POST("/item-lookup-submit", showItemLookupSubmit)
 
 	return nil
 }

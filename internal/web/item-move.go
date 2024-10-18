@@ -21,8 +21,8 @@ func showItemMoveForm(c echo.Context) error {
 	return render(http.StatusOK, "item-move-form.html", nil, c)
 }
 
-func submitItemMoveForm(c echo.Context) error {
-	fmt.Println("submitItemMoveForm")
+func submitItemMoveSubmit(c echo.Context) error {
+	fmt.Println("submitItemMoveSubmit")
 
 	item := new(ItemAssignment)
 	if err := c.Bind(item); err != nil {

@@ -1,0 +1,41 @@
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const submitButton = document.getElementById("submit-button");
+
+        document.getElementById("lookup_term").focus();
+    });
+</script>
+<h2 class="text-center">Assign Item to Shelf</h2>
+{{- if .item }}
+<div class="text-center alert alert-danger" role="alert">
+    {{ .error }}
+</div>
+{{- end }}
+<form action="/item-lookup-submit" method="POST" class="bg-white w-50 mx-auto p-4 rounded shadow">
+    <div class="form-group mb-3">
+        <label for="lookup_term">Item ID (e.g., ABC-123 or eBay ID):</label>
+        <input type="text" id="lookup_term" name="lookup_term" maxlength="100" 
+               class="form-control" 
+               required autocomplete="off">
+    </div>
+    <div class="text-center">
+        <button type="submit" id="submit-button" class="btn btn-success">Find</button>
+    </div>
+</form>
+{{- if .title }}
+<div class="bg-white w-50 mx-auto p-4 rounded shadow">
+    <h4 class="mb-3">Information for item: {{ .id }}</h4>
+    <p>
+        <strong>Title:</strong> {{ .title }}
+    </p>
+    <img src="{{ .imageURL }}" class="img-fluid rounded mb-3" alt="eBay Listing Image">
+    <p>
+        <strong>Description:</strong> {{ .description }}
+    </p>
+    <p><strong>Link:</strong> 
+        <a href="{{ .eBayURL }}" class="link-primary" target="_blank">
+            View on eBay
+        </a>
+    </p>
+</div>
+{{- end }}
