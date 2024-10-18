@@ -18,7 +18,7 @@ func init() {
 	e := echo.New()
 
 	echoLambda = echoadapter.New(e)
-	err := web.Init()
+	err := web.Init(e)
 	if err != nil {
 		log.Fatalf("Failed to initialize Echo app: %v", err)
 	}

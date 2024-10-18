@@ -2,10 +2,13 @@ package main
 
 import (
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/web"
+	"github.com/labstack/echo/v4"
 )
 
 func main() {
-	e, err := web.Init()
+	var e = echo.New()
+
+	err := web.Init(e)
 
 	if err != nil {
 		panic(err)
