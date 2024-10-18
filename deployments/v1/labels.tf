@@ -87,7 +87,7 @@ resource "aws_ssm_parameter" "label_printer_host_domain" {
   value     = "not_yet_defined"
   lifecycle {
     ignore_changes = [
-      "value"
+      value
     ]
   }
 }
