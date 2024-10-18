@@ -12,39 +12,23 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-var echoLambda *echoadapter.EchoLambda
+var (
+	echoLambda *echoadapter.EchoLambdaV2
+)
 
 func init() {
 	e := echo.New()
-
-	echoLambda = echoadapter.New(e)
 	err := web.Init(e)
 	if err != nil {
 		log.Fatalf("Failed to initialize Echo app: %v", err)
 	}
-
-	// Initialize the Lambda adapter
-	echoLambda = echoadapter.New(e)
+	echoLambda = echoadapter.NewV2(e)
 }
 
-func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	// Use echoLambda to proxy the request
-	log.Printf("Received request: %+v\n", req)
-
-	response, err := echoLambda.ProxyWithContext(ctx, req)
-	if err != nil {
-		return events.APIGatewayProxyResponse{StatusCode: 500}, err
-	}
-
-	// Ensure the Content-Type is set correctly
-	if response.Headers == nil {
-		response.Headers = map[string]string{}
-	}
-	response.Headers["Content-Type"] = "text/html; charset=utf-8" // Set to HTML
-
-	return response, nil
+func Handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
+	return echoLambda.ProxyWithContext(ctx, req)
 }
 
 func main() {
-	lambda.Start(handler)
+	lambda.Start(Handler)
 }
