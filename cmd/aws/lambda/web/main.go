@@ -23,7 +23,19 @@ func init() {
 }
 
 func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	return echoLambda.ProxyWithContext(ctx, req)
+	// Use echoLambda to proxy the request
+	response, err := echoLambda.ProxyWithContext(ctx, req)
+	if err != nil {
+		return events.APIGatewayProxyResponse{StatusCode: 500}, err
+	}
+
+	// Ensure the Content-Type is set correctly
+	if response.Headers == nil {
+		response.Headers = map[string]string{}
+	}
+	response.Headers["Content-Type"] = "text/html; charset=utf-8" // Set to HTML
+
+	return response, nil
 }
 
 func main() {
