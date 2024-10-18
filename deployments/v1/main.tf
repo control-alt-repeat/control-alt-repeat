@@ -6,3 +6,7 @@ module "ebay" {
 
   write_label_print_buffer_policy_arn = aws_iam_policy.allow_write_label_print_buffer.arn
 }
+
+module "web" {
+  source = "./web"
+}
