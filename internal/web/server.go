@@ -37,9 +37,9 @@ func Init() *echo.Echo {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	e.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
-		return username == "user" && password == "pass", nil
-	}))
+	// e.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
+	// 	return username == "user" && password == "pass", nil
+	// }))
 
 	// Routes
 	e.GET("/", showIndex)
