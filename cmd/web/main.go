@@ -5,7 +5,11 @@ import (
 )
 
 func main() {
-	e := web.Init()
+	e, err := web.Init()
+
+	if err != nil {
+		panic(err)
+	}
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
