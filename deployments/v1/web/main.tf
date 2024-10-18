@@ -14,8 +14,8 @@ resource "aws_lambda_function_url" "latest" {
   authorization_type = "NONE"
 }
 
-resource "aws_ssm_parameter" "notification_endpoint_parameter" {
-  name  = "/control_alt_repeat/ebay/live/notification/endpoint"
+resource "aws_ssm_parameter" "web_endpoint_parameter" {
+  name  = "/control_alt_repeat/ebay/live/web/endpoint"
   type  = "String"
   value = aws_lambda_function_url.latest.function_url
 }
