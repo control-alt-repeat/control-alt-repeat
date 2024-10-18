@@ -1,6 +1,8 @@
 package main
 
-import "github.com/Control-Alt-Repeat/control-alt-repeat/internal/web"
+import (
+	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/web"
+)
 
 func main() {
 	e := web.Init()

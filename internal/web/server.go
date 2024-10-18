@@ -1,10 +1,10 @@
 package web
 
 import (
+	"embed"
 	"io"
+	"log"
 	"net/http"
-	"path/filepath"
-	"runtime"
 	"strings"
 	"text/template"
 
@@ -20,21 +20,18 @@ func (r *CustomRenderer) Render(w io.Writer, name string, data interface{}, c ec
 	return r.templates.ExecuteTemplate(w, name, data)
 }
 
+//go:embed templates/*
+var templates embed.FS
+
 func Init() *echo.Echo {
 	e := echo.New()
 
-	_, filename, _, ok := runtime.Caller(0)
-	if !ok {
-		e.Logger.Fatal("Failed to get caller information")
+	t, err := template.ParseFS(templates, "templates/*")
+	if err != nil {
+		log.Fatal(err)
 	}
-	basePath := filepath.Dir(filename)
 
-	templatesPath := filepath.Join(basePath, "templates/*.html")
-
-	renderer := &CustomRenderer{
-		templates: template.Must(template.ParseGlob(templatesPath)),
-	}
-	e.Renderer = renderer
+	e.Renderer = &CustomRenderer{templates: t}
 
 	// Middleware
 	e.Use(middleware.Logger())

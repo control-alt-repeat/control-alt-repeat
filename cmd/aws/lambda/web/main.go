@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"log"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -12,6 +13,7 @@ import (
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/web"
 )
 
+var templates embed.FS
 var echoLambda *echoadapter.EchoLambda
 
 func init() {
