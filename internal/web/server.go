@@ -3,7 +3,6 @@ package web
 import (
 	"embed"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 	"text/template"
@@ -23,12 +22,12 @@ func (r *CustomRenderer) Render(w io.Writer, name string, data interface{}, c ec
 //go:embed templates/*
 var templates embed.FS
 
-func Init() *echo.Echo {
+func Init() (*echo.Echo, error) {
 	e := echo.New()
 
 	t, err := template.ParseFS(templates, "templates/*")
 	if err != nil {
-		log.Fatal(err)
+		return e, err
 	}
 
 	e.Renderer = &CustomRenderer{templates: t}
@@ -46,7 +45,7 @@ func Init() *echo.Echo {
 	e.GET("/item-move", showItemMoveForm)
 	e.POST("/item-move-submit", submitItemMoveForm)
 
-	return e
+	return e, nil
 }
 
 func showIndex(c echo.Context) error {
@@ -54,6 +53,8 @@ func showIndex(c echo.Context) error {
 }
 
 func render(code int, templateName string, data map[string]interface{}, c echo.Context) error {
+	c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTML)
+
 	var builder strings.Builder
 
 	c.Echo().Renderer.Render(&builder, templateName, data, c)

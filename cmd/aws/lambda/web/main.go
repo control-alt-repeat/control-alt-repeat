@@ -18,9 +18,12 @@ var echoLambda *echoadapter.EchoLambda
 
 func init() {
 	log.Printf("Echo cold start")
-	app := web.Init()
+	var err error
+	app, err := web.Init()
+	if err != nil {
+		log.Fatalf("Failed to initialize Echo app: %v", err)
+	}
 	echoLambda = echoadapter.New(app)
-
 }
 
 func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
