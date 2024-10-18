@@ -16,10 +16,14 @@ type ItemAssignment struct {
 }
 
 func showItemMoveForm(c echo.Context) error {
+	fmt.Println("showItemMoveForm")
+
 	return render(http.StatusOK, "item-move-form.html", nil, c)
 }
 
 func submitItemMoveForm(c echo.Context) error {
+	fmt.Println("submitItemMoveForm")
+
 	item := new(ItemAssignment)
 	if err := c.Bind(item); err != nil {
 		return c.String(http.StatusBadRequest, "Invalid form submission")
@@ -41,6 +45,8 @@ func submitItemMoveForm(c echo.Context) error {
 }
 
 func showItemMoveError(c echo.Context, error error) error {
+	fmt.Println("showItemMoveError")
+
 	fmt.Println(error.Error())
 
 	return render(http.StatusOK, "item-move-error.html", map[string]interface{}{

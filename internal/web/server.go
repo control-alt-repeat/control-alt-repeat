@@ -2,6 +2,7 @@ package web
 
 import (
 	"embed"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -49,13 +50,15 @@ func Init() (*echo.Echo, error) {
 }
 
 func showIndex(c echo.Context) error {
+	fmt.Println("showIndex")
+
 	return render(http.StatusOK, "index.html", nil, c)
 }
 
 func render(code int, templateName string, data map[string]interface{}, c echo.Context) error {
-	c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTML)
-
 	var builder strings.Builder
+
+	fmt.Println("Rendering: ", templateName)
 
 	c.Echo().Renderer.Render(&builder, templateName, data, c)
 
