@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"time"
 
 	aws "github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay"
@@ -29,14 +30,20 @@ func ImportEbayListing(ebayListing *models.EbayItem) error {
 		ebay.ReviseSKU(ebayListing.ItemID, newSKU)
 	}
 
+	startTime, err := time.Parse(ebayListing.ListingDetails.StartTime, time.RFC3339)
+	if err != nil {
+		return err
+	}
+
 	EbayItemInternal := &EbayItemInternal{
 		ID:          ebayListing.ItemID,
 		Title:       ebayListing.Title,
 		PictureURL:  ebayListing.PictureDetails.PictureURL[0],
 		ViewItemURL: ebayListing.ListingDetails.ViewItemURL,
+		StartTime:   startTime,
 	}
 
-	err := aws.SaveJsonObjectS3(
+	err = aws.SaveJsonObjectS3(
 		EbayListingsBucketName,
 		EbayItemInternal.ID,
 		EbayItemInternal,
