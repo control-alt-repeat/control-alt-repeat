@@ -28,9 +28,10 @@ type WarehouseItem struct {
 	} `json:"ebay"`
 }
 
-type EbayListingItem struct {
+type EbayItemInternal struct {
 	ID          string `json:"id"`
 	Title       string `json:"title"`
+	PictureURL  string `json:"pictureURL"`
 	ViewItemURL string `json:"viewItemURL"`
 }
 
@@ -42,7 +43,13 @@ func ImportEbayListing(ebayListingID string) error {
 
 	fmt.Printf("Listing ID valid: %s\n", ebayListingID)
 
-	ebayListing, err := ebay.GetItem(ebayListingID)
+	ebayListing, err := ebay.GetItem(ebayListingID, []string{
+		"ItemID",
+		"Title",
+		"Description",
+		"PictureDetails",
+		"ListingDetails",
+	})
 	if err != nil {
 		return err
 	}
@@ -67,19 +74,20 @@ func ImportEbayListing(ebayListingID string) error {
 		ebay.ReviseSKU(ebayListing.ItemID, newSKU)
 	}
 
-	ebayListingItem := &EbayListingItem{
+	EbayItemInternal := &EbayItemInternal{
 		ID:          ebayListing.ItemID,
 		Title:       ebayListing.Title,
+		PictureURL:  ebayListing.PictureDetails.PictureURL[0],
 		ViewItemURL: ebayListing.ListingDetails.ViewItemURL,
 	}
 
 	err = aws.SaveJsonObjectS3(
 		EbayListingsBucketName,
-		ebayListingItem.ID,
-		ebayListingItem,
+		EbayItemInternal.ID,
+		EbayItemInternal,
 	)
 	if err != nil {
-		fmt.Printf("Failed to save eBay listing '%s'\n", ebayListingItem.ID)
+		fmt.Printf("Failed to save eBay listing '%s'\n", EbayItemInternal.ID)
 		return err
 	}
 

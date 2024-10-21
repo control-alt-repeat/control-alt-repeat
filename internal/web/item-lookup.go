@@ -31,13 +31,18 @@ func showItemLookupSubmit(c echo.Context) error {
 		return showItemLookupError(c, err)
 	}
 
-	return render(http.StatusOK, "item-lookup.html", map[string]interface{}{
-		"id":          result.ID,
-		"title":       result.Title,
-		"imageURL":    result.ImageURL,
-		"description": result.Description,
-		"eBayURL":     result.EbayURL,
-	}, c)
+	lookupMap := map[string]interface{}{
+		"id":       result.ID,
+		"shelf":    result.Shelf,
+		"title":    result.Title,
+		"imageURL": result.ImageURL,
+		"eBayURL":  result.EbayURL,
+	}
+
+	fmt.Println("Details loaded")
+	fmt.Println(lookupMap)
+
+	return render(http.StatusOK, "item-lookup.html", lookupMap, c)
 }
 
 func showItemLookupError(c echo.Context, err error) error {

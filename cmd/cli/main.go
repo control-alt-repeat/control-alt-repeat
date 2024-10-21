@@ -11,6 +11,7 @@ var (
 	ebayListingID string
 	itemID        string
 	shelf         string
+	all           bool
 )
 
 // Root command: "car"
@@ -31,10 +32,19 @@ func main() {
 	cmdItemMove.MarkFlagRequired("item-id")
 	cmdItemMove.MarkFlagRequired("shelf")
 
+	cmdItemRefresh.Flags().StringVar(&itemID, "item-id", "", "Item ID")
+	cmdItemRefresh.Flags().BoolVar(&all, "all", false, "All items")
+	cmdItemRefresh.MarkFlagsOneRequired("item-id", "all")
+
+	cmdItemPrintShelfLabel.Flags().StringVar(&itemID, "item-id", "", "Item ID")
+	cmdItemPrintShelfLabel.MarkFlagRequired("item-id")
+
 	cmdEbay.AddCommand(cmdEbayImportListing)
 	cmdEbay.AddCommand(cmdEbayGetNotificationUsage)
 	cmdEbay.AddCommand(cmdEbaySetNotificationPreferences)
 	cmdItem.AddCommand(cmdItemMove)
+	cmdItem.AddCommand(cmdItemRefresh)
+	cmdItem.AddCommand(cmdItemPrintShelfLabel)
 	cmdRoot.AddCommand(cmdEbay)
 	cmdRoot.AddCommand(cmdItem)
 

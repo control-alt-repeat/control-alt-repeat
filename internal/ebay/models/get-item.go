@@ -32,6 +32,7 @@ type GetItemRequest struct {
 	Xmlns                string               `xml:"xmlns,attr"`
 	RequesterCredentials RequesterCredentials `xml:"RequesterCredentials"`
 	ItemID               string               `xml:"ItemID"`
+	OutputSelector       []string             `xml:"OutputSelector"`
 }
 
 type GetItemResponse struct {
@@ -68,6 +69,7 @@ type EbayItem struct {
 	} `xml:"BuyItNowPrice"`
 	Country        string `xml:"Country"`
 	Currency       string `xml:"Currency"`
+	Description    string `xml:"Description"`
 	ItemID         string `xml:"ItemID"`
 	ListingDetails struct {
 		Text                   string `xml:",chardata"`

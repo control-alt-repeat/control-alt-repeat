@@ -8,7 +8,7 @@ import (
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay/models"
 )
 
-func GetItem(ebayListingID string) (*models.EbayItem, error) {
+func GetItem(ebayListingID string, outputSelector []string) (*models.EbayItem, error) {
 	fmt.Printf("Getting eBay listing with ID: %s\n", ebayListingID)
 
 	request, requesterCredentials, err := newTraditionalAPIRequest("GetItem")
@@ -21,6 +21,7 @@ func GetItem(ebayListingID string) (*models.EbayItem, error) {
 		Xmlns:                "urn:ebay:apis:eBLBaseComponents",
 		RequesterCredentials: *requesterCredentials,
 		ItemID:               ebayListingID,
+		OutputSelector:       outputSelector,
 	}
 
 	resp, err := request.Post(payload)

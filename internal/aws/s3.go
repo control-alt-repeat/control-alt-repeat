@@ -7,12 +7,16 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 
 	awshttp "github.com/aws/aws-sdk-go-v2/aws/transport/http"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go/aws"
+
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
 func SaveBytesToS3(bucket, key string, data []byte, contentType string) error {
@@ -21,10 +25,8 @@ func SaveBytesToS3(bucket, key string, data []byte, contentType string) error {
 		return fmt.Errorf("unable to load SDK config: %w", err)
 	}
 
-	// Create an S3 client
 	svc := s3.NewFromConfig(cfg)
 
-	// Create the S3 PutObjectInput
 	_, err = svc.PutObject(context.TODO(), &s3.PutObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
@@ -37,22 +39,18 @@ func SaveBytesToS3(bucket, key string, data []byte, contentType string) error {
 }
 
 func SaveJsonObjectS3(bucket, key string, item interface{}) error {
-	// Load the AWS configuration
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("eu-west-2"))
 	if err != nil {
 		return fmt.Errorf("unable to load SDK config: %w", err)
 	}
 
-	// Create an S3 client
 	svc := s3.NewFromConfig(cfg)
 
-	// Marshal the item to JSON
 	jsonData, err := json.Marshal(item)
 	if err != nil {
 		return fmt.Errorf("failed to marshal item: %w", err)
 	}
 
-	// Upload input parameters
 	input := &s3.PutObjectInput{
 		Bucket:      aws.String(bucket),
 		Key:         aws.String(key),
@@ -60,7 +58,6 @@ func SaveJsonObjectS3(bucket, key string, item interface{}) error {
 		ContentType: aws.String("application/json"),
 	}
 
-	// Upload the JSON data to S3
 	_, err = svc.PutObject(context.TODO(), input)
 	if err != nil {
 		return fmt.Errorf("failed to upload file: %w", err)
@@ -70,16 +67,13 @@ func SaveJsonObjectS3(bucket, key string, item interface{}) error {
 }
 
 func LoadJsonObjectS3(bucket string, key string, object interface{}) error {
-	// Load the AWS configuration
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("eu-west-2"))
 	if err != nil {
 		return fmt.Errorf("unable to load SDK config: %w", err)
 	}
 
-	// Create an S3 client
 	svc := s3.NewFromConfig(cfg)
 
-	// Get the object from S3
 	resp, err := svc.GetObject(context.TODO(), &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
@@ -89,7 +83,6 @@ func LoadJsonObjectS3(bucket string, key string, object interface{}) error {
 	}
 	defer resp.Body.Close()
 
-	// Unmarshal the JSON data into the struct
 	if err := json.NewDecoder(resp.Body).Decode(object); err != nil {
 		return fmt.Errorf("unable to decode JSON: %w", err)
 	}
@@ -119,7 +112,6 @@ func KeyExistsInS3(bucket string, key string) (bool, error) {
 	return true, nil
 }
 
-// Lambda handler function
 func ReadS3Object(ctx context.Context, bucket string, key string, region string) (string, error) {
 	sdkConfig, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
@@ -133,21 +125,53 @@ func ReadS3Object(ctx context.Context, bucket string, key string, region string)
 		Key:    aws.String(key),
 	})
 
-	// Call S3 to get the object
 	if err != nil {
 		return "", fmt.Errorf("failed to get object from S3: %v", err)
 	}
 	defer result.Body.Close()
 
-	// Read the object's content
 	body, err := io.ReadAll(result.Body)
 	if err != nil {
 		return "", fmt.Errorf("failed to read object content: %v", err)
 	}
 
-	// Convert the content to a string
 	content := string(body)
 	fmt.Println("Content of the S3 object:", content)
 
 	return content, nil
+}
+
+func IterateS3Objects(bucket string, region string, f func(string) error) error {
+	s3Client, err := minio.New("s3.amazonaws.com", &minio.Options{
+		Creds: credentials.NewChainCredentials([]credentials.Provider{
+			&credentials.EnvAWS{},             // Check environment variables
+			&credentials.FileAWSCredentials{}, // Check ~/.aws/credentials file
+			&credentials.IAM{Client: nil},     // Check IAM roles (if running on AWS)
+		}),
+		Region: region,
+		Secure: true,
+	})
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	opts := minio.ListObjectsOptions{
+		UseV1:     true,
+		Recursive: true,
+	}
+
+	for object := range s3Client.ListObjects(context.TODO(), bucket, opts) {
+		if object.Err != nil {
+			fmt.Println(object.Err)
+			return nil
+		}
+
+		err := f(object.Key)
+		if err != nil {
+			fmt.Println(err)
+			return nil
+		}
+	}
+
+	return nil
 }
