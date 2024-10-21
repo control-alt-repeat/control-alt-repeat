@@ -8,49 +8,53 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type LookupAssignment struct {
-	Term string `form:"lookup_term"`
+type Item struct {
+	ID    string `json:"id"`
+	Title string `json:"title"`
+	Shelf string `json:"shelf"`
+	Image string `json:"image"`
+	Link  string `json:"link"`
 }
 
-func showItemLookup(c echo.Context) error {
-	fmt.Println("showItemLookup")
+func initialiseItemLookup(e *echo.Echo) {
+	e.GET("item-lookup", renderItemLookupPage)
+	e.POST("item-lookup", findItem)
+	e.POST("item-print-shelf-label", printLabel)
+}
+
+func renderItemLookupPage(c echo.Context) error {
+	fmt.Println("renderItemLookupPage")
 
 	return render(http.StatusOK, "item-lookup.html", nil, c)
 }
 
-func showItemLookupSubmit(c echo.Context) error {
-	fmt.Println("showItemLookupSubmit")
+func findItem(c echo.Context) error {
+	itemID := c.FormValue("itemID")
 
-	lookup := new(LookupAssignment)
-	if err := c.Bind(lookup); err != nil {
-		return c.String(http.StatusBadRequest, "Invalid form submission")
-	}
-
-	result, err := internal.LookupItem(lookup.Term)
+	result, err := internal.LookupItem(itemID)
 	if err != nil {
-		return showItemLookupError(c, err)
+		return c.JSON(http.StatusInternalServerError, err)
 	}
 
-	lookupMap := map[string]interface{}{
-		"id":       result.ID,
-		"shelf":    result.Shelf,
-		"title":    result.Title,
-		"imageURL": result.ImageURL,
-		"eBayURL":  result.EbayURL,
+	item := &Item{
+		ID:    result.ID,
+		Title: result.Title,
+		Shelf: result.Shelf,
+		Image: result.ImageURL,
+		Link:  result.EbayURL,
 	}
 
-	fmt.Println("Details loaded")
-	fmt.Println(lookupMap)
-
-	return render(http.StatusOK, "item-lookup.html", lookupMap, c)
+	return c.JSON(http.StatusOK, item)
 }
 
-func showItemLookupError(c echo.Context, err error) error {
-	fmt.Println("showItemLookupError")
+func printLabel(c echo.Context) error {
+	itemID := c.FormValue("itemID")
 
-	fmt.Println(err.Error())
+	err := internal.ItemPrintShelfLabel(itemID)
 
-	return render(http.StatusOK, "item-lookup.html", map[string]interface{}{
-		"error": err.Error(),
-	}, c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"message": "Shelf label printed successfully"})
 }

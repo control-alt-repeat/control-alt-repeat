@@ -16,7 +16,7 @@ func NotifyLabelPrintServer() error {
 
 	webhookURL := labelPrinterDomain + "/webhook"
 
-	fmt.Println("Letting the printer know import complete at: ", webhookURL)
+	fmt.Println("Letting the printer know at: ", webhookURL)
 
 	// Create a new POST request with no body
 	req, err := http.NewRequest("POST", webhookURL, nil)

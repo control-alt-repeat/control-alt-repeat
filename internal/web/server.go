@@ -43,8 +43,8 @@ func Init(e *echo.Echo) error {
 	e.GET("/", showIndex)
 	e.GET("/item-move", showItemMoveForm)
 	e.POST("/item-move-submit", submitItemMoveSubmit)
-	e.GET("/item-lookup", showItemLookup)
-	e.POST("/item-lookup-submit", showItemLookupSubmit)
+
+	initialiseItemLookup(e)
 
 	return nil
 }
