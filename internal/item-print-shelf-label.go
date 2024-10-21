@@ -35,11 +35,9 @@ func ItemPrintShelfLabel(itemID string) error {
 
 	key := fmt.Sprintf("102x152-%s.png", warehouseItem.ControlAltRepeatID)
 
-	fmt.Println("Saving label to S3 buffer: ", key)
-	err = aws.SaveBytesToS3("control-alt-repeat-label-print-buffer", key, label, "image/png")
 	if err != nil {
 		return err
 	}
 
-	return labels.NotifyLabelPrintServer()
+	return labels.UploadFileFromBytes(label, key)
 }
