@@ -7,36 +7,47 @@ import (
 )
 
 type ItemLookupResult struct {
-	ID          string
-	Shelf       string
+	ID             string
+	Shelf          string
+	EbayReferences []ItemLookupEbayReference
+}
+
+type ItemLookupEbayReference struct {
 	Title       string
-	ImageURL    string
 	Description string
-	EbayURL     string
+	ImageURL    string
+	ListingURL  string
 }
 
 func LookupItem(itemID string) (ItemLookupResult, error) {
 	var warehouseItem WarehouseItem
-	var ebayItem EbayItemInternal
-	var result ItemLookupResult
 
+	fmt.Printf("Loading item '%s' from warehouse\n", itemID)
 	err := aws.LoadJsonObjectS3(WarehouseItemsBucketName, itemID, &warehouseItem)
 	if err != nil {
-		return result, err
+		return ItemLookupResult{}, err
 	}
-	fmt.Printf("Loaded item '%s' from warehouse\n", warehouseItem.ControlAltRepeatID)
 
-	err = aws.LoadJsonObjectS3(EbayListingsBucketName, warehouseItem.Ebay.ID, &ebayItem)
-	if err != nil {
-		return result, err
+	var ebayReferences []ItemLookupEbayReference
+
+	for _, ebayListingID := range warehouseItem.EbayListingIDs {
+		var ebayItem EbayItemInternal
+		fmt.Printf("Loading item '%s' from ebay listings\n", ebayListingID)
+		err = aws.LoadJsonObjectS3(EbayListingsBucketName, ebayListingID, &ebayItem)
+		if err != nil {
+			return ItemLookupResult{}, err
+		}
+
+		ebayReferences = append(ebayReferences, ItemLookupEbayReference{
+			Title:      ebayItem.Title,
+			ImageURL:   ebayItem.PictureURL,
+			ListingURL: ebayItem.ViewItemURL,
+		})
 	}
-	fmt.Printf("Loaded item '%s' from ebay listings\n", warehouseItem.Ebay.ID)
 
 	return ItemLookupResult{
-		ID:       itemID,
-		Shelf:    warehouseItem.Shelf,
-		Title:    ebayItem.Title,
-		ImageURL: ebayItem.PictureURL,
-		EbayURL:  ebayItem.ViewItemURL,
+		ID:             itemID,
+		Shelf:          warehouseItem.Shelf,
+		EbayReferences: ebayReferences,
 	}, nil
 }

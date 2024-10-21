@@ -21,29 +21,37 @@ func RefreshItemFromEbay(itemID string) error {
 		return err
 	}
 
-	fmt.Println("loading ebay item ", warehouseItem.Ebay.ID)
-	err = aws.LoadJsonObjectS3(EbayListingsBucketName, warehouseItem.Ebay.ID, &ebayItemInternal)
-	if err != nil {
-		return err
+	for _, ebayListingID := range warehouseItem.EbayListingIDs {
+		fmt.Println("loading ebay item ", ebayListingID)
+		err = aws.LoadJsonObjectS3(EbayListingsBucketName, ebayListingID, &ebayItemInternal)
+		if err != nil {
+			return err
+		}
+
+		ebayItemSource, err := ebay.GetItem(ebayListingID, []string{
+			"ItemID",
+			"Title",
+			"PictureDetails",
+			"ListingDetails",
+		})
+		if err != nil {
+			return err
+		}
+
+		ebayItemInternal.Title = ebayItemSource.Title
+		ebayItemInternal.PictureURL = ebayItemSource.PictureDetails.PictureURL[0]
+		ebayItemInternal.ViewItemURL = ebayItemSource.ListingDetails.ViewItemURL
+
+		fmt.Println("Title: ", ebayItemInternal.Title)
+		fmt.Println("PictureURL: ", ebayItemInternal.PictureURL)
+		fmt.Println("ViewItemURL: ", ebayItemInternal.ViewItemURL)
+
+		warehouseItem.EbayListingIDs = []string{ebayListingID}
+
+		err = aws.SaveJsonObjectS3(EbayListingsBucketName, ebayListingID, &ebayItemInternal)
+		if err != nil {
+			return err
+		}
 	}
-
-	ebayItemSource, err := ebay.GetItem(warehouseItem.Ebay.ID, []string{
-		"ItemID",
-		"Title",
-		"PictureDetails",
-		"ListingDetails",
-	})
-	if err != nil {
-		return err
-	}
-
-	ebayItemInternal.Title = ebayItemSource.Title
-	ebayItemInternal.PictureURL = ebayItemSource.PictureDetails.PictureURL[0]
-	ebayItemInternal.ViewItemURL = ebayItemSource.ListingDetails.ViewItemURL
-
-	fmt.Println("Title: ", ebayItemInternal.Title)
-	fmt.Println("PictureURL: ", ebayItemInternal.PictureURL)
-	fmt.Println("ViewItemURL: ", ebayItemInternal.ViewItemURL)
-
-	return aws.SaveJsonObjectS3(EbayListingsBucketName, warehouseItem.Ebay.ID, &ebayItemInternal)
+	return nil
 }

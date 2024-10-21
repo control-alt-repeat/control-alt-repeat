@@ -3,15 +3,19 @@
 
     <form @submit.prevent="itemLookup()" class="bg-white w-50 mx-auto p-4 rounded shadow">
         <input id="itemID" type="text" x-model="itemID" placeholder="Enter Item ID" maxlength="7" autocomplete="off" required>
-        <button type="submit" class="btn btn-success">Find Item</button>
+        <button id="lookup-button" type="submit" class="btn btn-success">Find Item</button>
     </form>
 
     <div x-show="item" class="bg-white w-50 mx-auto p-4 rounded shadow">
         <h2 class="mb-3">Item ID: <span x-text="item.id"></span></h4>
         <h4 class="mb-3">Shelf: <span x-text="item.shelf"></span></h3>
-        <img x-bind:src="item.image" class="img-fluid rounded mb-3" alt="Item Image" style="max-width: 150px;">
-        <p><a x-bind:href="item.link" class="link-primary" target="_blank">View item on eBay</a></p>
-        <button @click="printShelfLabel()" class="btn btn-success">Print Shelf Label</button>
+        <template x-for="ebayReference in item.ebayReferences">
+            <div>
+                <img x-bind:src="ebayReference.imageURL" class="img-fluid rounded mb-3" alt="Item Image" style="max-width: 150px;">
+                <p><a x-bind:href="ebayReference.listingURL" class="link-primary" target="_blank">eBay: <span x-text="ebayReference.title"></span></a></p>
+                <button @click="printShelfLabel()" class="btn btn-success">Print Shelf Label</button>
+            </div>
+        </template>
     </div>
 
 </div>

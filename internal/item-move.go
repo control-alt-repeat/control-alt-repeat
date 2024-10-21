@@ -20,12 +20,16 @@ func MoveItem(itemID string, newShelf string) error {
 
 	warehouseItem.Shelf = newShelf
 
-	err = ebay.ReviseSKU(warehouseItem.Ebay.ID, warehouseItem.toEbaySKU())
-	if err != nil {
-		return err
+	for _, ebayListingID := range warehouseItem.EbayListingIDs {
+		err = ebay.ReviseSKU(ebayListingID, warehouseItem.toEbaySKU())
+		if err != nil {
+			return err
+		}
+
+		err = aws.SaveJsonObjectS3(WarehouseItemsBucketName, warehouseItem.ControlAltRepeatID, warehouseItem)
+		if err != nil {
+			return err
+		}
 	}
-
-	aws.SaveJsonObjectS3(WarehouseItemsBucketName, warehouseItem.ControlAltRepeatID, warehouseItem)
-
 	return nil
 }

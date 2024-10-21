@@ -9,11 +9,16 @@ import (
 )
 
 type Item struct {
-	ID    string `json:"id"`
-	Title string `json:"title"`
-	Shelf string `json:"shelf"`
-	Image string `json:"image"`
-	Link  string `json:"link"`
+	ID             string          `json:"id"`
+	Shelf          string          `json:"shelf"`
+	EbayReferences []EbayReference `json:"ebayReferences"`
+}
+
+type EbayReference struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	ImageURL    string `json:"imageURL"`
+	ListingURL  string `json:"listingURL"`
 }
 
 func initialiseItemLookup(e *echo.Echo) {
@@ -29,7 +34,11 @@ func renderItemLookupPage(c echo.Context) error {
 }
 
 func findItem(c echo.Context) error {
+	fmt.Println("findItem")
+
 	itemID := c.FormValue("itemID")
+
+	fmt.Println(itemID)
 
 	result, err := internal.LookupItem(itemID)
 	if err != nil {
@@ -37,11 +46,17 @@ func findItem(c echo.Context) error {
 	}
 
 	item := &Item{
-		ID:    result.ID,
-		Title: result.Title,
-		Shelf: result.Shelf,
-		Image: result.ImageURL,
-		Link:  result.EbayURL,
+		ID:             result.ID,
+		Shelf:          result.Shelf,
+		EbayReferences: []EbayReference{},
+	}
+
+	for _, ebayReference := range result.EbayReferences {
+		item.EbayReferences = append(item.EbayReferences, EbayReference{
+			Title:      ebayReference.Title,
+			ImageURL:   ebayReference.ImageURL,
+			ListingURL: ebayReference.ListingURL,
+		})
 	}
 
 	return c.JSON(http.StatusOK, item)

@@ -18,8 +18,8 @@ func ItemPrintShelfLabel(itemID string) error {
 		return err
 	}
 
-	fmt.Println("loading ebay item ", warehouseItem.Ebay.ID)
-	err = aws.LoadJsonObjectS3(EbayListingsBucketName, warehouseItem.Ebay.ID, &ebayItemInternal)
+	fmt.Println("loading ebay item ", warehouseItem.EbayListingIDs[0])
+	err = aws.LoadJsonObjectS3(EbayListingsBucketName, warehouseItem.EbayListingIDs[0], &ebayItemInternal)
 	if err != nil {
 		return err
 	}
