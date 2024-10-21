@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/xml"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/url"
 
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal"
@@ -45,7 +45,7 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 		defer result.Body.Close() // Ensure the body is closed after reading
 
 		// Read the object body
-		body, err := ioutil.ReadAll(result.Body)
+		body, err := io.ReadAll(result.Body)
 		if err != nil {
 			return fmt.Errorf("failed to read object body: %v", err)
 		}
@@ -56,7 +56,10 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 			return fmt.Errorf("failed to Unmarshal body: %v", err)
 		}
 
-		return internal.ImportEbayListing(notification.Body.GetItemResponse.Item.ItemID)
+		err = internal.ImportEbayListing(&notification.Body.GetItemResponse.Item)
+		if err != nil {
+			return fmt.Errorf("failed to import listing: %v", err)
+		}
 	}
 
 	return nil

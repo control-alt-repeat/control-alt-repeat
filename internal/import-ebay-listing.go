@@ -5,29 +5,12 @@ import (
 
 	aws "github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay"
+	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay/models"
 )
 
-func ImportEbayListing(ebayListingID string) error {
-	err := validateListingID(ebayListingID)
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("Listing ID valid: %s\n", ebayListingID)
-
-	ebayListing, err := ebay.GetItem(ebayListingID, []string{
-		"ItemID",
-		"Title",
-		"Description",
-		"PictureDetails",
-		"ListingDetails",
-	})
-	if err != nil {
-		return err
-	}
-
+func ImportEbayListing(ebayListing *models.EbayItem) error {
 	if ebayListing.SKU != "" {
-		err = validateSKU(ebayListing.SKU)
+		err := validateSKU(ebayListing.SKU)
 		if err != nil {
 			return err
 		}
@@ -53,7 +36,7 @@ func ImportEbayListing(ebayListingID string) error {
 		ViewItemURL: ebayListing.ListingDetails.ViewItemURL,
 	}
 
-	err = aws.SaveJsonObjectS3(
+	err := aws.SaveJsonObjectS3(
 		EbayListingsBucketName,
 		EbayItemInternal.ID,
 		EbayItemInternal,
@@ -73,7 +56,29 @@ func ImportEbayListing(ebayListingID string) error {
 		return err
 	}
 
-	fmt.Printf("Successfully imported eBay listing %s with ID %s\n", ebayListingID, warehouseItem.ControlAltRepeatID)
+	fmt.Printf("Successfully imported eBay listing %s with ID %s\n", ebayListing.ItemID, warehouseItem.ControlAltRepeatID)
 
-	return err
+	return nil
+}
+
+func ImportEbayListingByID(ebayListingID string) error {
+	err := validateListingID(ebayListingID)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Listing ID valid: %s\n", ebayListingID)
+
+	ebayListing, err := ebay.GetItem(ebayListingID, []string{
+		"ItemID",
+		"Title",
+		"Description",
+		"PictureDetails",
+		"ListingDetails",
+	})
+	if err != nil {
+		return err
+	}
+
+	return ImportEbayListing(ebayListing)
 }
