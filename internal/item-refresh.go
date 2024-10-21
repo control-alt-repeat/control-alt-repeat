@@ -33,6 +33,7 @@ func RefreshItemFromEbay(itemID string) error {
 			"Title",
 			"PictureDetails",
 			"ListingDetails",
+			"SKU",
 		})
 		if err != nil {
 			return err

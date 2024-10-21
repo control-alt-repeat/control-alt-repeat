@@ -75,6 +75,7 @@ func ImportEbayListingByID(ebayListingID string) error {
 		"Description",
 		"PictureDetails",
 		"ListingDetails",
+		"SKU",
 	})
 	if err != nil {
 		return err
