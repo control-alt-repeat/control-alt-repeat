@@ -10,6 +10,9 @@ import (
 )
 
 func UploadFileFromBytes(imageBytes []byte, filename string) error {
+	sizeMB := float64(len(imageBytes)) / (1024 * 1024) // Convert bytes to MB
+	fmt.Printf("Data size: %.2f MB\n", sizeMB)
+
 	labelPrinterDomain, err := aws.GetParameterValue("eu-west-2", "/control_alt_repeat/ebay/live/label_printer/host_domain")
 	if err != nil {
 		return fmt.Errorf("error creating POST request: %v", err)

@@ -16,9 +16,10 @@ const (
 )
 
 type WarehouseItem struct {
-	ControlAltRepeatID string   `json:"controlAltRepeatID"`
-	Shelf              string   `json:"shelf"`
-	EbayListingIDs     []string `json:"ebayListingIDs"`
+	ControlAltRepeatID string    `json:"controlAltRepeatID"`
+	Shelf              string    `json:"shelf"`
+	AddedTime          time.Time `json:"addedTime"`
+	EbayListingIDs     []string  `json:"ebayListingIDs"`
 }
 
 func generateControlAltRepeatID() string {

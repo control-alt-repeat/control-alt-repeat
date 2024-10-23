@@ -71,9 +71,9 @@ func LoadJsonObjectS3(bucket string, key string, object interface{}) error {
 	if err != nil {
 		return fmt.Errorf("unable to load SDK config: %w", err)
 	}
-
 	svc := s3.NewFromConfig(cfg)
-
+	fmt.Println(bucket)
+	fmt.Println(key)
 	resp, err := svc.GetObject(context.TODO(), &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
@@ -82,11 +82,9 @@ func LoadJsonObjectS3(bucket string, key string, object interface{}) error {
 		return fmt.Errorf("unable to get object from S3: %w", err)
 	}
 	defer resp.Body.Close()
-
 	if err := json.NewDecoder(resp.Body).Decode(object); err != nil {
 		return fmt.Errorf("unable to decode JSON: %w", err)
 	}
-
 	return nil
 }
 

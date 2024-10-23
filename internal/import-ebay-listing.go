@@ -30,12 +30,12 @@ func ImportEbayListing(ebayListing *models.EbayItem) error {
 		ebay.ReviseSKU(ebayListing.ItemID, newSKU)
 	}
 
-	startTime, err := time.Parse(ebayListing.ListingDetails.StartTime, time.RFC3339)
+	startTime, err := time.Parse(time.RFC3339, ebayListing.ListingDetails.StartTime)
 	if err != nil {
 		return err
 	}
 
-	EbayItemInternal := &EbayItemInternal{
+	ebayItemInternal := &EbayItemInternal{
 		ID:          ebayListing.ItemID,
 		Title:       ebayListing.Title,
 		PictureURL:  ebayListing.PictureDetails.PictureURL[0],
@@ -43,13 +43,15 @@ func ImportEbayListing(ebayListing *models.EbayItem) error {
 		StartTime:   startTime,
 	}
 
+	warehouseItem.AddedTime = ebayItemInternal.StartTime
+
 	err = aws.SaveJsonObjectS3(
 		EbayListingsBucketName,
-		EbayItemInternal.ID,
-		EbayItemInternal,
+		ebayItemInternal.ID,
+		ebayItemInternal,
 	)
 	if err != nil {
-		fmt.Printf("Failed to save eBay listing '%s'\n", EbayItemInternal.ID)
+		fmt.Printf("Failed to save eBay listing '%s'\n", ebayItemInternal.ID)
 		return err
 	}
 

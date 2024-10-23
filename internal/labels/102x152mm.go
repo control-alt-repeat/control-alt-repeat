@@ -34,7 +34,7 @@ func Create102x152mmItemLabel(warehouseID string, itemDescription string, qrValu
 	addLabel(img, 20, 200, warehouseID, loadFontFace(250))
 
 	// return writeImageToPNG(rot90(img))
-	return writeImageToPNG(img)
+	return writeImageToPNG(rot90(rot90(rot90(img))))
 }
 
 // addText adds text to the image at specified coordinates

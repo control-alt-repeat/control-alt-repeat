@@ -42,7 +42,8 @@ func findItem(c echo.Context) error {
 
 	result, err := internal.LookupItem(itemID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+		fmt.Println(err)
+		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
 	item := &Item{
@@ -68,6 +69,7 @@ func printLabel(c echo.Context) error {
 	err := internal.ItemPrintShelfLabel(itemID)
 
 	if err != nil {
+		fmt.Println(err)
 		return c.JSON(http.StatusInternalServerError, err)
 	}
 

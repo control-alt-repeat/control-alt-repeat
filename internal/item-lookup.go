@@ -27,6 +27,7 @@ func LookupItem(itemID string) (ItemLookupResult, error) {
 	if err != nil {
 		return ItemLookupResult{}, err
 	}
+	fmt.Printf("Loaded item '%s' from warehouse\n", itemID)
 
 	var ebayReferences []ItemLookupEbayReference
 
