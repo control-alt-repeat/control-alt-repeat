@@ -1,7 +1,6 @@
 package web
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -10,46 +9,39 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type ItemAssignment struct {
-	ItemID string `form:"item_id"`
+type ItemMove struct {
+	ItemID string `form:"id"`
 	Shelf  string `form:"shelf"`
 }
 
-func showItemMoveForm(c echo.Context) error {
-	fmt.Println("showItemMoveForm")
-
-	return render(http.StatusOK, "item-move-form.html", nil, c)
+func initialiseItemMove(e *echo.Echo) {
+	e.GET("item-move", renderItemMovePage)
+	e.POST("item-move", itemMove)
 }
 
-func submitItemMoveSubmit(c echo.Context) error {
-	fmt.Println("submitItemMoveSubmit")
+func renderItemMovePage(c echo.Context) error {
+	return render(http.StatusOK, "item-move.html", nil, c)
+}
 
-	item := new(ItemAssignment)
-	if err := c.Bind(item); err != nil {
-		return c.String(http.StatusBadRequest, "Invalid form submission")
+func itemMove(c echo.Context) error {
+	itemMove := &ItemMove{
+		ItemID: c.FormValue("id"),
+		Shelf:  c.FormValue("shelf"),
 	}
 
-	matched, err := regexp.MatchString(`^[A-Z]{3}-[0-9]{3}$`, item.ItemID)
+	matched, err := regexp.MatchString(`^[A-Z]{3}-[0-9]{3}$`, itemMove.ItemID)
 	if err != nil || !matched {
-		return showItemMoveError(c, errors.New("item ID must be in the format A-Z-0-9 (e.g., A-123)"))
+		fmt.Println(err)
+		return c.JSON(http.StatusInternalServerError, err)
 	}
-	fmt.Println("Moving item with ID:", item.ItemID, "to shelf:", item.Shelf)
+	fmt.Println("Moving item with ID:", itemMove.ItemID, "to shelf:", itemMove.Shelf)
 
-	err = internal.MoveItem(item.ItemID, item.Shelf)
+	err = internal.MoveItem(itemMove.ItemID, itemMove.Shelf)
 
 	if err != nil {
-		return showItemMoveError(c, err)
+		fmt.Println(err)
+		return c.JSON(http.StatusInternalServerError, err)
 	}
 
-	return render(http.StatusOK, "item-move-ok.html", nil, c)
-}
-
-func showItemMoveError(c echo.Context, error error) error {
-	fmt.Println("showItemMoveError")
-
-	fmt.Println(error.Error())
-
-	return render(http.StatusOK, "item-move-error.html", map[string]interface{}{
-		"error": error.Error(),
-	}, c)
+	return c.JSON(http.StatusOK, map[string]string{"message": "Successfully moved the item"})
 }

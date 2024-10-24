@@ -7,25 +7,26 @@ import (
 	aws "github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay"
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay/models"
+	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/warehouse"
 )
 
 func ImportEbayListing(ebayListing *models.EbayItem) error {
 	if ebayListing.SKU != "" {
-		err := validateSKU(ebayListing.SKU)
+		err := warehouse.ValidateSKU(ebayListing.SKU)
 		if err != nil {
 			return err
 		}
 	}
 
-	warehouseItem := &WarehouseItem{}
+	warehouseItem := &warehouse.WarehouseItem{}
 	warehouseItem.EbayListingIDs = []string{ebayListing.ItemID}
 
-	warehouseItem.initialiseFromSKU(ebayListing.SKU)
+	warehouseItem.InitialiseFromSKU(ebayListing.SKU)
 
 	if warehouseItem.ControlAltRepeatID == "" {
-		warehouseItem.ControlAltRepeatID = generateControlAltRepeatID()
+		warehouseItem.ControlAltRepeatID = warehouse.GenerateControlAltRepeatID()
 
-		newSKU := warehouseItem.toEbaySKU()
+		newSKU := warehouseItem.ToEbaySKU()
 
 		ebay.ReviseSKU(ebayListing.ItemID, newSKU)
 	}
@@ -35,7 +36,7 @@ func ImportEbayListing(ebayListing *models.EbayItem) error {
 		return err
 	}
 
-	ebayItemInternal := &EbayItemInternal{
+	ebayItemInternal := &warehouse.EbayItemInternal{
 		ID:          ebayListing.ItemID,
 		Title:       ebayListing.Title,
 		PictureURL:  ebayListing.PictureDetails.PictureURL[0],
@@ -46,7 +47,7 @@ func ImportEbayListing(ebayListing *models.EbayItem) error {
 	warehouseItem.AddedTime = ebayItemInternal.StartTime
 
 	err = aws.SaveJsonObjectS3(
-		EbayListingsBucketName,
+		warehouse.EbayListingsBucketName,
 		ebayItemInternal.ID,
 		ebayItemInternal,
 	)
@@ -56,7 +57,7 @@ func ImportEbayListing(ebayListing *models.EbayItem) error {
 	}
 
 	err = aws.SaveJsonObjectS3(
-		WarehouseItemsBucketName,
+		warehouse.WarehouseItemsBucketName,
 		warehouseItem.ControlAltRepeatID,
 		warehouseItem,
 	)
@@ -71,7 +72,7 @@ func ImportEbayListing(ebayListing *models.EbayItem) error {
 }
 
 func ImportEbayListingByID(ebayListingID string) error {
-	err := validateListingID(ebayListingID)
+	err := warehouse.ValidateListingID(ebayListingID)
 	if err != nil {
 		return err
 	}

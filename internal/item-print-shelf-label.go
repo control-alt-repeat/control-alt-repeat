@@ -6,20 +6,21 @@ import (
 
 	aws "github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/labels"
+	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/warehouse"
 )
 
 func ItemPrintShelfLabel(itemID string) error {
-	var warehouseItem WarehouseItem
-	var ebayItemInternal EbayItemInternal
+	var warehouseItem warehouse.WarehouseItem
+	var ebayItemInternal warehouse.EbayItemInternal
 
 	fmt.Println("loading warehouse item ", itemID)
-	err := aws.LoadJsonObjectS3(WarehouseItemsBucketName, itemID, &warehouseItem)
+	err := aws.LoadJsonObjectS3(warehouse.WarehouseItemsBucketName, itemID, &warehouseItem)
 	if err != nil {
 		return err
 	}
 
 	fmt.Println("loading ebay item ", warehouseItem.EbayListingIDs[0])
-	err = aws.LoadJsonObjectS3(EbayListingsBucketName, warehouseItem.EbayListingIDs[0], &ebayItemInternal)
+	err = aws.LoadJsonObjectS3(warehouse.EbayListingsBucketName, warehouseItem.EbayListingIDs[0], &ebayItemInternal)
 	if err != nil {
 		return err
 	}

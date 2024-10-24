@@ -8,19 +8,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type Item struct {
-	ID             string          `json:"id"`
-	Shelf          string          `json:"shelf"`
-	EbayReferences []EbayReference `json:"ebayReferences"`
-}
-
-type EbayReference struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	ImageURL    string `json:"imageURL"`
-	ListingURL  string `json:"listingURL"`
-}
-
 func initialiseItemLookup(e *echo.Echo) {
 	e.GET("item-lookup", renderItemLookupPage)
 	e.POST("item-lookup", findItem)
@@ -28,15 +15,11 @@ func initialiseItemLookup(e *echo.Echo) {
 }
 
 func renderItemLookupPage(c echo.Context) error {
-	fmt.Println("renderItemLookupPage")
-
 	return render(http.StatusOK, "item-lookup.html", nil, c)
 }
 
 func findItem(c echo.Context) error {
-	fmt.Println("findItem")
-
-	itemID := c.FormValue("itemID")
+	itemID := c.FormValue("id")
 
 	fmt.Println(itemID)
 
@@ -64,7 +47,7 @@ func findItem(c echo.Context) error {
 }
 
 func printLabel(c echo.Context) error {
-	itemID := c.FormValue("itemID")
+	itemID := c.FormValue("id")
 
 	err := internal.ItemPrintShelfLabel(itemID)
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	aws "github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
+	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/warehouse"
 )
 
 type ItemLookupResult struct {
@@ -20,10 +21,10 @@ type ItemLookupEbayReference struct {
 }
 
 func LookupItem(itemID string) (ItemLookupResult, error) {
-	var warehouseItem WarehouseItem
+	var warehouseItem warehouse.WarehouseItem
 
 	fmt.Printf("Loading item '%s' from warehouse\n", itemID)
-	err := aws.LoadJsonObjectS3(WarehouseItemsBucketName, itemID, &warehouseItem)
+	err := aws.LoadJsonObjectS3(warehouse.WarehouseItemsBucketName, itemID, &warehouseItem)
 	if err != nil {
 		return ItemLookupResult{}, err
 	}
@@ -32,9 +33,9 @@ func LookupItem(itemID string) (ItemLookupResult, error) {
 	var ebayReferences []ItemLookupEbayReference
 
 	for _, ebayListingID := range warehouseItem.EbayListingIDs {
-		var ebayItem EbayItemInternal
+		var ebayItem warehouse.EbayItemInternal
 		fmt.Printf("Loading item '%s' from ebay listings\n", ebayListingID)
-		err = aws.LoadJsonObjectS3(EbayListingsBucketName, ebayListingID, &ebayItem)
+		err = aws.LoadJsonObjectS3(warehouse.EbayListingsBucketName, ebayListingID, &ebayItem)
 		if err != nil {
 			return ItemLookupResult{}, err
 		}

@@ -1,0 +1,56 @@
+<div x-data="page()">
+    <h2 class="text-center">Assign Item to Shelf</h2>
+    <form @submit.prevent="itemMove()" class="bg-white col-12 col-md-6 mx-auto p-4 rounded shadow">
+        <div class="form-group mb-3">
+            <label for="id">Item ID (e.g., ABC-123):</label>
+            <input type="text" id="id" x-model="id" maxlength="10" 
+                class="form-control mb-3 w-100"  
+                required autocomplete="off">
+        </div>
+        <div class="form-group mb-3">
+            <label for="shelf">Shelf (e.g., A1):</label>
+            <input type="text" id="shelf" x-model="shelf" maxlength="10" 
+                class="form-control mb-3 w-100"
+                required autocomplete="off">
+        </div>
+        <div class="text-center">
+            <button type="move-button" type="submit" class="btn btn-success w-100">Move</button>
+        </div>
+    </form>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("shelf").focus();
+});
+
+function page() {
+    return {
+        id: "",
+        shelf: "",
+        init() {
+            const urlParams = new URLSearchParams(window.location.search);
+            this.id = urlParams.get('id') || '';
+            this.shelf = urlParams.get('shelf') || '';
+        },
+        itemMove() {
+            fetch("item-move", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({ id: this.id, shelf: this.shelf })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error()
+                return response.json()
+            })
+            .then(data => {
+                window.location.href = `/item-lookup?id=${this.id}`;
+            })
+            .catch(error => {
+                alert(error.message.Error)
+            })
+        }
+    }
+}
+</script>

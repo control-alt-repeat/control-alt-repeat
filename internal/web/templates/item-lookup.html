@@ -2,13 +2,16 @@
     <h2 class="text-center">Lookup Item</h2>
 
     <form @submit.prevent="itemLookup()" class="bg-white col-12 col-md-6 mx-auto p-4 rounded shadow">
-        <input id="itemID" type="text" x-model="itemID" placeholder="Enter Item ID" maxlength="7" autocomplete="off"  class="form-control mb-3 w-100" required>
+        <input id="id" type="text" x-model="id" placeholder="Enter Item ID" autocomplete="off" class="form-control mb-3 w-100" required>
         <button id="lookup-button" type="submit" class="btn btn-success w-100">Find Item</button>
     </form>
 
     <div x-show="item" class="bg-white col-12 col-md-6 mx-auto p-4 rounded shadow mt-4">
         <h2 class="mb-3">Item ID: <span x-text="item.id"></span></h4>
-        <h4 class="mb-3">Shelf: <span x-text="item.shelf"></span></h3>
+        <h4 class="mb-3">
+            Shelf: <span x-text="item.shelf"></span>
+            <a :href="'/item-move?id=' + item.id + '&shelf=' + item.shelf" class="btn btn-primary btn-block w-100">Move</a>
+        </h3>
         <template x-for="ebayReference in item.ebayReferences">
             <div>
                 <img x-bind:src="ebayReference.imageURL" class="img-fluid rounded mb-3" alt="Item Image" style="max-width: 150px;">
@@ -21,22 +24,29 @@
 </div>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("itemID").focus();
+    document.getElementById("id").focus();
 });
 
 function page() {
     return {
-        itemID: "",
+        id: "",
         item: null,
+        init() {
+            const urlParams = new URLSearchParams(window.location.search);
+            this.id = urlParams.get('id') || '';
+            if (this.id) {
+                this.itemLookup()
+            }
+        },
         itemLookup() {
-            console.log("Lookup item: ", this.itemID);
+            console.log("Lookup item: ", this.id);
 
             fetch("item-lookup", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
                 },
-                body: new URLSearchParams({ itemID: this.itemID })
+                body: new URLSearchParams({ id: this.id })
             })
             .then(response => {
                 if (!response.ok) throw new Error()
@@ -51,14 +61,14 @@ function page() {
             })
         },
         printShelfLabel() {
-            console.log("Printing shelf label for item: ", this.itemID);
+            console.log("Printing shelf label for item: ", this.id);
 
             fetch("item-print-shelf-label", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
                 },
-                body: new URLSearchParams({ itemID: this.itemID })
+                body: new URLSearchParams({ id: this.id })
             })
             .then(response => {
                 if (!response.ok) throw new Error()

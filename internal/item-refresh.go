@@ -6,25 +6,26 @@ import (
 
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay"
+	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/warehouse"
 )
 
 func RefreshItemsFromEbay() error {
-	return aws.IterateS3Objects(WarehouseItemsBucketName, "eu-west-2", RefreshItemFromEbay)
+	return aws.IterateS3Objects(warehouse.WarehouseItemsBucketName, "eu-west-2", RefreshItemFromEbay)
 }
 
 func RefreshItemFromEbay(itemID string) error {
-	var warehouseItem WarehouseItem
-	var ebayItemInternal EbayItemInternal
+	var warehouseItem warehouse.WarehouseItem
+	var ebayItemInternal warehouse.EbayItemInternal
 
 	fmt.Println("loading warehouse item ", itemID)
-	err := aws.LoadJsonObjectS3(WarehouseItemsBucketName, itemID, &warehouseItem)
+	err := aws.LoadJsonObjectS3(warehouse.WarehouseItemsBucketName, itemID, &warehouseItem)
 	if err != nil {
 		return err
 	}
 
 	for _, ebayListingID := range warehouseItem.EbayListingIDs {
 		fmt.Println("loading ebay item ", ebayListingID)
-		err = aws.LoadJsonObjectS3(EbayListingsBucketName, ebayListingID, &ebayItemInternal)
+		err = aws.LoadJsonObjectS3(warehouse.EbayListingsBucketName, ebayListingID, &ebayItemInternal)
 		if err != nil {
 			return err
 		}
@@ -57,7 +58,7 @@ func RefreshItemFromEbay(itemID string) error {
 
 		warehouseItem.EbayListingIDs = []string{ebayListingID}
 
-		err = aws.SaveJsonObjectS3(EbayListingsBucketName, ebayListingID, &ebayItemInternal)
+		err = aws.SaveJsonObjectS3(warehouse.EbayListingsBucketName, ebayListingID, &ebayItemInternal)
 		if err != nil {
 			return err
 		}

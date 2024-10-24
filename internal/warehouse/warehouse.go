@@ -1,4 +1,4 @@
-package internal
+package warehouse
 
 import (
 	"errors"
@@ -22,7 +22,7 @@ type WarehouseItem struct {
 	EbayListingIDs     []string  `json:"ebayListingIDs"`
 }
 
-func generateControlAltRepeatID() string {
+func GenerateControlAltRepeatID() string {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	letters := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	numbers := []rune("0123456789")
@@ -39,7 +39,7 @@ func generateControlAltRepeatID() string {
 	return result.String()
 }
 
-func (wi *WarehouseItem) initialiseFromSKU(sku string) {
+func (wi *WarehouseItem) InitialiseFromSKU(sku string) {
 	re := regexp.MustCompile(SKURegex)
 
 	match := re.FindStringSubmatch(sku)
@@ -55,7 +55,7 @@ func (wi *WarehouseItem) initialiseFromSKU(sku string) {
 	}
 }
 
-func validateSKU(sku string) error {
+func ValidateSKU(sku string) error {
 	re := regexp.MustCompile(SKURegex)
 
 	if !re.MatchString(sku) {
@@ -65,7 +65,7 @@ func validateSKU(sku string) error {
 	return nil
 }
 
-func validateListingID(ebayListingID string) error {
+func ValidateListingID(ebayListingID string) error {
 	id, err := strconv.Atoi(ebayListingID)
 	if err != nil {
 		return err
@@ -77,6 +77,6 @@ func validateListingID(ebayListingID string) error {
 	return nil
 }
 
-func (i WarehouseItem) toEbaySKU() string {
+func (i WarehouseItem) ToEbaySKU() string {
 	return fmt.Sprintf("(%s) %s", i.Shelf, i.ControlAltRepeatID)
 }
