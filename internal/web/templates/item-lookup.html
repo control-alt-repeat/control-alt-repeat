@@ -1,6 +1,5 @@
 <div x-data="page()">
-    <h2 class="text-center">Lookup Item</h2>
-
+    <h2 class="text-center">Lookup Item</h2>    
     <form @submit.prevent="itemLookup()" class="bg-white col-12 col-md-6 mx-auto p-4 rounded shadow">
         <input id="id" type="text" x-model="id" placeholder="Enter Item ID" autocomplete="off" class="form-control mb-3 w-100" required>
         <button id="lookup-button" type="submit" class="btn btn-success w-100">Find Item</button>
@@ -49,16 +48,23 @@ function page() {
                 body: new URLSearchParams({ id: this.id })
             })
             .then(response => {
-                if (!response.ok) throw new Error()
-                return response.json()
+                // Check if response is ok (status in the range 200-299)
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        console.log(err)
+                        throw new Error(err.error || 'An unknown error occurred');
+                    });
+                }
+                return response.json();
             })
             .then(data => {
-                this.item = data
-                console.log(this.item)
+                this.item = data;        // Store the item data
+                this.showError = false;  // Hide any previous error
             })
             .catch(error => {
-                alert(error.message.Error)
-            })
+                this.errorMessage = error.message || 'An unknown error occurred';
+                this.showError = true;   // Show the Bootstrap alert
+            });
         },
         printShelfLabel() {
             console.log("Printing shelf label for item: ", this.id);
@@ -71,15 +77,22 @@ function page() {
                 body: new URLSearchParams({ id: this.id })
             })
             .then(response => {
-                if (!response.ok) throw new Error()
-                return response.json()
+                // Check if response is ok (status in the range 200-299)
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.error || 'An unknown error occurred');
+                    });
+                }
+                return response.json();
             })
             .then(data => {
-                console.log(this.item)
+                this.item = data;        // Store the item data
+                this.showError = false;  // Hide any previous error
             })
             .catch(error => {
-                alert(error.message.Error)
-            })
+                this.errorMessage = error.message || 'An unknown error occurred';
+                this.showError = true;   // Show the Bootstrap alert
+            });
         }
     }
 }

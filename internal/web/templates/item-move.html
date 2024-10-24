@@ -41,15 +41,23 @@ function page() {
                 body: new URLSearchParams({ id: this.id, shelf: this.shelf })
             })
             .then(response => {
-                if (!response.ok) throw new Error()
-                return response.json()
-            })
-            .then(data => {
+                // Check if response is ok (status in the range 200-299)
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        console.log(err)
+                        throw new Error(err.error || 'An unknown error occurred');
+                    });
+                }
                 window.location.href = `/item-lookup?id=${this.id}`;
             })
-            .catch(error => {
-                alert(error.message.Error)
+            .then(data => {
+                this.item = data;        // Store the item data
+                this.showError = false;  // Hide any previous error
             })
+            .catch(error => {
+                this.errorMessage = error.message || 'An unknown error occurred';
+                this.showError = true;   // Show the Bootstrap alert
+            });
         }
     }
 }

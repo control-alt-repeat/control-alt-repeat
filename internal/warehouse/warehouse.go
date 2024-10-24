@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
 )
 
 const (
@@ -20,6 +22,17 @@ type WarehouseItem struct {
 	Shelf              string    `json:"shelf"`
 	AddedTime          time.Time `json:"addedTime"`
 	EbayListingIDs     []string  `json:"ebayListingIDs"`
+}
+
+func GetWarehouseItem(itemID string) (WarehouseItem, error) {
+	var warehouseItem WarehouseItem
+
+	err := aws.LoadJsonObjectS3(WarehouseItemsBucketName, itemID, &warehouseItem)
+	if err != nil {
+		return warehouseItem, err
+	}
+
+	return warehouseItem, nil
 }
 
 func GenerateControlAltRepeatID() string {

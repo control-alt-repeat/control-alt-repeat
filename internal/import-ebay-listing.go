@@ -10,11 +10,11 @@ import (
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/warehouse"
 )
 
-func ImportEbayListing(ebayListing *models.EbayItem) error {
+func ImportEbayListing(ebayListing *models.EbayItem) (string, error) {
 	if ebayListing.SKU != "" {
 		err := warehouse.ValidateSKU(ebayListing.SKU)
 		if err != nil {
-			return err
+			return "", err
 		}
 	}
 
@@ -33,7 +33,7 @@ func ImportEbayListing(ebayListing *models.EbayItem) error {
 
 	startTime, err := time.Parse(time.RFC3339, ebayListing.ListingDetails.StartTime)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	ebayItemInternal := &warehouse.EbayItemInternal{
@@ -53,7 +53,7 @@ func ImportEbayListing(ebayListing *models.EbayItem) error {
 	)
 	if err != nil {
 		fmt.Printf("Failed to save eBay listing '%s'\n", ebayItemInternal.ID)
-		return err
+		return "", err
 	}
 
 	err = aws.SaveJsonObjectS3(
@@ -63,18 +63,18 @@ func ImportEbayListing(ebayListing *models.EbayItem) error {
 	)
 	if err != nil {
 		fmt.Printf("Failed to save warehouse item '%s'\n", warehouseItem.ControlAltRepeatID)
-		return err
+		return "", err
 	}
 
 	fmt.Printf("Successfully imported eBay listing %s with ID %s\n", ebayListing.ItemID, warehouseItem.ControlAltRepeatID)
 
-	return nil
+	return warehouseItem.ControlAltRepeatID, nil
 }
 
-func ImportEbayListingByID(ebayListingID string) error {
+func ImportEbayListingByID(ebayListingID string) (string, error) {
 	err := warehouse.ValidateListingID(ebayListingID)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	fmt.Printf("Listing ID valid: %s\n", ebayListingID)
@@ -88,7 +88,7 @@ func ImportEbayListingByID(ebayListingID string) error {
 		"SKU",
 	})
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	return ImportEbayListing(ebayListing)

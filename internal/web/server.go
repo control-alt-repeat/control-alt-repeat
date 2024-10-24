@@ -44,6 +44,7 @@ func Init(e *echo.Echo) error {
 
 	initialiseItemLookup(e)
 	initialiseItemMove(e)
+	initialiseEbayImportListing(e)
 
 	return nil
 }

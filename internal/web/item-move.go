@@ -31,7 +31,6 @@ func itemMove(c echo.Context) error {
 
 	matched, err := regexp.MatchString(`^[A-Z]{3}-[0-9]{3}$`, itemMove.ItemID)
 	if err != nil || !matched {
-		fmt.Println(err)
 		return c.JSON(http.StatusInternalServerError, err)
 	}
 	fmt.Println("Moving item with ID:", itemMove.ItemID, "to shelf:", itemMove.Shelf)
@@ -39,7 +38,6 @@ func itemMove(c echo.Context) error {
 	err = internal.MoveItem(itemMove.ItemID, itemMove.Shelf)
 
 	if err != nil {
-		fmt.Println(err)
 		return c.JSON(http.StatusInternalServerError, err)
 	}
 

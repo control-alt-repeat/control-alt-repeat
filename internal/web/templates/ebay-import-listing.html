@@ -1,0 +1,46 @@
+<div x-data="page()">
+    <h2 class="text-center">Import eBay Listing</h2>    
+    <form @submit.prevent="ebayImportListing()" class="bg-white col-12 col-md-6 mx-auto p-4 rounded shadow">
+        <input id="listingID" type="text" x-model="listingID" placeholder="Enter Listing ID" autocomplete="off" class="form-control mb-3 w-100" required>
+        <button id="lookup-button" type="submit" class="btn btn-success w-100">Import Listing</button>
+    </form>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("id").focus();
+});
+
+function page() {
+    return {
+        listingID: "",
+        ebayImportListing() {
+            console.log("Lookup item: ", this.id);
+
+            fetch("ebay-import-listing", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({ listingID: this.listingID })
+            })
+            .then(response => {
+                // Check if response is ok (status in the range 200-299)
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        console.log(err)
+                        throw new Error(err.error || 'An unknown error occurred');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                window.location.href = `/item-lookup?id=${data.warehouseID}`;
+            })
+            .catch(error => {
+                this.errorMessage = error.message || 'An unknown error occurred';
+                this.showError = true;   // Show the Bootstrap alert
+            });
+        }
+    }
+}
+</script>

@@ -23,23 +23,25 @@ func findItem(c echo.Context) error {
 
 	fmt.Println(itemID)
 
-	result, err := internal.LookupItem(itemID)
+	warehouseItem, ebayInternalItems, err := internal.LookupItem(itemID)
 	if err != nil {
 		fmt.Println(err)
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"error": err.Error(),
+		})
 	}
 
 	item := &Item{
-		ID:             result.ID,
-		Shelf:          result.Shelf,
+		ID:             warehouseItem.ControlAltRepeatID,
+		Shelf:          warehouseItem.Shelf,
 		EbayReferences: []EbayReference{},
 	}
 
-	for _, ebayReference := range result.EbayReferences {
+	for _, ebayReference := range ebayInternalItems {
 		item.EbayReferences = append(item.EbayReferences, EbayReference{
 			Title:      ebayReference.Title,
-			ImageURL:   ebayReference.ImageURL,
-			ListingURL: ebayReference.ListingURL,
+			ImageURL:   ebayReference.PictureURL,
+			ListingURL: ebayReference.ViewItemURL,
 		})
 	}
 
@@ -52,7 +54,6 @@ func printLabel(c echo.Context) error {
 	err := internal.ItemPrintShelfLabel(itemID)
 
 	if err != nil {
-		fmt.Println(err)
 		return c.JSON(http.StatusInternalServerError, err)
 	}
 
