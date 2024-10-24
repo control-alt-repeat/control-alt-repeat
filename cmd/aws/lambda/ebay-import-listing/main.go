@@ -56,7 +56,7 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 			return fmt.Errorf("failed to Unmarshal body: %v", err)
 		}
 
-		err = internal.ImportEbayListing(&notification.Body.GetItemResponse.Item)
+		_, err = internal.ImportEbayListing(&notification.Body.GetItemResponse.Item)
 		if err != nil {
 			return fmt.Errorf("failed to import listing: %v", err)
 		}

@@ -44,7 +44,7 @@ func ebayImportListing(cmd *cobra.Command, args []string) {
 	}
 	fmt.Println("Importing eBay listing with ID:", ebayListingID)
 
-	err := internal.ImportEbayListingByID(ebayListingID)
+	_, err := internal.ImportEbayListingByID(ebayListingID)
 
 	if err != nil {
 		fmt.Println(err)
