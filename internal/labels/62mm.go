@@ -16,7 +16,6 @@ func Create62mmItemLabel(text string, qrValue string) ([]byte, error) {
 
 	textSlice := []string{text}
 	dpi := float64(300)
-	hinting := "none"
 	size := float64(55)
 	spacing := float64(0.5)
 	whiteOnBlack := false
@@ -41,19 +40,13 @@ func Create62mmItemLabel(text string, qrValue string) ([]byte, error) {
 		rgba.Set(10+i, 10, ruler)
 	}
 
-	// Draw the text.
-	h := font.HintingNone
-	switch hinting {
-	case "full":
-		h = font.HintingFull
-	}
 	d := &font.Drawer{
 		Dst: rgba,
 		Src: fg,
 		Face: truetype.NewFace(f, &truetype.Options{
 			Size:    size,
 			DPI:     dpi,
-			Hinting: h,
+			Hinting: font.HintingNone,
 		}),
 	}
 	y := 10 + int(math.Ceil(size*dpi/72))
