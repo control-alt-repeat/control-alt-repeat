@@ -1,0 +1,39 @@
+name: Golang CI Lint
+
+on:
+  workflow_dispatch:
+
+jobs:
+  go-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download source code artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: source-code
+
+      - name: Extract source code
+        run: tar -xzf source-code.tar.gz
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.20'
+          cache: true
+
+      - name: Cache golangci-lint
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/golangci-lint
+          key: golangci-lint-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            golangci-lint-${{ runner.os }}-
+
+      - name: Install golangci-lint
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.54.2
+          golangci-lint --version
+
+      - name: Run golangci-lint
+        run: golangci-lint run --timeout 5m

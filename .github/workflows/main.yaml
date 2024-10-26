@@ -7,8 +7,46 @@ permissions:
   id-token: write
   contents: read
 jobs:
+  checkout-source-code:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Archive code
+        run: tar -czf source-code.tar.gz .
+      - name: Upload source code as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: source-code
+          path: source-code.tar.gz
+
+  go-critic:
+    needs: checkout-source-code
+    uses: ./.github/workflows/go-critic.yaml
+    secrets: inherit
+  go-lint:
+    needs: checkout-source-code
+    uses: ./.github/workflows/go-lint.yaml
+    secrets: inherit
+  go-vet:
+    needs: checkout-source-code
+    uses: ./.github/workflows/go-vet.yaml
+    secrets: inherit
+
+# name: Install gosec
+# name: Run gosec
+# name: Run govulncheck
+# name: Run goimports
+
+  linting:
+    needs:
+      - go-critic
+      - go-lint
+      - go-vet
+
   main-pipeline:
     runs-on: ubuntu-latest
+    needs: linting
     steps:
       - uses: hashicorp/setup-terraform@v3
       - uses: actions/checkout@v4
