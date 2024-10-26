@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Create temporary directory and archive source code
         run: |
           # Create a temporary directory
@@ -33,60 +33,34 @@ jobs:
           # Clean up the temporary directory
           rm -rf "$TEMP_DIR"
       - name: Upload source code as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: source-code
           path: source-code.tar.gz
 
-  # go-critic:
-  #   needs: checkout-source-code
-  #   uses: ./.github/workflows/go-critic.yaml
-  #   secrets: inherit
-  # go-imports:
-  #   needs: checkout-source-code
-  #   uses: ./.github/workflows/go-imports.yaml
-  #   secrets: inherit
   golangci-lint:
     needs: checkout-source-code
     uses: ./.github/workflows/golangci-lint.yaml
     secrets: inherit
-  # go-sec:
-  #   needs: checkout-source-code
-  #   uses: ./.github/workflows/go-sec.yaml
-  #   secrets: inherit
-  # go-vet:
-  #   needs: checkout-source-code
-  #   uses: ./.github/workflows/go-vet.yaml
-  #   secrets: inherit
-  # go-vulncheck:
-  #   needs: checkout-source-code
-  #   uses: ./.github/workflows/go-vulncheck.yaml
-  #   secrets: inherit
-
-  # go-static-checks:
-  #   runs-on: ubuntu-latest
-  #   needs:
-  #     # - go-critic
-  #     # - go-imports
-  #     - golangci-lint
-  #     # - go-sec
-  #     # - go-vet
-  #     # - go-vulncheck
-  #   steps:
-  #     - name: Go Static Checks
-  #       run: echo "Go static analysis has completed successfully"
  
   main-pipeline:
     runs-on: ubuntu-latest
     needs: golangci-lint
     steps:
       - uses: hashicorp/setup-terraform@v3
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - name: Download source code artifact
+        uses: actions/download-artifact@v4
         with:
-          go-version: '1.23.x'
+          name: source-code
+
+      - name: Extract source code
+        run: tar -xzf source-code.tar.gz
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
       - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v3
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubOIDC
           aws-region: eu-west-2
