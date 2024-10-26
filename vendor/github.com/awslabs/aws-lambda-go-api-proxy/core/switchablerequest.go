@@ -3,6 +3,7 @@ package core
 import (
 	"encoding/json"
 	"errors"
+
 	"github.com/aws/aws-lambda-go/events"
 )
 
@@ -16,6 +17,7 @@ func NewSwitchableAPIGatewayRequestV1(v *events.APIGatewayProxyRequest) *Switcha
 		v: v,
 	}
 }
+
 // NewSwitchableAPIGatewayRequestV2 creates a new SwitchableAPIGatewayRequest from APIGatewayV2HTTPRequest
 func NewSwitchableAPIGatewayRequestV2(v *events.APIGatewayV2HTTPRequest) *SwitchableAPIGatewayRequest {
 	return &SwitchableAPIGatewayRequest{

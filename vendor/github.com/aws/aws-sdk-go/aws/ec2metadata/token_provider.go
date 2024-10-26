@@ -2,10 +2,11 @@ package ec2metadata
 
 import (
 	"fmt"
-	"github.com/aws/aws-sdk-go/aws"
 	"net/http"
 	"sync/atomic"
 	"time"
+
+	"github.com/aws/aws-sdk-go/aws"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"

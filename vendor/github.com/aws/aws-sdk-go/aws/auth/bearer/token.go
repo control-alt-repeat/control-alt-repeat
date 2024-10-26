@@ -1,8 +1,9 @@
 package bearer
 
 import (
-	"github.com/aws/aws-sdk-go/aws"
 	"time"
+
+	"github.com/aws/aws-sdk-go/aws"
 )
 
 // Token provides a type wrapping a bearer token and expiration metadata.

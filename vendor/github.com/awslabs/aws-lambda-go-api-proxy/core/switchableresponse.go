@@ -3,6 +3,7 @@ package core
 import (
 	"encoding/json"
 	"errors"
+
 	"github.com/aws/aws-lambda-go/events"
 )
 
