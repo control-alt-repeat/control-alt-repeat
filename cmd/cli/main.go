@@ -29,7 +29,6 @@ var cmdRoot = &cobra.Command{
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
@@ -84,6 +83,8 @@ func main() {
 	cmdItem.AddCommand(cmdItemPrintShelfLabel)
 	cmdRoot.AddCommand(cmdEbay)
 	cmdRoot.AddCommand(cmdItem)
+
+	defer cancel()
 
 	if err := cmdRoot.ExecuteContext(ctx); err != nil {
 		fmt.Println(err)
