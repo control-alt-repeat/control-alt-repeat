@@ -14,13 +14,11 @@ func ItemPrintShelfLabel(ctx context.Context, itemID string) error {
 	var warehouseItem warehouse.WarehouseItem
 	var ebayItemInternal warehouse.EbayItemInternal
 
-	fmt.Println("loading warehouse item ", itemID)
 	err := aws.LoadJsonObjectS3(ctx, warehouse.WarehouseItemsBucketName, itemID, &warehouseItem)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("loading ebay item ", warehouseItem.EbayListingIDs[0])
 	err = aws.LoadJsonObjectS3(ctx, warehouse.EbayListingsBucketName, warehouseItem.EbayListingIDs[0], &ebayItemInternal)
 	if err != nil {
 		return err

@@ -100,8 +100,6 @@ var userDeliveryPreferenceArray = models.UserDeliveryPreferenceArray{
 }
 
 func SetNotificationPreferences(ctx context.Context) error {
-	fmt.Println("Setting notification preferences")
-
 	request, requesterCredentials, err := newTraditionalAPIRequest("SetNotificationPreferences")
 	if err != nil {
 		return err
@@ -111,14 +109,12 @@ func SetNotificationPreferences(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(ebayNotificationEndpoint)
 
 	applicationDeliveryPreferences.ApplicationURL = ebayNotificationEndpoint
 
 	payload := models.SetNotificationPreferencesRequest{
-		Xmlns:                "urn:ebay:apis:eBLBaseComponents",
-		RequesterCredentials: *requesterCredentials,
-		// DeliveryURLName:                "AWS Lambda function - *-ebay-notifification-endpoint",
+		Xmlns:                          "urn:ebay:apis:eBLBaseComponents",
+		RequesterCredentials:           *requesterCredentials,
 		ApplicationDeliveryPreferences: applicationDeliveryPreferences,
 		UserDeliveryPreferenceArray:    userDeliveryPreferenceArray,
 		WarningLevel:                   "High",
@@ -139,12 +135,8 @@ func SetNotificationPreferences(ctx context.Context) error {
 	}
 
 	if response.Ack != "Success" {
-		err = errors.New(response.Errors.LongMessage)
+		return errors.New(response.Errors.LongMessage)
 	}
 
-	fmt.Println(response.Ack)
-
-	fmt.Println()
-
-	return err
+	return nil
 }

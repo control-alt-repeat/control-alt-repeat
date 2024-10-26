@@ -10,8 +10,6 @@ import (
 )
 
 func GetItem(ctx context.Context, ebayListingID string, outputSelector []string) (*models.EbayItem, error) {
-	fmt.Printf("Getting eBay listing with ID: %s\n", ebayListingID)
-
 	request, requesterCredentials, err := newTraditionalAPIRequest("GetItem")
 	if err != nil {
 		fmt.Println(err)
@@ -27,14 +25,11 @@ func GetItem(ctx context.Context, ebayListingID string, outputSelector []string)
 
 	resp, err := request.Post(ctx, payload)
 	if err != nil {
-		fmt.Println(err)
 		return &models.EbayItem{}, err
 	}
 
 	var getItemResponse models.GetItemResponse
-	err = xml.Unmarshal(resp, &getItemResponse)
-	if err != nil {
-		fmt.Println(err)
+	if err = xml.Unmarshal(resp, &getItemResponse); err != nil {
 		return &models.EbayItem{}, err
 	}
 

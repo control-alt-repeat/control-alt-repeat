@@ -13,7 +13,6 @@ import (
 )
 
 func Create62mmItemLabel(text string, qrValue string) ([]byte, error) {
-
 	textSlice := []string{text}
 	dpi := float64(300)
 	size := float64(55)

@@ -15,7 +15,7 @@ func UploadFileFromBytes(imageBytes []byte, filename string) error {
 
 	labelPrinterDomain, err := aws.GetParameterValue("eu-west-2", "/control_alt_repeat/ebay/live/label_printer/host_domain")
 	if err != nil {
-		return fmt.Errorf("error creating POST request: %v", err)
+		return err
 	}
 
 	printURL := labelPrinterDomain + "/print"
@@ -61,9 +61,8 @@ func UploadFileFromBytes(imageBytes []byte, filename string) error {
 
 	// Check the response
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("upload failed: %s", resp.Status)
+		return err
 	}
 
-	fmt.Println("File uploaded successfully")
 	return nil
 }

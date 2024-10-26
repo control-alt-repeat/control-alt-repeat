@@ -2,7 +2,6 @@ package internal
 
 import (
 	"context"
-	"fmt"
 
 	aws "github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay"
@@ -17,8 +16,6 @@ func MoveItem(ctx context.Context, itemID string, newShelf string) error {
 	if err != nil {
 		return err
 	}
-
-	fmt.Printf("Loaded item '%s' from warehouse\n", warehouseItem.ControlAltRepeatID)
 
 	warehouseItem.Shelf = newShelf
 

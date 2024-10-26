@@ -10,11 +10,8 @@ import (
 )
 
 func ReviseSKU(ctx context.Context, ebayListingID string, sku string) error {
-	fmt.Printf("Updating SKU to '%s' on eBay listing '%s'\n", sku, ebayListingID)
-
 	request, requesterCredentials, err := newTraditionalAPIRequest("ReviseItem")
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 
@@ -27,24 +24,21 @@ func ReviseSKU(ctx context.Context, ebayListingID string, sku string) error {
 
 	resp, err := request.Post(ctx, payload)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 
 	var reviseItemResponse models.ReviseItemResponse
-	err = xml.Unmarshal(resp, &reviseItemResponse)
-	if err != nil {
-		fmt.Println(err)
+	if err = xml.Unmarshal(resp, &reviseItemResponse); err != nil {
 		return err
 	}
 
 	if reviseItemResponse.Ack == "Failure" {
-		err = errors.New(reviseItemResponse.Errors.LongMessage)
+		return errors.New(reviseItemResponse.Errors.LongMessage)
 	}
 
 	if reviseItemResponse.Ack == "Warning" {
 		fmt.Printf("eBay API Warning: %s\n", reviseItemResponse.Errors.LongMessage)
 	}
 
-	return err
+	return nil
 }

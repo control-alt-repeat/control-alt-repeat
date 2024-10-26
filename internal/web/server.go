@@ -58,8 +58,6 @@ func showIndex(c echo.Context) error {
 func render(code int, templateName string, data map[string]interface{}, c echo.Context) error {
 	var builder strings.Builder
 
-	fmt.Println("Rendering: ", templateName)
-
 	if err := c.Echo().Renderer.Render(&builder, templateName, data, c); err != nil {
 		return err
 	}

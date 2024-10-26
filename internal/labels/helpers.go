@@ -3,10 +3,8 @@ package labels
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"image"
 	"image/png"
-	"log"
 
 	"github.com/yeqown/go-qrcode/v2"
 	"github.com/yeqown/go-qrcode/writer/standard"
@@ -96,7 +94,7 @@ func newQRCode(destination string) (image.Image, error) {
 	)
 
 	if err = qrc.Save(w); err != nil {
-		fmt.Printf("could not save image: %v\n", err)
+		return nil, err
 	}
 
 	image, _, err := image.Decode(buffer)
@@ -104,11 +102,10 @@ func newQRCode(destination string) (image.Image, error) {
 	return image, err
 }
 
-func loadFontFace(size float64) font.Face {
-
+func loadFontFace(size float64) (font.Face, error) {
 	f, err := opentype.Parse(gomonobold.TTF)
 	if err != nil {
-		log.Fatalf("failed to parse font: %v", err)
+		return nil, err
 	}
 
 	face, err := opentype.NewFace(f, &opentype.FaceOptions{
@@ -117,8 +114,8 @@ func loadFontFace(size float64) font.Face {
 		Hinting: font.HintingFull,
 	})
 	if err != nil {
-		log.Fatalf("failed to create font face: %v", err)
+		return nil, err
 	}
 
-	return face
+	return face, nil
 }

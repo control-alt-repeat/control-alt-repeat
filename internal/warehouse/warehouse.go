@@ -45,7 +45,6 @@ func GenerateControlAltRepeatID() (string, error) {
 	for i := 0; i < 3; i++ {
 		n, err := rand.Int(rand.Reader, big.NewInt(int64(len(letters))))
 		if err != nil {
-			fmt.Println("Error generating secure random number:", err)
 			return "", err
 		}
 		result.WriteRune(letters[n.Int64()])
@@ -54,7 +53,6 @@ func GenerateControlAltRepeatID() (string, error) {
 	for i := 0; i < 3; i++ {
 		n, err := rand.Int(rand.Reader, big.NewInt(int64(len(numbers))))
 		if err != nil {
-			fmt.Println("Error generating secure random number:", err)
 			return "", err
 		}
 		result.WriteRune(numbers[n.Int64()])

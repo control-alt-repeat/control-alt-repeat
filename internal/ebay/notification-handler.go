@@ -21,16 +21,11 @@ func HandleNotification(ctx context.Context, notificationXml string) error {
 	notificationBytes := []byte(notificationXml)
 
 	var notification models.ItemNotificationEnvelope
-	err := xml.Unmarshal(notificationBytes, &notification)
-	if err != nil {
+	if err := xml.Unmarshal(notificationBytes, &notification); err != nil {
 		return saveRawXml(ctx, notificationBytes)
 	}
 
-	// Get the current time in UTC
-	currentTime := time.Now().UTC()
-
-	// Format the time as a human-readable string
-	timestamp := currentTime.Format("2006-01-02T15:04:05Z") // ISO 8601 format
+	timestamp := time.Now().UTC().Format("2006-01-02T15:04:05Z")
 
 	key := fmt.Sprintf("%s-%s.xml", timestamp, notification.Body.GetItemResponse.NotificationEventName)
 
@@ -44,11 +39,7 @@ func HandleNotification(ctx context.Context, notificationXml string) error {
 }
 
 func saveRawXml(ctx context.Context, rawXml []byte) error {
-	// Get the current time in UTC
-	currentTime := time.Now().UTC()
-
-	// Format the time as a human-readable string
-	timestamp := currentTime.Format("2006-01-02T15:04:05Z.xml") // ISO 8601 format
+	timestamp := time.Now().UTC().Format("2006-01-02T15:04:05Z.xml")
 
 	return aws.SaveBytesToS3(
 		ctx,

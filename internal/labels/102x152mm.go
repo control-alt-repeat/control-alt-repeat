@@ -28,10 +28,19 @@ func Create102x152mmItemLabel(warehouseID string, itemDescription string, qrValu
 	qrPos := image.Pt(width-qrCodeSize-20, 0) // Position with margin
 	draw.Draw(img, image.Rect(qrPos.X, qrPos.Y, qrPos.X+qrCodeSize, qrPos.Y+qrCodeSize), qrCode, image.Point{}, draw.Over)
 
-	drawTextBox(img, 100, 500, 800, itemDescription, loadFontFace(50))
+	fontFace50, err := loadFontFace(50)
+	if err != nil {
+		return nil, err
+	}
+	fontFace250, err := loadFontFace(250)
+	if err != nil {
+		return nil, err
+	}
+
+	drawTextBox(img, 100, 500, 800, itemDescription, fontFace50)
 
 	// Draw text in the bottom left corner
-	addLabel(img, 20, 200, warehouseID, loadFontFace(250))
+	addLabel(img, 20, 200, warehouseID, fontFace250)
 
 	// return writeImageToPNG(rot90(img))
 	return writeImageToPNG(rot90(rot90(rot90(img))))

@@ -3,7 +3,6 @@ package ebay
 import (
 	"context"
 	"encoding/xml"
-	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -31,7 +30,6 @@ func (r *TraditionalAPIRequest) Post(ctx context.Context, payload interface{}) (
 
 	reader := strings.NewReader(xmlString)
 
-	fmt.Println("Sending request to https://api.ebay.com/ws/api.dll")
 	request, err := http.NewRequestWithContext(ctx, "POST", "https://api.ebay.com/ws/api.dll", reader)
 
 	if err != nil {
@@ -46,14 +44,12 @@ func (r *TraditionalAPIRequest) Post(ctx context.Context, payload interface{}) (
 
 	res, err := client.Do(request)
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 

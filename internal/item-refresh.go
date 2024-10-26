@@ -18,7 +18,6 @@ func RefreshItemFromEbay(ctx context.Context, itemID string) error {
 	var warehouseItem warehouse.WarehouseItem
 	var ebayItemInternal warehouse.EbayItemInternal
 
-	fmt.Println("loading warehouse item ", itemID)
 	err := aws.LoadJsonObjectS3(ctx, warehouse.WarehouseItemsBucketName, itemID, &warehouseItem)
 	if err != nil {
 		return err
@@ -51,11 +50,6 @@ func RefreshItemFromEbay(ctx context.Context, itemID string) error {
 		ebayItemInternal.PictureURL = ebayItemSource.PictureDetails.PictureURL[0]
 		ebayItemInternal.ViewItemURL = ebayItemSource.ListingDetails.ViewItemURL
 		ebayItemInternal.StartTime = startTime
-
-		fmt.Println("Title: ", ebayItemInternal.Title)
-		fmt.Println("PictureURL: ", ebayItemInternal.PictureURL)
-		fmt.Println("ViewItemURL: ", ebayItemInternal.ViewItemURL)
-		fmt.Println("StartTime: ", ebayItemInternal.StartTime)
 
 		warehouseItem.EbayListingIDs = []string{ebayListingID}
 

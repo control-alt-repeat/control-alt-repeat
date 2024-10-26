@@ -1,7 +1,6 @@
 package web
 
 import (
-	"fmt"
 	"net/http"
 	"regexp"
 
@@ -34,7 +33,6 @@ func itemMove(c echo.Context) error {
 	if err != nil || !matched {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
-	fmt.Println("Moving item with ID:", itemMove.ItemID, "to shelf:", itemMove.Shelf)
 
 	err = internal.MoveItem(c.Request().Context(), itemMove.ItemID, itemMove.Shelf)
 

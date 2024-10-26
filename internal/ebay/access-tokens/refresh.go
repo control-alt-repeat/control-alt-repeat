@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -40,54 +39,43 @@ func refreshOAuthToken() (string, error) {
 	if err := os.Setenv("AWS_DEFAULT_REGION", "eu-west-2"); err != nil {
 		return "", err
 	}
-
-	err := ssmconfig.Process("/control_alt_repeat/ebay/live/", &ebayAuthSecrets)
-	if err != nil {
+	if err := ssmconfig.Process("/control_alt_repeat/ebay/live/", &ebayAuthSecrets); err != nil {
 		return "", err
 	}
 
-	// Prepare basic authentication (base64 encoded clientID:clientSecret)
 	auth := base64.StdEncoding.EncodeToString([]byte(ebayAuthSecrets.ClientID + ":" + ebayAuthSecrets.ClientSecret))
 
-	// Create form data for the token refresh request
 	data := url.Values{}
 	data.Set("grant_type", "refresh_token")
 	data.Set("refresh_token", ebayAuthSecrets.RefreshToken)
 
-	// Create a new HTTP POST request
 	req, err := http.NewRequest("POST", ebayAuthSecrets.TokenUrl, bytes.NewBufferString(data.Encode()))
 	if err != nil {
-		return "", fmt.Errorf("failed to create request: %v", err)
+		return "", err
 	}
 
-	// Add necessary headers
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Add("Authorization", "Basic "+auth)
 
-	// Send the request
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("failed to send request: %v", err)
+		return "", err
 	}
 	defer resp.Body.Close()
 
-	// Read the response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("failed to read response body: %v", err)
+		return "", err
 	}
 
-	// Check for errors in the response
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("failed to refresh token: %s", string(body))
+		return "", err
 	}
 
-	// Parse the token response
 	var tokenResp TokenResponse
-	err = json.Unmarshal(body, &tokenResp)
-	if err != nil {
-		return "", fmt.Errorf("failed to parse token response: %v", err)
+	if err = json.Unmarshal(body, &tokenResp); err != nil {
+		return "", err
 	}
 
 	if err = aws.CreateOrUpdateSSMParameter(map[string]string{

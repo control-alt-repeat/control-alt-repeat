@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 
 	awshttp "github.com/aws/aws-sdk-go-v2/aws/transport/http"
@@ -22,7 +21,7 @@ import (
 func SaveBytesToS3(ctx context.Context, bucket, key string, data []byte, contentType string) error {
 	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion("eu-west-2"))
 	if err != nil {
-		return fmt.Errorf("unable to load SDK config: %w", err)
+		return err
 	}
 
 	svc := s3.NewFromConfig(cfg)
@@ -33,7 +32,7 @@ func SaveBytesToS3(ctx context.Context, bucket, key string, data []byte, content
 		Body:   bytes.NewReader(data),
 	})
 	if err != nil {
-		return fmt.Errorf("failed to upload file to S3: %w", err)
+		return err
 	}
 	return nil
 }
@@ -41,14 +40,14 @@ func SaveBytesToS3(ctx context.Context, bucket, key string, data []byte, content
 func SaveJsonObjectS3(ctx context.Context, bucket, key string, item interface{}) error {
 	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion("eu-west-2"))
 	if err != nil {
-		return fmt.Errorf("unable to load SDK config: %w", err)
+		return err
 	}
 
 	svc := s3.NewFromConfig(cfg)
 
 	jsonData, err := json.Marshal(item)
 	if err != nil {
-		return fmt.Errorf("failed to marshal item: %w", err)
+		return err
 	}
 
 	input := &s3.PutObjectInput{
@@ -60,7 +59,7 @@ func SaveJsonObjectS3(ctx context.Context, bucket, key string, item interface{})
 
 	_, err = svc.PutObject(ctx, input)
 	if err != nil {
-		return fmt.Errorf("failed to upload file: %w", err)
+		return err
 	}
 
 	return nil
@@ -69,7 +68,7 @@ func SaveJsonObjectS3(ctx context.Context, bucket, key string, item interface{})
 func LoadJsonObjectS3(ctx context.Context, bucket string, key string, object interface{}) error {
 	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion("eu-west-2"))
 	if err != nil {
-		return fmt.Errorf("unable to load SDK config: %w", err)
+		return err
 	}
 	svc := s3.NewFromConfig(cfg)
 	fmt.Println(bucket)
@@ -79,11 +78,11 @@ func LoadJsonObjectS3(ctx context.Context, bucket string, key string, object int
 		Key:    aws.String(key),
 	})
 	if err != nil {
-		return fmt.Errorf("unable to get object from S3: %w", err)
+		return err
 	}
 	defer resp.Body.Close()
 	if err := json.NewDecoder(resp.Body).Decode(object); err != nil {
-		return fmt.Errorf("unable to decode JSON: %w", err)
+		return err
 	}
 	return nil
 }
@@ -91,7 +90,6 @@ func LoadJsonObjectS3(ctx context.Context, bucket string, key string, object int
 func KeyExistsInS3(ctx context.Context, bucket string, key string) (bool, error) {
 	sdkConfig, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
-		fmt.Println("Couldn't load default configuration. Have you set up your AWS account?")
 		return false, err
 	}
 	s3Client := s3.NewFromConfig(sdkConfig)
@@ -113,7 +111,6 @@ func KeyExistsInS3(ctx context.Context, bucket string, key string) (bool, error)
 func ReadS3Object(ctx context.Context, bucket string, key string, region string) (string, error) {
 	sdkConfig, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
-		fmt.Println("Couldn't load default configuration. Have you set up your AWS account?")
 		return "", err
 	}
 	s3Client := s3.NewFromConfig(sdkConfig)
@@ -124,19 +121,16 @@ func ReadS3Object(ctx context.Context, bucket string, key string, region string)
 	})
 
 	if err != nil {
-		return "", fmt.Errorf("failed to get object from S3: %v", err)
+		return "", err
 	}
 	defer result.Body.Close()
 
 	body, err := io.ReadAll(result.Body)
 	if err != nil {
-		return "", fmt.Errorf("failed to read object content: %v", err)
+		return "", err
 	}
 
-	content := string(body)
-	fmt.Println("Content of the S3 object:", content)
-
-	return content, nil
+	return string(body), nil
 }
 
 func IterateS3Objects(ctx context.Context, bucket string, region string, f func(context.Context, string) error) error {
@@ -150,7 +144,7 @@ func IterateS3Objects(ctx context.Context, bucket string, region string, f func(
 		Secure: true,
 	})
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	opts := minio.ListObjectsOptions{
@@ -160,14 +154,12 @@ func IterateS3Objects(ctx context.Context, bucket string, region string, f func(
 
 	for object := range s3Client.ListObjects(ctx, bucket, opts) {
 		if object.Err != nil {
-			fmt.Println(object.Err)
-			return nil
+			return err
 		}
 
 		err := f(ctx, object.Key)
 		if err != nil {
-			fmt.Println(err)
-			return nil
+			return err
 		}
 	}
 
