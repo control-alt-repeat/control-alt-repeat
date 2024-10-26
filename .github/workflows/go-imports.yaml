@@ -33,7 +33,6 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           go install golang.org/x/tools/cmd/goimports@latest
-          goimports --version
 
       - name: Run goimports
         run: goimports -d $(find . -type f -name '*.go')

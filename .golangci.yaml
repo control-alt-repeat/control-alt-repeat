@@ -1,0 +1,32 @@
+# Aiming for lots of linting
+linters:
+  enable:
+    - gocritic
+    - goimports
+    - gosec
+    - govet
+    - misspell
+
+linters-settings:
+  gocritic:
+    enabled-tags:
+      # - diagnostic
+      # - opinionated
+      # - performance
+      # - style
+  goimports:
+    local-prefixes: github.com/Control-Alt-Repeat/control-alt-repeat
+  govet:
+    enable:
+      - nilness
+      - shadow
+  misspell:
+    locale: US
+    ignore-words:
+
+# Exclude the hostedtoolcache directory
+exclude:
+  - ../../../../../opt/hostedtoolcache/.*  # Adjust the path as needed based on your project structure
+
+run:
+  timeout: 5m
