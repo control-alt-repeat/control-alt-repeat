@@ -47,7 +47,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: golangci-lint
     steps:
-      - uses: hashicorp/setup-terraform@v3
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.7
+          cache: true
       - name: Download source code artifact
         uses: actions/download-artifact@v4
         with:
