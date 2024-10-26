@@ -60,9 +60,11 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - go-critic
+      - go-imports
       - go-lint
-      = go-sec
+      - go-sec
       - go-vet
+      - go-vulncheck
     steps:
       - name: Linting Complete
         run: echo "Linting completed successfully"
