@@ -39,6 +39,7 @@ jobs:
 # name: Run goimports
 
   linting:
+    runs-on: ubuntu-latest
     needs:
       - go-critic
       - go-lint
