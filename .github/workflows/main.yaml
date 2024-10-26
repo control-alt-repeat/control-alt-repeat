@@ -12,8 +12,19 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v2
-      - name: Archive code
-        run: tar -czf source-code.tar.gz .
+      - name: Create temporary directory and archive source code
+        run: |
+          # Create a temporary directory
+          TEMP_DIR=$(mktemp -d)
+
+          # Copy files to the temporary directory
+          cp -r . "$TEMP_DIR"
+
+          # Create a tar archive from the temporary directory
+          tar -czf source-code.tar.gz -C "$TEMP_DIR" .
+
+          # Clean up the temporary directory
+          rm -rf "$TEMP_DIR"
       - name: Upload source code as artifact
         uses: actions/upload-artifact@v3
         with:
