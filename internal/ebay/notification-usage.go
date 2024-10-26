@@ -1,6 +1,7 @@
 package ebay
 
 import (
+	"context"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -8,7 +9,7 @@ import (
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay/models"
 )
 
-func GetNotificationUsage(itemID string) error {
+func GetNotificationUsage(ctx context.Context, itemID string) error {
 
 	fmt.Println("Getting notification usage")
 
@@ -23,7 +24,7 @@ func GetNotificationUsage(itemID string) error {
 		ItemID:               itemID,
 	}
 
-	resp, err := request.Post(payload)
+	resp, err := request.Post(ctx, payload)
 	if err != nil {
 		return err
 	}

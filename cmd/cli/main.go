@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"time"
@@ -27,6 +28,9 @@ var cmdRoot = &cobra.Command{
 }
 
 func main() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 
@@ -81,7 +85,7 @@ func main() {
 	cmdRoot.AddCommand(cmdEbay)
 	cmdRoot.AddCommand(cmdItem)
 
-	if err := cmdRoot.Execute(); err != nil {
+	if err := cmdRoot.ExecuteContext(ctx); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}

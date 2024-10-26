@@ -1,6 +1,7 @@
 package ebay
 
 import (
+	"context"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -8,7 +9,7 @@ import (
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay/models"
 )
 
-func ReviseSKU(ebayListingID string, sku string) error {
+func ReviseSKU(ctx context.Context, ebayListingID string, sku string) error {
 	fmt.Printf("Updating SKU to '%s' on eBay listing '%s'\n", sku, ebayListingID)
 
 	request, requesterCredentials, err := newTraditionalAPIRequest("ReviseItem")
@@ -24,7 +25,7 @@ func ReviseSKU(ebayListingID string, sku string) error {
 	payload.Item.ItemID = ebayListingID
 	payload.Item.SKU = sku
 
-	resp, err := request.Post(payload)
+	resp, err := request.Post(ctx, payload)
 	if err != nil {
 		fmt.Println(err)
 		return err

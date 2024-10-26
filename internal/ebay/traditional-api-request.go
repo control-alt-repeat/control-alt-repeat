@@ -1,6 +1,7 @@
 package ebay
 
 import (
+	"context"
 	"encoding/xml"
 	"fmt"
 	"io"
@@ -18,7 +19,7 @@ type TraditionalAPIRequestPayload interface {
 	SetEbayAccessToken()
 }
 
-func (r *TraditionalAPIRequest) Post(payload interface{}) ([]byte, error) {
+func (r *TraditionalAPIRequest) Post(ctx context.Context, payload interface{}) ([]byte, error) {
 	xmlData, err := xml.MarshalIndent(payload, "", "  ")
 	if err != nil {
 		return nil, err
@@ -31,7 +32,7 @@ func (r *TraditionalAPIRequest) Post(payload interface{}) ([]byte, error) {
 	reader := strings.NewReader(xmlString)
 
 	fmt.Println("Sending request to https://api.ebay.com/ws/api.dll")
-	request, err := http.NewRequest("POST", "https://api.ebay.com/ws/api.dll", reader)
+	request, err := http.NewRequestWithContext(ctx, "POST", "https://api.ebay.com/ws/api.dll", reader)
 
 	if err != nil {
 		return nil, err

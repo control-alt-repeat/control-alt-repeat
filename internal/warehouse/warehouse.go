@@ -1,6 +1,7 @@
 package warehouse
 
 import (
+	"context"
 	"crypto/rand"
 	"errors"
 	"fmt"
@@ -25,10 +26,10 @@ type WarehouseItem struct {
 	EbayListingIDs     []string  `json:"ebayListingIDs"`
 }
 
-func GetWarehouseItem(itemID string) (WarehouseItem, error) {
+func GetWarehouseItem(ctx context.Context, itemID string) (WarehouseItem, error) {
 	var warehouseItem WarehouseItem
 
-	err := aws.LoadJsonObjectS3(WarehouseItemsBucketName, itemID, &warehouseItem)
+	err := aws.LoadJsonObjectS3(ctx, WarehouseItemsBucketName, itemID, &warehouseItem)
 	if err != nil {
 		return warehouseItem, err
 	}

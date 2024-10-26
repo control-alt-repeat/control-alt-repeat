@@ -21,7 +21,7 @@ func renderEbayImportListingPage(c echo.Context) error {
 func ebayImportListing(c echo.Context) error {
 	listingID := c.FormValue("listingID")
 
-	warehouseID, err := internal.ImportEbayListingByID(listingID)
+	warehouseID, err := internal.ImportEbayListingByID(c.Request().Context(), listingID)
 	if err != nil {
 		fmt.Println(err)
 		return c.JSON(http.StatusInternalServerError, echo.Map{

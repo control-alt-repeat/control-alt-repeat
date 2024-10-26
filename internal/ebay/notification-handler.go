@@ -1,6 +1,7 @@
 package ebay
 
 import (
+	"context"
 	"encoding/xml"
 	"fmt"
 	"time"
@@ -16,13 +17,13 @@ type Notification struct {
 
 const notificationBucket = "control-alt-repeat-live-ebay-incoming-notifications"
 
-func HandleNotification(notificationXml string) error {
+func HandleNotification(ctx context.Context, notificationXml string) error {
 	notificationBytes := []byte(notificationXml)
 
 	var notification models.ItemNotificationEnvelope
 	err := xml.Unmarshal(notificationBytes, &notification)
 	if err != nil {
-		return saveRawXml(notificationBytes)
+		return saveRawXml(ctx, notificationBytes)
 	}
 
 	// Get the current time in UTC
@@ -34,6 +35,7 @@ func HandleNotification(notificationXml string) error {
 	key := fmt.Sprintf("%s-%s.xml", timestamp, notification.Body.GetItemResponse.NotificationEventName)
 
 	return aws.SaveBytesToS3(
+		ctx,
 		notificationBucket,
 		key,
 		notificationBytes,
@@ -41,7 +43,7 @@ func HandleNotification(notificationXml string) error {
 	)
 }
 
-func saveRawXml(rawXml []byte) error {
+func saveRawXml(ctx context.Context, rawXml []byte) error {
 	// Get the current time in UTC
 	currentTime := time.Now().UTC()
 
@@ -49,6 +51,7 @@ func saveRawXml(rawXml []byte) error {
 	timestamp := currentTime.Format("2006-01-02T15:04:05Z.xml") // ISO 8601 format
 
 	return aws.SaveBytesToS3(
+		ctx,
 		notificationBucket,
 		timestamp,
 		[]byte(rawXml),

@@ -1,7 +1,8 @@
 name: Deploy Control Alt Repeat
 on:
+  pull_request:
   push:
-    branches:
+    branches-ignore:
       - main
 env:
   AWS_REGION : eu-west-2
@@ -86,12 +87,8 @@ jobs:
         working-directory: configs/test
       - run: terraform validate -no-color
         working-directory: configs/test
-      - run: terraform apply -auto-approve
-        working-directory: configs/test
 
       - run: terraform init
         working-directory: configs/live
       - run: terraform validate -no-color
-        working-directory: configs/live
-      - run: terraform apply -auto-approve
         working-directory: configs/live

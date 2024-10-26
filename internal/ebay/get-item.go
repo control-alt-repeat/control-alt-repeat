@@ -1,6 +1,7 @@
 package ebay
 
 import (
+	"context"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -8,7 +9,7 @@ import (
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay/models"
 )
 
-func GetItem(ebayListingID string, outputSelector []string) (*models.EbayItem, error) {
+func GetItem(ctx context.Context, ebayListingID string, outputSelector []string) (*models.EbayItem, error) {
 	fmt.Printf("Getting eBay listing with ID: %s\n", ebayListingID)
 
 	request, requesterCredentials, err := newTraditionalAPIRequest("GetItem")
@@ -24,7 +25,7 @@ func GetItem(ebayListingID string, outputSelector []string) (*models.EbayItem, e
 		OutputSelector:       outputSelector,
 	}
 
-	resp, err := request.Post(payload)
+	resp, err := request.Post(ctx, payload)
 	if err != nil {
 		fmt.Println(err)
 		return &models.EbayItem{}, err

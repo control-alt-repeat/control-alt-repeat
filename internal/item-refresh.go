@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -9,28 +10,28 @@ import (
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/warehouse"
 )
 
-func RefreshItemsFromEbay() error {
-	return aws.IterateS3Objects(warehouse.WarehouseItemsBucketName, "eu-west-2", RefreshItemFromEbay)
+func RefreshItemsFromEbay(ctx context.Context) error {
+	return aws.IterateS3Objects(ctx, warehouse.WarehouseItemsBucketName, "eu-west-2", RefreshItemFromEbay)
 }
 
-func RefreshItemFromEbay(itemID string) error {
+func RefreshItemFromEbay(ctx context.Context, itemID string) error {
 	var warehouseItem warehouse.WarehouseItem
 	var ebayItemInternal warehouse.EbayItemInternal
 
 	fmt.Println("loading warehouse item ", itemID)
-	err := aws.LoadJsonObjectS3(warehouse.WarehouseItemsBucketName, itemID, &warehouseItem)
+	err := aws.LoadJsonObjectS3(ctx, warehouse.WarehouseItemsBucketName, itemID, &warehouseItem)
 	if err != nil {
 		return err
 	}
 
 	for _, ebayListingID := range warehouseItem.EbayListingIDs {
 		fmt.Println("loading ebay item ", ebayListingID)
-		err = aws.LoadJsonObjectS3(warehouse.EbayListingsBucketName, ebayListingID, &ebayItemInternal)
+		err = aws.LoadJsonObjectS3(ctx, warehouse.EbayListingsBucketName, ebayListingID, &ebayItemInternal)
 		if err != nil {
 			return err
 		}
 
-		ebayItemSource, err := ebay.GetItem(ebayListingID, []string{
+		ebayItemSource, err := ebay.GetItem(ctx, ebayListingID, []string{
 			"ItemID",
 			"Title",
 			"PictureDetails",
@@ -58,7 +59,7 @@ func RefreshItemFromEbay(itemID string) error {
 
 		warehouseItem.EbayListingIDs = []string{ebayListingID}
 
-		err = aws.SaveJsonObjectS3(warehouse.EbayListingsBucketName, ebayListingID, &ebayItemInternal)
+		err = aws.SaveJsonObjectS3(ctx, warehouse.EbayListingsBucketName, ebayListingID, &ebayItemInternal)
 		if err != nil {
 			return err
 		}

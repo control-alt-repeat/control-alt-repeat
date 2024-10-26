@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -10,7 +11,7 @@ import (
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/warehouse"
 )
 
-func ImportEbayListing(ebayListing *models.EbayItem) (string, error) {
+func ImportEbayListing(ctx context.Context, ebayListing *models.EbayItem) (string, error) {
 	if ebayListing.SKU != "" {
 		err := warehouse.ValidateSKU(ebayListing.SKU)
 		if err != nil {
@@ -33,7 +34,7 @@ func ImportEbayListing(ebayListing *models.EbayItem) (string, error) {
 
 		newSKU := warehouseItem.ToEbaySKU()
 
-		if err := ebay.ReviseSKU(ebayListing.ItemID, newSKU); err != nil {
+		if err := ebay.ReviseSKU(ctx, ebayListing.ItemID, newSKU); err != nil {
 			return "", err
 		}
 	}
@@ -54,6 +55,7 @@ func ImportEbayListing(ebayListing *models.EbayItem) (string, error) {
 	warehouseItem.AddedTime = ebayItemInternal.StartTime
 
 	err = aws.SaveJsonObjectS3(
+		ctx,
 		warehouse.EbayListingsBucketName,
 		ebayItemInternal.ID,
 		ebayItemInternal,
@@ -64,6 +66,7 @@ func ImportEbayListing(ebayListing *models.EbayItem) (string, error) {
 	}
 
 	err = aws.SaveJsonObjectS3(
+		ctx,
 		warehouse.WarehouseItemsBucketName,
 		warehouseItem.ControlAltRepeatID,
 		warehouseItem,
@@ -78,7 +81,7 @@ func ImportEbayListing(ebayListing *models.EbayItem) (string, error) {
 	return warehouseItem.ControlAltRepeatID, nil
 }
 
-func ImportEbayListingByID(ebayListingID string) (string, error) {
+func ImportEbayListingByID(ctx context.Context, ebayListingID string) (string, error) {
 	err := warehouse.ValidateListingID(ebayListingID)
 	if err != nil {
 		return "", err
@@ -86,7 +89,7 @@ func ImportEbayListingByID(ebayListingID string) (string, error) {
 
 	fmt.Printf("Listing ID valid: %s\n", ebayListingID)
 
-	ebayListing, err := ebay.GetItem(ebayListingID, []string{
+	ebayListing, err := ebay.GetItem(ctx, ebayListingID, []string{
 		"ItemID",
 		"Title",
 		"Description",
@@ -98,5 +101,5 @@ func ImportEbayListingByID(ebayListingID string) (string, error) {
 		return "", err
 	}
 
-	return ImportEbayListing(ebayListing)
+	return ImportEbayListing(ctx, ebayListing)
 }

@@ -24,7 +24,7 @@ func findItem(c echo.Context) error {
 
 	fmt.Println(itemID)
 
-	warehouseItem, ebayInternalItems, err := internal.LookupItem(itemID)
+	warehouseItem, ebayInternalItems, err := internal.LookupItem(c.Request().Context(), itemID)
 	if err != nil {
 		fmt.Println(err)
 		return c.JSON(http.StatusInternalServerError, echo.Map{
@@ -52,7 +52,7 @@ func findItem(c echo.Context) error {
 func printLabel(c echo.Context) error {
 	itemID := c.FormValue("id")
 
-	err := internal.ItemPrintShelfLabel(itemID)
+	err := internal.ItemPrintShelfLabel(c.Request().Context(), itemID)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)

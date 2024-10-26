@@ -4,6 +4,7 @@
 package ebay
 
 import (
+	"context"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -98,7 +99,7 @@ var userDeliveryPreferenceArray = models.UserDeliveryPreferenceArray{
 	},
 }
 
-func SetNotificationPreferences() error {
+func SetNotificationPreferences(ctx context.Context) error {
 	fmt.Println("Setting notification preferences")
 
 	request, requesterCredentials, err := newTraditionalAPIRequest("SetNotificationPreferences")
@@ -123,7 +124,7 @@ func SetNotificationPreferences() error {
 		WarningLevel:                   "High",
 	}
 
-	resp, err := request.Post(payload)
+	resp, err := request.Post(ctx, payload)
 	if err != nil {
 		return err
 	}

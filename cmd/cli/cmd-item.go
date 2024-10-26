@@ -45,7 +45,7 @@ func itemMove(cmd *cobra.Command, args []string) {
 	}
 	fmt.Println("Moving item with ID:", itemID, "to shelf:", shelf)
 
-	err = internal.MoveItem(itemID, shelf)
+	err = internal.MoveItem(cmd.Context(), itemID, shelf)
 
 	if err != nil {
 		fmt.Println(err)
@@ -71,9 +71,9 @@ func itemRefresh(cmd *cobra.Command, args []string) {
 
 	var err error
 	if all {
-		err = internal.RefreshItemsFromEbay()
+		err = internal.RefreshItemsFromEbay(cmd.Context())
 	} else if itemID != "" {
-		err = internal.RefreshItemFromEbay(itemID)
+		err = internal.RefreshItemFromEbay(cmd.Context(), itemID)
 	}
 
 	if err != nil {
@@ -90,7 +90,7 @@ func itemPrintShelfLabel(cmd *cobra.Command, args []string) {
 	}
 	fmt.Println("Printing shelf label for item ID:", itemID)
 
-	err = internal.ItemPrintShelfLabel(itemID)
+	err = internal.ItemPrintShelfLabel(cmd.Context(), itemID)
 
 	if err != nil {
 		fmt.Println(err)

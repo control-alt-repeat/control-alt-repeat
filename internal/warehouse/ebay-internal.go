@@ -1,6 +1,7 @@
 package warehouse
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -17,13 +18,13 @@ type EbayItemInternal struct {
 	StartTime   time.Time `json:"startTime"`
 }
 
-func GetEbayInternalItems(ebayListingIDs []string) ([]EbayItemInternal, error) {
+func GetEbayInternalItems(ctx context.Context, ebayListingIDs []string) ([]EbayItemInternal, error) {
 	var ebayInternalItems []EbayItemInternal
 
 	for _, ebayListingID := range ebayListingIDs {
 		var ebayItem EbayItemInternal
 		fmt.Printf("Loading item '%s' from ebay listings\n", ebayListingID)
-		err := aws.LoadJsonObjectS3(EbayListingsBucketName, ebayListingID, &ebayItem)
+		err := aws.LoadJsonObjectS3(ctx, EbayListingsBucketName, ebayListingID, &ebayItem)
 		if err != nil {
 			return []EbayItemInternal{}, err
 		}

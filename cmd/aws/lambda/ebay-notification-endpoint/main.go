@@ -12,7 +12,7 @@ import (
 )
 
 func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	if err := ebay.HandleNotification(req.Body); err != nil {
+	if err := ebay.HandleNotification(ctx, req.Body); err != nil {
 		fmt.Println(err)
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusOK, // this is our eBay notification endpoint. If they see errors one this they may cut us off.

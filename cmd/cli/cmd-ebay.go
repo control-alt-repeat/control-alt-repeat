@@ -45,7 +45,7 @@ func ebayImportListing(cmd *cobra.Command, args []string) {
 	}
 	fmt.Println("Importing eBay listing with ID:", ebayListingID)
 
-	_, err := internal.ImportEbayListingByID(ebayListingID)
+	_, err := internal.ImportEbayListingByID(cmd.Context(), ebayListingID)
 
 	if err != nil {
 		fmt.Println(err)
@@ -54,7 +54,7 @@ func ebayImportListing(cmd *cobra.Command, args []string) {
 }
 
 func ebayGetNotificationUsage(cmd *cobra.Command, args []string) {
-	err := ebay.GetNotificationUsage(ebayListingID)
+	err := ebay.GetNotificationUsage(cmd.Context(), ebayListingID)
 
 	if err != nil {
 		fmt.Println(err)
@@ -63,7 +63,7 @@ func ebayGetNotificationUsage(cmd *cobra.Command, args []string) {
 }
 
 func ebaySetNotificationPreferences(cmd *cobra.Command, args []string) {
-	err := ebay.SetNotificationPreferences()
+	err := ebay.SetNotificationPreferences(cmd.Context())
 
 	if err != nil {
 		fmt.Println(err)

@@ -19,15 +19,15 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
-func SaveBytesToS3(bucket, key string, data []byte, contentType string) error {
-	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("eu-west-2"))
+func SaveBytesToS3(ctx context.Context, bucket, key string, data []byte, contentType string) error {
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion("eu-west-2"))
 	if err != nil {
 		return fmt.Errorf("unable to load SDK config: %w", err)
 	}
 
 	svc := s3.NewFromConfig(cfg)
 
-	_, err = svc.PutObject(context.TODO(), &s3.PutObjectInput{
+	_, err = svc.PutObject(ctx, &s3.PutObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
 		Body:   bytes.NewReader(data),
@@ -38,8 +38,8 @@ func SaveBytesToS3(bucket, key string, data []byte, contentType string) error {
 	return nil
 }
 
-func SaveJsonObjectS3(bucket, key string, item interface{}) error {
-	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("eu-west-2"))
+func SaveJsonObjectS3(ctx context.Context, bucket, key string, item interface{}) error {
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion("eu-west-2"))
 	if err != nil {
 		return fmt.Errorf("unable to load SDK config: %w", err)
 	}
@@ -58,7 +58,7 @@ func SaveJsonObjectS3(bucket, key string, item interface{}) error {
 		ContentType: aws.String("application/json"),
 	}
 
-	_, err = svc.PutObject(context.TODO(), input)
+	_, err = svc.PutObject(ctx, input)
 	if err != nil {
 		return fmt.Errorf("failed to upload file: %w", err)
 	}
@@ -66,15 +66,15 @@ func SaveJsonObjectS3(bucket, key string, item interface{}) error {
 	return nil
 }
 
-func LoadJsonObjectS3(bucket string, key string, object interface{}) error {
-	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("eu-west-2"))
+func LoadJsonObjectS3(ctx context.Context, bucket string, key string, object interface{}) error {
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion("eu-west-2"))
 	if err != nil {
 		return fmt.Errorf("unable to load SDK config: %w", err)
 	}
 	svc := s3.NewFromConfig(cfg)
 	fmt.Println(bucket)
 	fmt.Println(key)
-	resp, err := svc.GetObject(context.TODO(), &s3.GetObjectInput{
+	resp, err := svc.GetObject(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
 	})
@@ -88,15 +88,15 @@ func LoadJsonObjectS3(bucket string, key string, object interface{}) error {
 	return nil
 }
 
-func KeyExistsInS3(bucket string, key string) (bool, error) {
-	sdkConfig, err := config.LoadDefaultConfig(context.TODO())
+func KeyExistsInS3(ctx context.Context, bucket string, key string) (bool, error) {
+	sdkConfig, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		fmt.Println("Couldn't load default configuration. Have you set up your AWS account?")
 		return false, err
 	}
 	s3Client := s3.NewFromConfig(sdkConfig)
 
-	_, err = s3Client.HeadObject(context.TODO(), &s3.HeadObjectInput{
+	_, err = s3Client.HeadObject(ctx, &s3.HeadObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
 	})
@@ -111,14 +111,14 @@ func KeyExistsInS3(bucket string, key string) (bool, error) {
 }
 
 func ReadS3Object(ctx context.Context, bucket string, key string, region string) (string, error) {
-	sdkConfig, err := config.LoadDefaultConfig(context.TODO())
+	sdkConfig, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		fmt.Println("Couldn't load default configuration. Have you set up your AWS account?")
 		return "", err
 	}
 	s3Client := s3.NewFromConfig(sdkConfig)
 
-	result, err := s3Client.GetObject(context.TODO(), &s3.GetObjectInput{
+	result, err := s3Client.GetObject(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
 	})
@@ -139,7 +139,7 @@ func ReadS3Object(ctx context.Context, bucket string, key string, region string)
 	return content, nil
 }
 
-func IterateS3Objects(bucket string, region string, f func(string) error) error {
+func IterateS3Objects(ctx context.Context, bucket string, region string, f func(context.Context, string) error) error {
 	s3Client, err := minio.New("s3.amazonaws.com", &minio.Options{
 		Creds: credentials.NewChainCredentials([]credentials.Provider{
 			&credentials.EnvAWS{},             // Check environment variables
@@ -158,13 +158,13 @@ func IterateS3Objects(bucket string, region string, f func(string) error) error 
 		Recursive: true,
 	}
 
-	for object := range s3Client.ListObjects(context.TODO(), bucket, opts) {
+	for object := range s3Client.ListObjects(ctx, bucket, opts) {
 		if object.Err != nil {
 			fmt.Println(object.Err)
 			return nil
 		}
 
-		err := f(object.Key)
+		err := f(ctx, object.Key)
 		if err != nil {
 			fmt.Println(err)
 			return nil

@@ -36,7 +36,7 @@ func itemMove(c echo.Context) error {
 	}
 	fmt.Println("Moving item with ID:", itemMove.ItemID, "to shelf:", itemMove.Shelf)
 
-	err = internal.MoveItem(itemMove.ItemID, itemMove.Shelf)
+	err = internal.MoveItem(c.Request().Context(), itemMove.ItemID, itemMove.Shelf)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
