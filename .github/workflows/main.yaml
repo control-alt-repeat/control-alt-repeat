@@ -38,20 +38,26 @@ jobs:
           name: source-code
           path: source-code.tar.gz
 
-  golangci-lint:
+  lint-golang:
     needs: checkout-source-code
-    uses: ./.github/workflows/golangci-lint.yaml
+    uses: ./.github/workflows/lint-golang.yaml
+    secrets: inherit
+
+  lint-terraform:
+    needs: checkout-source-code
+    uses: ./.github/workflows/lint-terraform.yaml
     secrets: inherit
  
   main-pipeline:
     runs-on: ubuntu-latest
-    needs: golangci-lint
+    needs:
+      - lint-golang
+      - lint-terraform
     steps:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.9.7
-          cache: true
       - name: Download source code artifact
         uses: actions/download-artifact@v4
         with:

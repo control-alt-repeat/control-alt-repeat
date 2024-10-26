@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  go-lint:
+  lint-golang:
     runs-on: ubuntu-latest
     steps:
       - name: Download source code artifact

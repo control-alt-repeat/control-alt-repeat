@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  terraform-lint:
+  lint-terraform:
     runs-on: ubuntu-latest
     steps:
       - name: Download source code artifact
