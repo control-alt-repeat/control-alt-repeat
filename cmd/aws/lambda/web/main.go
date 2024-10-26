@@ -4,10 +4,11 @@ import (
 	"context"
 	"log"
 
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/web"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	echoadapter "github.com/awslabs/aws-lambda-go-api-proxy/echo"
+
+	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/web"
 
 	"github.com/labstack/echo/v4"
 )

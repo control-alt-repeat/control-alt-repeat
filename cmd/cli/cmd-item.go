@@ -5,8 +5,9 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal"
 	"github.com/spf13/cobra"
+
+	"github.com/Control-Alt-Repeat/control-alt-repeat/internal"
 )
 
 // Item command: "car item"
@@ -55,7 +56,7 @@ func itemMove(cmd *cobra.Command, args []string) {
 func itemRefresh(cmd *cobra.Command, args []string) {
 	// Parse flags
 	all, _ := cmd.Flags().GetBool("all")
-	itemID, _ := cmd.Flags().GetString("item-id")
+	itemID, _ = cmd.Flags().GetString("item-id")
 
 	// Check for conflicting or missing flags
 	if all && itemID != "" {

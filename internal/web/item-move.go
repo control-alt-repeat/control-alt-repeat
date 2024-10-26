@@ -5,8 +5,9 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal"
 	"github.com/labstack/echo/v4"
+
+	"github.com/Control-Alt-Repeat/control-alt-repeat/internal"
 )
 
 type ItemMove struct {

@@ -11,8 +11,9 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
 	ssmconfig "github.com/ianlopshire/go-ssm-config"
+
+	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
 )
 
 type TokenResponse struct {

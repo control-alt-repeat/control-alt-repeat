@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/web"
 	"github.com/labstack/echo/v4"
+
+	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/web"
 )
 
 func main() {

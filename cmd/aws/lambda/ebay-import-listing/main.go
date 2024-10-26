@@ -7,13 +7,14 @@ import (
 	"io"
 	"net/url"
 
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal"
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay/models"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+
+	"github.com/Control-Alt-Repeat/control-alt-repeat/internal"
+	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay/models"
 )
 
 func handler(ctx context.Context, s3Event events.S3Event) error {

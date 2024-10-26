@@ -36,9 +36,5 @@ func ItemPrintShelfLabel(itemID string) error {
 
 	key := fmt.Sprintf("102x152-%s.png", warehouseItem.ControlAltRepeatID)
 
-	if err != nil {
-		return err
-	}
-
 	return labels.UploadFileFromBytes(label, key)
 }

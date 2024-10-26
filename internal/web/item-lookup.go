@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal"
 	"github.com/labstack/echo/v4"
+
+	"github.com/Control-Alt-Repeat/control-alt-repeat/internal"
 )
 
 func initialiseItemLookup(e *echo.Echo) {

@@ -5,9 +5,10 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/spf13/cobra"
+
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal"
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay"
-	"github.com/spf13/cobra"
 )
 
 // eBay command: "car ebay"
