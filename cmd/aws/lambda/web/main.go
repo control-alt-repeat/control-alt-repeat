@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
-	"log"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/pkgerrors"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -13,15 +15,26 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+var log zerolog.Logger
+
 var (
 	echoLambda *echoadapter.EchoLambdaV2
 )
 
 func init() {
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
+
+	log.With().
+		Timestamp().
+		Str("service", "web").
+		Logger().
+		Level(zerolog.DebugLevel)
+
 	e := echo.New()
 	err := web.Init(e)
 	if err != nil {
-		log.Fatalf("Failed to initialize Echo app: %v", err)
+		log.Fatal().Err(err).Msg("Failed to initialize Echo app")
 	}
 	echoLambda = echoadapter.NewV2(e)
 }

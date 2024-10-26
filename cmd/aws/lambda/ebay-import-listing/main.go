@@ -7,6 +7,9 @@ import (
 	"io"
 	"net/url"
 
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/pkgerrors"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
@@ -16,6 +19,19 @@ import (
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal"
 	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay/models"
 )
+
+var log zerolog.Logger
+
+func init() {
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
+
+	log.With().
+		Timestamp().
+		Str("service", "ebay-import-listing").
+		Logger().
+		Level(zerolog.DebugLevel)
+}
 
 func handler(ctx context.Context, s3Event events.S3Event) error {
 	sess, err := session.NewSession()
