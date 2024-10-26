@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"time"
 
@@ -28,8 +27,23 @@ var cmdRoot = &cobra.Command{
 }
 
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 
+	consoleWriter := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
+
+	log = zerolog.New(consoleWriter).
+		With().
+		Timestamp().
+		Str("service", "cli").
+		Logger().
+		Level(zerolog.DebugLevel)
+
+	exitCode := run()
+	os.Exit(exitCode)
+}
+
+func run() int {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 
@@ -44,25 +58,25 @@ func main() {
 
 	cmdEbayImportListing.Flags().StringVar(&ebayListingID, "ebay-listing-id", "", "eBay listing ID")
 	if err := cmdEbayImportListing.MarkFlagRequired("ebay-listing-id"); err != nil {
-		log.Fatal().Err(err).Msg("")
-		return
+		log.Error().Err(err).Msg("")
+		return 1
 	}
 
 	cmdEbayGetNotificationUsage.Flags().StringVar(&ebayListingID, "ebay-listing-id", "", "eBay listing ID")
 	if err := cmdEbayImportListing.MarkFlagRequired("ebay-listing-id"); err != nil {
-		log.Fatal().Err(err).Msg("")
-		return
+		log.Error().Err(err).Msg("")
+		return 1
 	}
 
 	cmdItemMove.Flags().StringVar(&itemID, "item-id", "", "Item ID")
 	cmdItemMove.Flags().StringVar(&shelf, "shelf", "", "Shelf location")
 	if err := cmdItemMove.MarkFlagRequired("item-id"); err != nil {
-		log.Fatal().Err(err).Msg("")
-		return
+		log.Error().Err(err).Msg("")
+		return 1
 	}
 	if err := cmdItemMove.MarkFlagRequired("shelf"); err != nil {
-		log.Fatal().Err(err).Msg("")
-		return
+		log.Error().Err(err).Msg("")
+		return 1
 	}
 
 	cmdItemRefresh.Flags().StringVar(&itemID, "item-id", "", "Item ID")
@@ -71,8 +85,8 @@ func main() {
 
 	cmdItemPrintShelfLabel.Flags().StringVar(&itemID, "item-id", "", "Item ID")
 	if err := cmdItemPrintShelfLabel.MarkFlagRequired("item-id"); err != nil {
-		log.Fatal().Err(err).Msg("")
-		return
+		log.Error().Err(err).Msg("")
+		return 1
 	}
 
 	cmdEbay.AddCommand(cmdEbayImportListing)
@@ -84,10 +98,13 @@ func main() {
 	cmdRoot.AddCommand(cmdEbay)
 	cmdRoot.AddCommand(cmdItem)
 
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	if err := cmdRoot.ExecuteContext(ctx); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Error().Err(err).Msg("")
+		return 1
 	}
+
+	return 0
 }
