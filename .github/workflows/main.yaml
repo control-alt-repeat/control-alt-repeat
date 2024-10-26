@@ -44,8 +44,8 @@ jobs:
       - go-lint
       - go-vet
     steps:
-      name: Linting Complete
-      run: echo "Linting completed successfully"
+      - name: Linting Complete
+        run: echo "Linting completed successfully"
 
   main-pipeline:
     runs-on: ubuntu-latest
