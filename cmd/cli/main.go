@@ -3,9 +3,15 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/pkgerrors"
 
 	"github.com/spf13/cobra"
 )
+
+var log zerolog.Logger
 
 var (
 	ebayListingID string
@@ -21,23 +27,50 @@ var cmdRoot = &cobra.Command{
 }
 
 func main() {
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
+
+	consoleWriter := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
+
+	log = zerolog.New(consoleWriter).
+		With().
+		Timestamp().
+		Str("service", "cli").
+		Logger().
+		Level(zerolog.DebugLevel)
+
 	cmdEbayImportListing.Flags().StringVar(&ebayListingID, "ebay-listing-id", "", "eBay listing ID")
-	cmdEbayImportListing.MarkFlagRequired("ebay-listing-id")
+	if err := cmdEbayImportListing.MarkFlagRequired("ebay-listing-id"); err != nil {
+		log.Fatal().Err(err).Msg("")
+		return
+	}
 
 	cmdEbayGetNotificationUsage.Flags().StringVar(&ebayListingID, "ebay-listing-id", "", "eBay listing ID")
-	cmdEbayImportListing.MarkFlagRequired("ebay-listing-id")
+	if err := cmdEbayImportListing.MarkFlagRequired("ebay-listing-id"); err != nil {
+		log.Fatal().Err(err).Msg("")
+		return
+	}
 
 	cmdItemMove.Flags().StringVar(&itemID, "item-id", "", "Item ID")
 	cmdItemMove.Flags().StringVar(&shelf, "shelf", "", "Shelf location")
-	cmdItemMove.MarkFlagRequired("item-id")
-	cmdItemMove.MarkFlagRequired("shelf")
+	if err := cmdItemMove.MarkFlagRequired("item-id"); err != nil {
+		log.Fatal().Err(err).Msg("")
+		return
+	}
+	if err := cmdItemMove.MarkFlagRequired("shelf"); err != nil {
+		log.Fatal().Err(err).Msg("")
+		return
+	}
 
 	cmdItemRefresh.Flags().StringVar(&itemID, "item-id", "", "Item ID")
 	cmdItemRefresh.Flags().BoolVar(&all, "all", false, "All items")
 	cmdItemRefresh.MarkFlagsOneRequired("item-id", "all")
 
 	cmdItemPrintShelfLabel.Flags().StringVar(&itemID, "item-id", "", "Item ID")
-	cmdItemPrintShelfLabel.MarkFlagRequired("item-id")
+	if err := cmdItemPrintShelfLabel.MarkFlagRequired("item-id"); err != nil {
+		log.Fatal().Err(err).Msg("")
+		return
+	}
 
 	cmdEbay.AddCommand(cmdEbayImportListing)
 	cmdEbay.AddCommand(cmdEbayGetNotificationUsage)

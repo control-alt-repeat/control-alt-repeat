@@ -33,8 +33,12 @@ type EbayAuthSecretsConfig struct {
 func refreshOAuthToken() (string, error) {
 	var ebayAuthSecrets EbayAuthSecretsConfig
 
-	os.Setenv("AWS_REGION", "eu-west-2")
-	os.Setenv("AWS_DEFAULT_REGION", "eu-west-2")
+	if err := os.Setenv("AWS_REGION", "eu-west-2"); err != nil {
+		return "", err
+	}
+	if err := os.Setenv("AWS_DEFAULT_REGION", "eu-west-2"); err != nil {
+		return "", err
+	}
 
 	err := ssmconfig.Process("/control_alt_repeat/ebay/live/", &ebayAuthSecrets)
 	if err != nil {
@@ -85,11 +89,13 @@ func refreshOAuthToken() (string, error) {
 		return "", fmt.Errorf("failed to parse token response: %v", err)
 	}
 
-	aws.CreateOrUpdateSSMParameter(map[string]string{
+	if err = aws.CreateOrUpdateSSMParameter(map[string]string{
 		"/control_alt_repeat/ebay/live/access_token": tokenResp.AccessToken,
 		"/control_alt_repeat/ebay/live/expires_in":   strconv.Itoa(tokenResp.ExpiresIn),
 		"/control_alt_repeat/ebay/live/timestamp":    strconv.Itoa(tokenResp.ExpiresIn),
-	})
+	}); err != nil {
+		return "", err
+	}
 
 	// Return the new access token
 	return tokenResp.AccessToken, nil

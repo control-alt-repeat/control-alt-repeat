@@ -1,0 +1,39 @@
+name: Golang CI Vuln Check
+
+on:
+  workflow_call:
+
+jobs:
+  go-vuln-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download source code artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: source-code
+
+      - name: Extract source code
+        run: tar -xzf source-code.tar.gz
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.20'
+          cache: true
+
+      - name: Cache govulncheck
+        uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/bin/govulncheck
+          key: ${{ runner.os }}-govulncheck-${{ hashFiles('**/go.mod') }}
+          restore-keys: |
+            ${{ runner.os }}-govulncheck-
+
+      - name: Install govulncheck
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck --version
+
+      - name: Run govulncheck
+        run: govulncheck ./...

@@ -35,25 +35,33 @@ jobs:
     needs: checkout-source-code
     uses: ./.github/workflows/go-critic.yaml
     secrets: inherit
+  go-imports:
+    needs: checkout-source-code
+    uses: ./.github/workflows/go-imports.yaml
+    secrets: inherit
   go-lint:
     needs: checkout-source-code
     uses: ./.github/workflows/go-lint.yaml
+    secrets: inherit
+  go-sec:
+    needs: checkout-source-code
+    uses: ./.github/workflows/go-sec.yaml
     secrets: inherit
   go-vet:
     needs: checkout-source-code
     uses: ./.github/workflows/go-vet.yaml
     secrets: inherit
-
-# name: Install gosec
-# name: Run gosec
-# name: Run govulncheck
-# name: Run goimports
+  go-vulncheck:
+    needs: checkout-source-code
+    uses: ./.github/workflows/go-vulncheck.yaml
+    secrets: inherit
 
   linting:
     runs-on: ubuntu-latest
     needs:
       - go-critic
       - go-lint
+      = go-sec
       - go-vet
     steps:
       - name: Linting Complete

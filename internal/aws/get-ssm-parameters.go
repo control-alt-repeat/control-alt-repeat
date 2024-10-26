@@ -27,7 +27,7 @@ func GetSecrets(region string, keynames []*string) (*map[string]interface{}, err
 		return nil, err
 	}
 
-	var secretsInfo map[string]interface{}
+	secretsInfo := make(map[string]interface{})
 
 	for _, item := range param.Parameters {
 		secretsInfo[*item.Name] = *item.Value

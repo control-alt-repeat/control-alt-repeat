@@ -34,7 +34,7 @@ func Create62mmItemLabel(text string, qrValue string) ([]byte, error) {
 	}
 	const imgW, imgH = 1109, 696
 	rgba := image.NewRGBA(image.Rect(0, 0, imgW, imgH))
-	draw.Draw(rgba, rgba.Bounds(), bg, image.ZP, draw.Src)
+	draw.Draw(rgba, rgba.Bounds(), bg, image.Point{}, draw.Src)
 	for i := 0; i < 200; i++ {
 		rgba.Set(10, 10+i, ruler)
 		rgba.Set(10+i, 10, ruler)

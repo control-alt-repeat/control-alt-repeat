@@ -10,29 +10,10 @@ import (
 
 	"github.com/yeqown/go-qrcode/v2"
 	"github.com/yeqown/go-qrcode/writer/standard"
-	"golang.org/x/image/draw"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/gofont/gomonobold"
 	"golang.org/x/image/font/opentype"
 )
-
-func resizeWithHeight(i image.Image, newHeight int) image.Image {
-
-	// draw.Draw(rgba, img1.Bounds(), img1, image.Point{0, 0}, draw.Src)
-	// draw.Draw(rgba, r2, img2, image.Point{0, 0}, draw.Src)
-
-	aspectRatio := float64(i.Bounds().Dx()) / float64(i.Bounds().Dy())
-	newWidth := int(float64(newHeight) * aspectRatio)
-
-	resizedImg := image.NewRGBA(image.Rect(0, 0, newWidth, newHeight))
-	draw.CatmullRom.Scale(resizedImg, resizedImg.Bounds(), i, i.Bounds(), draw.Over, nil)
-
-	return i
-}
-
-func resizeWithWidth(width int) {
-	panic("Not implemented")
-}
 
 func rot90(inputImage *image.RGBA) *image.RGBA {
 	bounds := inputImage.Bounds()

@@ -38,7 +38,9 @@ func UploadFileFromBytes(imageBytes []byte, filename string) error {
 	}
 
 	// Close the multipart writer
-	writer.Close()
+	if err = writer.Close(); err != nil {
+		return err
+	}
 
 	// Create a request to upload the file
 	req, err := http.NewRequest("POST", printURL, &body)

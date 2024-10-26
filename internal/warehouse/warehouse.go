@@ -1,9 +1,10 @@
 package warehouse
 
 import (
+	"crypto/rand"
 	"errors"
 	"fmt"
-	"math/rand"
+	"math/big"
 	"regexp"
 	"strconv"
 	"strings"
@@ -35,21 +36,30 @@ func GetWarehouseItem(itemID string) (WarehouseItem, error) {
 	return warehouseItem, nil
 }
 
-func GenerateControlAltRepeatID() string {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+func GenerateControlAltRepeatID() (string, error) {
 	letters := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	numbers := []rune("0123456789")
 
 	var result strings.Builder
 	for i := 0; i < 3; i++ {
-		result.WriteRune(letters[r.Intn(len(letters))])
+		n, err := rand.Int(rand.Reader, big.NewInt(int64(len(letters))))
+		if err != nil {
+			fmt.Println("Error generating secure random number:", err)
+			return "", err
+		}
+		result.WriteRune(letters[n.Int64()])
 	}
 	result.WriteRune('-')
 	for i := 0; i < 3; i++ {
-		result.WriteRune(numbers[r.Intn(len(numbers))])
+		n, err := rand.Int(rand.Reader, big.NewInt(int64(len(numbers))))
+		if err != nil {
+			fmt.Println("Error generating secure random number:", err)
+			return "", err
+		}
+		result.WriteRune(numbers[n.Int64()])
 	}
 
-	return result.String()
+	return result.String(), nil
 }
 
 func (wi *WarehouseItem) InitialiseFromSKU(sku string) {

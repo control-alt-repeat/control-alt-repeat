@@ -11,11 +11,6 @@ import (
 	"os"
 )
 
-// Constants for eBay OAuth
-const (
-	tokenURL = "https://api.ebay.com/identity/v1/oauth2/token"
-)
-
 // Struct to capture the token response
 type TokenResponse struct {
 	AccessToken string `json:"access_token"`
@@ -26,6 +21,7 @@ type TokenResponse struct {
 
 // Function to refresh the OAuth token using the refresh token
 func refreshOAuthToken() (string, error) {
+	tokenURL := os.Getenv("https://api.ebay.com/identity/v1/oauth2/token")
 	clientID := os.Getenv("CLIENT_ID")
 	clientSecret := os.Getenv("CLIENT_SECRET")
 	refreshToken := os.Getenv("REFRESH_TOKEN")

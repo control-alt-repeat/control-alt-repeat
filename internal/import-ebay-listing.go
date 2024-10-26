@@ -24,11 +24,18 @@ func ImportEbayListing(ebayListing *models.EbayItem) (string, error) {
 	warehouseItem.InitialiseFromSKU(ebayListing.SKU)
 
 	if warehouseItem.ControlAltRepeatID == "" {
-		warehouseItem.ControlAltRepeatID = warehouse.GenerateControlAltRepeatID()
+		newID, err := warehouse.GenerateControlAltRepeatID()
+		if err != nil {
+			return "", err
+		}
+
+		warehouseItem.ControlAltRepeatID = newID
 
 		newSKU := warehouseItem.ToEbaySKU()
 
-		ebay.ReviseSKU(ebayListing.ItemID, newSKU)
+		if err := ebay.ReviseSKU(ebayListing.ItemID, newSKU); err != nil {
+			return "", err
+		}
 	}
 
 	startTime, err := time.Parse(time.RFC3339, ebayListing.ListingDetails.StartTime)

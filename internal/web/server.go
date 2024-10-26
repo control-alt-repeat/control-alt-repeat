@@ -60,7 +60,9 @@ func render(code int, templateName string, data map[string]interface{}, c echo.C
 
 	fmt.Println("Rendering: ", templateName)
 
-	c.Echo().Renderer.Render(&builder, templateName, data, c)
+	if err := c.Echo().Renderer.Render(&builder, templateName, data, c); err != nil {
+		return err
+	}
 
 	return c.Render(code, "base.html", map[string]interface{}{
 		"content": builder.String(),
