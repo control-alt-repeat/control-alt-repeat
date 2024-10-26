@@ -39,6 +39,3 @@ jobs:
       - name: Run TFLint Configs
         run: |
           tflint --format compact --chdir configs --recursive
-
-      - name: Run TFLint
-        run: tflint
