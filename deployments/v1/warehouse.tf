@@ -2,6 +2,39 @@ resource "aws_s3_bucket" "warehouse" {
   bucket = "control-alt-repeat-warehouse"
 }
 
+resource "aws_dynamodb_table" "warehouse" {
+  name           = "control-alt-repeat-warehouse"
+  billing_mode   = "PAY_PER_REQUEST"
+
+  attribute {
+    name = "ID"
+    type = "S"
+  }
+
+  hash_key = "ID"
+
+  attribute {
+    name = "title"
+    type = "S"
+  }
+
+  attribute {
+    name = "shelf"
+    type = "S"
+  }
+
+  attribute {
+    name = "createdAt"
+    type = "N"
+  }
+
+  attribute {
+    name = "updatedAt"
+    type = "N"
+  }
+}
+
+
 data "aws_iam_policy_document" "allow_warehouse_read" {
   statement {
     effect = "Allow"
