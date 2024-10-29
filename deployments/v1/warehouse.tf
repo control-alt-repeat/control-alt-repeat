@@ -24,6 +24,11 @@ resource "aws_dynamodb_table" "warehouse" {
   }
 
   attribute {
+    name = "owner"
+    type = "S"
+  }
+
+  attribute {
     name = "createdAt"
     type = "N"
   }
