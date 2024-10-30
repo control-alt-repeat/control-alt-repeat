@@ -3,22 +3,19 @@ package warehouse
 import (
 	"context"
 	"crypto/rand"
-	"errors"
 	"math/big"
-	"strconv"
 	"strings"
 
 	"github.com/control-alt-repeat/control-alt-repeat/internal/models"
 	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse/persistence"
 )
 
-func GetWarehouseItem(ctx context.Context, itemID string) (models.WarehouseItem, error) {
-	item, err := persistence.LoadItem(ctx, persistence.LoadItemOptions{ID: itemID})
-	if err != nil {
-		return models.WarehouseItem{}, err
-	}
+func SaveItem(ctx context.Context, item models.WarehouseItem) error {
+	return persistence.SaveItem(ctx, persistence.SaveItemOptions{Item: item})
+}
 
-	return item, nil
+func LoadItem(ctx context.Context, itemID string) (models.WarehouseItem, error) {
+	return persistence.LoadItem(ctx, persistence.LoadItemOptions{ID: itemID})
 }
 
 func GenerateControlAltRepeatID() (string, error) {
@@ -43,16 +40,4 @@ func GenerateControlAltRepeatID() (string, error) {
 	}
 
 	return result.String(), nil
-}
-
-func ValidateListingID(ebayListingID string) error {
-	id, err := strconv.Atoi(ebayListingID)
-	if err != nil {
-		return err
-	}
-	if id <= 0 {
-		return errors.New("ebay listing ID does not look valid - should be a biggish number")
-	}
-
-	return nil
 }

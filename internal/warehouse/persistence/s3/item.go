@@ -3,6 +3,8 @@ package s3
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/minio/minio-go/v7"
@@ -13,6 +15,34 @@ type Item struct {
 	Shelf              string    `json:"shelf"`
 	AddedTime          time.Time `json:"addedTime"`
 	EbayListingIDs     []string  `json:"ebayListingIDs"`
+}
+
+type SaveItemOptions struct {
+	Item Item
+}
+
+func SaveItem(ctx context.Context, opt SaveItemOptions) error {
+	s3, err := getClient()
+	if err != nil {
+		return err
+	}
+
+	jsonData, err := json.Marshal(opt.Item)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(jsonData)
+
+	_, err = s3.client.PutObject(
+		ctx,
+		"control-alt-repeat-warehouse",
+		opt.Item.ControlAltRepeatID,
+		strings.NewReader(string(jsonData)),
+		int64(len(jsonData)),
+		minio.PutObjectOptions{})
+
+	return err
 }
 
 type LoadItemOptions struct {

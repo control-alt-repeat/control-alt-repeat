@@ -7,16 +7,16 @@ import (
 	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse"
 )
 
-func LookupItem(ctx context.Context, itemID string) (models.WarehouseItem, []warehouse.EbayItemInternal, error) {
-	warehouseItem, err := warehouse.GetWarehouseItem(ctx, itemID)
+func LookupItem(ctx context.Context, itemID string) (models.WarehouseItem, []models.WarehouseEbayListing, error) {
+	warehouseItem, err := warehouse.LoadItem(ctx, itemID)
 	if err != nil {
 		return models.WarehouseItem{}, nil, err
 	}
 
-	ebayInternalItems, err := warehouse.GetEbayInternalItems(ctx, warehouseItem.EbayListingIDs)
+	ebayListing, err := warehouse.LoadEbayListing(ctx, warehouseItem.EbayListingID)
 	if err != nil {
 		return models.WarehouseItem{}, nil, err
 	}
 
-	return warehouseItem, ebayInternalItems, err
+	return warehouseItem, []models.WarehouseEbayListing{ebayListing}, err
 }

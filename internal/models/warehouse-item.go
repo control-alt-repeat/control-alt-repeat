@@ -10,7 +10,7 @@ type WarehouseItem struct {
 	ControlAltRepeatID string
 	Shelf              string
 	AddedTime          time.Time
-	EbayListingIDs     []string
+	EbayListingID      string
 }
 
 const SKURegex = `(?m)^\(?(?P<Shelf>\d+[A-Z]+)?\)?( )?(?P<ID>[A-Z]{3}\-[0-9]{3})?`
