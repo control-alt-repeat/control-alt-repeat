@@ -5,20 +5,19 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay"
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/warehouse"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/aws"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse"
 )
 
 func RefreshItemsFromEbay(ctx context.Context) error {
-	return aws.IterateS3Objects(ctx, warehouse.WarehouseItemsBucketName, "eu-west-2", RefreshItemFromEbay)
+	return aws.IterateS3Objects(ctx, "control-alt-repeat-warehouse", "eu-west-2", RefreshItemFromEbay)
 }
 
 func RefreshItemFromEbay(ctx context.Context, itemID string) error {
-	var warehouseItem warehouse.WarehouseItem
 	var ebayItemInternal warehouse.EbayItemInternal
 
-	err := aws.LoadJsonObjectS3(ctx, warehouse.WarehouseItemsBucketName, itemID, &warehouseItem)
+	warehouseItem, err := warehouse.GetWarehouseItem(ctx, itemID)
 	if err != nil {
 		return err
 	}

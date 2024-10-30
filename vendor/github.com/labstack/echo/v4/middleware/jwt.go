@@ -9,11 +9,10 @@ package middleware
 import (
 	"errors"
 	"fmt"
-	"net/http"
-	"reflect"
-
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
+	"net/http"
+	"reflect"
 )
 
 // JWTConfig defines the config for JWT middleware.

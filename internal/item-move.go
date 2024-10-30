@@ -3,16 +3,16 @@ package internal
 import (
 	"context"
 
-	aws "github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay"
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/warehouse"
+	aws "github.com/control-alt-repeat/control-alt-repeat/internal/aws"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/models"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse"
 )
 
 func MoveItem(ctx context.Context, itemID string, newShelf string) error {
-	var warehouseItem warehouse.WarehouseItem
+	var warehouseItem models.WarehouseItem
 
-	err := aws.LoadJsonObjectS3(ctx, warehouse.WarehouseItemsBucketName, itemID, &warehouseItem)
-
+	warehouseItem, err := warehouse.GetWarehouseItem(ctx, itemID)
 	if err != nil {
 		return err
 	}
@@ -25,7 +25,7 @@ func MoveItem(ctx context.Context, itemID string, newShelf string) error {
 			return err
 		}
 
-		err = aws.SaveJsonObjectS3(ctx, warehouse.WarehouseItemsBucketName, warehouseItem.ControlAltRepeatID, warehouseItem)
+		err = aws.SaveJsonObjectS3(ctx, "control-alt-repeat-warehouse", warehouseItem.ControlAltRepeatID, warehouseItem)
 		if err != nil {
 			return err
 		}

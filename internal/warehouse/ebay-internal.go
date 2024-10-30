@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/aws"
 )
 
 const EbayListingsBucketName = "control-alt-repeat-ebay-listings"

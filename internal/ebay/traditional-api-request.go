@@ -6,8 +6,6 @@ import (
 	"io"
 	"net/http"
 	"strings"
-
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay/models"
 )
 
 type TraditionalAPIRequest struct {
@@ -56,11 +54,11 @@ func (r *TraditionalAPIRequest) Post(ctx context.Context, payload interface{}) (
 	return body, nil
 }
 
-func newTraditionalAPIRequest(callName string) (*TraditionalAPIRequest, *models.RequesterCredentials, error) {
+func newTraditionalAPIRequest(callName string) (*TraditionalAPIRequest, *RequesterCredentials, error) {
 	traditionalAPIRequest := &TraditionalAPIRequest{
 		CallName: callName,
 	}
-	requesterCredentials := &models.RequesterCredentials{}
+	requesterCredentials := &RequesterCredentials{}
 
 	err := requesterCredentials.SetEBayAuthToken()
 

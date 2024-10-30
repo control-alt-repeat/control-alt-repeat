@@ -11,7 +11,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay"
 )
 
 var log zerolog.Logger

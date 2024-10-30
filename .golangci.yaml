@@ -15,7 +15,7 @@ linters-settings:
       # - performance
       # - style
   goimports:
-    local-prefixes: github.com/Control-Alt-Repeat/control-alt-repeat
+    local-prefixes: github.com/control-alt-repeat/control-alt-repeat
   govet:
     enable:
       - nilness

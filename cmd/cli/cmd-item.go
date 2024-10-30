@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal"
+	"github.com/control-alt-repeat/control-alt-repeat/internal"
 )
 
 // Item command: "car item"

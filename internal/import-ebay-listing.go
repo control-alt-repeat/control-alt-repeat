@@ -5,21 +5,21 @@ import (
 	"fmt"
 	"time"
 
-	aws "github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay"
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay/models"
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/warehouse"
+	aws "github.com/control-alt-repeat/control-alt-repeat/internal/aws"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/models"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse"
 )
 
-func ImportEbayListing(ctx context.Context, ebayListing *models.EbayItem) (string, error) {
+func ImportEbayListing(ctx context.Context, ebayListing *ebay.EbayItem) (string, error) {
 	if ebayListing.SKU != "" {
-		err := warehouse.ValidateSKU(ebayListing.SKU)
+		err := models.ValidateSKU(ebayListing.SKU)
 		if err != nil {
 			return "", err
 		}
 	}
 
-	warehouseItem := &warehouse.WarehouseItem{}
+	warehouseItem := &models.WarehouseItem{}
 	warehouseItem.EbayListingIDs = []string{ebayListing.ItemID}
 
 	warehouseItem.InitialiseFromSKU(ebayListing.SKU)
@@ -67,7 +67,7 @@ func ImportEbayListing(ctx context.Context, ebayListing *models.EbayItem) (strin
 
 	err = aws.SaveJsonObjectS3(
 		ctx,
-		warehouse.WarehouseItemsBucketName,
+		"control-alt-repeat-warehouse",
 		warehouseItem.ControlAltRepeatID,
 		warehouseItem,
 	)

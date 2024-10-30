@@ -4,37 +4,21 @@ import (
 	"context"
 	"crypto/rand"
 	"errors"
-	"fmt"
 	"math/big"
-	"regexp"
 	"strconv"
 	"strings"
-	"time"
 
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/models"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse/persistence"
 )
 
-const (
-	SKURegex                 = `(?m)^\(?(?P<Shelf>\d+[A-Z]+)?\)?( )?(?P<ID>[A-Z]{3}\-[0-9]{3})?`
-	WarehouseItemsBucketName = "control-alt-repeat-warehouse"
-)
-
-type WarehouseItem struct {
-	ControlAltRepeatID string    `json:"controlAltRepeatID"`
-	Shelf              string    `json:"shelf"`
-	AddedTime          time.Time `json:"addedTime"`
-	EbayListingIDs     []string  `json:"ebayListingIDs"`
-}
-
-func GetWarehouseItem(ctx context.Context, itemID string) (WarehouseItem, error) {
-	var warehouseItem WarehouseItem
-
-	err := aws.LoadJsonObjectS3(ctx, WarehouseItemsBucketName, itemID, &warehouseItem)
+func GetWarehouseItem(ctx context.Context, itemID string) (models.WarehouseItem, error) {
+	item, err := persistence.LoadItem(ctx, persistence.LoadItemOptions{ID: itemID})
 	if err != nil {
-		return warehouseItem, err
+		return models.WarehouseItem{}, err
 	}
 
-	return warehouseItem, nil
+	return item, nil
 }
 
 func GenerateControlAltRepeatID() (string, error) {
@@ -61,32 +45,6 @@ func GenerateControlAltRepeatID() (string, error) {
 	return result.String(), nil
 }
 
-func (wi *WarehouseItem) InitialiseFromSKU(sku string) {
-	re := regexp.MustCompile(SKURegex)
-
-	match := re.FindStringSubmatch(sku)
-	for i, name := range re.SubexpNames() {
-		if i != 0 && name != "" {
-			if name == "Shelf" {
-				wi.Shelf = match[i]
-			}
-			if name == "ID" {
-				wi.ControlAltRepeatID = match[i]
-			}
-		}
-	}
-}
-
-func ValidateSKU(sku string) error {
-	re := regexp.MustCompile(SKURegex)
-
-	if !re.MatchString(sku) {
-		return fmt.Errorf("the SKU from eBay '%s' does not match regular expression - fix before retrying", sku)
-	}
-
-	return nil
-}
-
 func ValidateListingID(ebayListingID string) error {
 	id, err := strconv.Atoi(ebayListingID)
 	if err != nil {
@@ -97,8 +55,4 @@ func ValidateListingID(ebayListingID string) error {
 	}
 
 	return nil
-}
-
-func (i WarehouseItem) ToEbaySKU() string {
-	return fmt.Sprintf("(%s) %s", i.Shelf, i.ControlAltRepeatID)
 }

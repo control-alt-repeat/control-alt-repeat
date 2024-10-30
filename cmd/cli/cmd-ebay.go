@@ -7,8 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal"
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay"
+	"github.com/control-alt-repeat/control-alt-repeat/internal"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay"
 )
 
 // eBay command: "car ebay"

@@ -12,7 +12,7 @@ import (
 
 	ssmconfig "github.com/ianlopshire/go-ssm-config"
 
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/aws"
 )
 
 type TokenResponse struct {

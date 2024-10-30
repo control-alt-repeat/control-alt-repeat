@@ -10,7 +10,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	echoadapter "github.com/awslabs/aws-lambda-go-api-proxy/echo"
 
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/web"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/web"
 
 	"github.com/labstack/echo/v4"
 )

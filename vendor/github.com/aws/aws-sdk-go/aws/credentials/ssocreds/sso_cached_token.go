@@ -5,14 +5,13 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/aws/aws-sdk-go/internal/shareddefaults"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/aws/aws-sdk-go/internal/shareddefaults"
 )
 
 var resolvedOsUserHomeDir = shareddefaults.UserHomeDir

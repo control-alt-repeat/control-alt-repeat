@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay/models"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/aws"
 )
 
 type Notification struct {
@@ -20,7 +19,7 @@ const notificationBucket = "control-alt-repeat-live-ebay-incoming-notifications"
 func HandleNotification(ctx context.Context, notificationXml string) error {
 	notificationBytes := []byte(notificationXml)
 
-	var notification models.ItemNotificationEnvelope
+	var notification ItemNotificationEnvelope
 	if err := xml.Unmarshal(notificationBytes, &notification); err != nil {
 		return saveRawXml(ctx, notificationBytes)
 	}

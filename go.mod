@@ -1,4 +1,4 @@
-module github.com/Control-Alt-Repeat/control-alt-repeat
+module github.com/control-alt-repeat/control-alt-repeat
 
 go 1.23
 

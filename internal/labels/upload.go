@@ -6,7 +6,7 @@ import (
 	"mime/multipart"
 	"net/http"
 
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/aws"
 )
 
 func UploadFileFromBytes(imageBytes []byte, filename string) error {

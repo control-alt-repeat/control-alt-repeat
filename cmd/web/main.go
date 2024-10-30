@@ -6,7 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/web"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/web"
 )
 
 var log zerolog.Logger

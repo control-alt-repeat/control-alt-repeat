@@ -5,16 +5,17 @@ import (
 	"fmt"
 	"strings"
 
-	aws "github.com/Control-Alt-Repeat/control-alt-repeat/internal/aws"
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/labels"
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/warehouse"
+	aws "github.com/control-alt-repeat/control-alt-repeat/internal/aws"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/labels"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/models"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse"
 )
 
 func ItemPrintShelfLabel(ctx context.Context, itemID string) error {
-	var warehouseItem warehouse.WarehouseItem
+	var warehouseItem models.WarehouseItem
 	var ebayItemInternal warehouse.EbayItemInternal
 
-	err := aws.LoadJsonObjectS3(ctx, warehouse.WarehouseItemsBucketName, itemID, &warehouseItem)
+	warehouseItem, err := warehouse.GetWarehouseItem(ctx, itemID)
 	if err != nil {
 		return err
 	}

@@ -16,8 +16,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal"
-	"github.com/Control-Alt-Repeat/control-alt-repeat/internal/ebay/models"
+	"github.com/control-alt-repeat/control-alt-repeat/internal"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay"
 )
 
 var log zerolog.Logger
@@ -67,7 +67,7 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 			return fmt.Errorf("failed to read object body: %v", err)
 		}
 
-		var notification models.ItemNotificationEnvelope
+		var notification ebay.ItemNotificationEnvelope
 		err = xml.Unmarshal(body, &notification)
 		if err != nil {
 			return fmt.Errorf("failed to Unmarshal body: %v", err)
