@@ -17,6 +17,7 @@ var (
 	ebayListingID string
 	itemID        string
 	shelf         string
+	contactID     string
 	all           bool
 )
 
@@ -56,17 +57,33 @@ func run() int {
 		Logger().
 		Level(zerolog.DebugLevel)
 
+	cmdRoot.AddCommand(cmdEbay)
+
 	cmdEbayImportListing.Flags().StringVar(&ebayListingID, "ebay-listing-id", "", "eBay listing ID")
 	if err := cmdEbayImportListing.MarkFlagRequired("ebay-listing-id"); err != nil {
 		log.Error().Err(err).Msg("")
 		return 1
 	}
+	cmdEbay.AddCommand(cmdEbayImportListing)
 
 	cmdEbayGetNotificationUsage.Flags().StringVar(&ebayListingID, "ebay-listing-id", "", "eBay listing ID")
-	if err := cmdEbayImportListing.MarkFlagRequired("ebay-listing-id"); err != nil {
+	if err := cmdEbayGetNotificationUsage.MarkFlagRequired("ebay-listing-id"); err != nil {
 		log.Error().Err(err).Msg("")
 		return 1
 	}
+	cmdEbay.AddCommand(cmdEbayGetNotificationUsage)
+	cmdEbay.AddCommand(cmdEbaySetNotificationPreferences)
+
+	cmdRoot.AddCommand(cmdFreeagent)
+
+	cmdFreeagentGetContact.Flags().StringVar(&contactID, "contact-id", "", "Freeagent contact ID")
+	if err := cmdFreeagentGetContact.MarkFlagRequired("contact-id"); err != nil {
+		log.Error().Err(err).Msg("")
+		return 1
+	}
+	cmdFreeagent.AddCommand(cmdFreeagentGetContact)
+
+	cmdRoot.AddCommand(cmdItem)
 
 	cmdItemMove.Flags().StringVar(&itemID, "item-id", "", "Item ID")
 	cmdItemMove.Flags().StringVar(&shelf, "shelf", "", "Shelf location")
@@ -78,25 +95,19 @@ func run() int {
 		log.Error().Err(err).Msg("")
 		return 1
 	}
+	cmdItem.AddCommand(cmdItemMove)
 
 	cmdItemRefresh.Flags().StringVar(&itemID, "item-id", "", "Item ID")
 	cmdItemRefresh.Flags().BoolVar(&all, "all", false, "All items")
 	cmdItemRefresh.MarkFlagsOneRequired("item-id", "all")
+	cmdItem.AddCommand(cmdItemRefresh)
 
 	cmdItemPrintShelfLabel.Flags().StringVar(&itemID, "item-id", "", "Item ID")
 	if err := cmdItemPrintShelfLabel.MarkFlagRequired("item-id"); err != nil {
 		log.Error().Err(err).Msg("")
 		return 1
 	}
-
-	cmdEbay.AddCommand(cmdEbayImportListing)
-	cmdEbay.AddCommand(cmdEbayGetNotificationUsage)
-	cmdEbay.AddCommand(cmdEbaySetNotificationPreferences)
-	cmdItem.AddCommand(cmdItemMove)
-	cmdItem.AddCommand(cmdItemRefresh)
 	cmdItem.AddCommand(cmdItemPrintShelfLabel)
-	cmdRoot.AddCommand(cmdEbay)
-	cmdRoot.AddCommand(cmdItem)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

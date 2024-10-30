@@ -23,6 +23,7 @@ linters-settings:
   misspell:
     locale: US
     ignore-words:
+      - organisation
 
 # Exclude the hostedtoolcache directory
 exclude:
