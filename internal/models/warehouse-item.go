@@ -8,9 +8,11 @@ import (
 
 type WarehouseItem struct {
 	ControlAltRepeatID string
+	Title              string
 	Shelf              string
 	AddedTime          time.Time
 	EbayListingID      string
+	PictureURL         string
 	FreeagentOwnerID   string
 	OwnerDisplayName   string
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/control-alt-repeat/control-alt-repeat/internal"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse"
 )
 
 type ItemMove struct {
@@ -17,6 +18,7 @@ type ItemMove struct {
 func initialiseItemMove(e *echo.Echo) {
 	e.GET("item-move", renderItemMovePage)
 	e.POST("item-move", itemMove)
+	e.POST("items-unshelved", itemsUnshelved)
 }
 
 func renderItemMovePage(c echo.Context) error {
@@ -41,4 +43,20 @@ func itemMove(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"message": "Successfully moved the item"})
+}
+
+func itemsUnshelved(c echo.Context) error {
+	items, err := warehouse.LoadUnshelvedItems(c.Request().Context())
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
+	result := []Item{}
+
+	for _, item := range items {
+		result = append(result, Map(item))
+	}
+
+	return c.JSON(http.StatusOK, result)
 }

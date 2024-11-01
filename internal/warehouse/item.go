@@ -15,7 +15,16 @@ func SaveItem(ctx context.Context, item models.WarehouseItem) error {
 }
 
 func LoadItem(ctx context.Context, itemID string) (models.WarehouseItem, error) {
-	return persistence.LoadItem(ctx, persistence.LoadItemOptions{ID: itemID})
+	items, err := persistence.QueryItems(ctx, persistence.ItemByIDQuery(itemID))
+	if err != nil {
+		return models.WarehouseItem{}, err
+	}
+
+	return items[0], err
+}
+
+func LoadUnshelvedItems(ctx context.Context) ([]models.WarehouseItem, error) {
+	return persistence.QueryItems(ctx, persistence.UnshelvedItemsQuery)
 }
 
 func GenerateControlAltRepeatID() (string, error) {

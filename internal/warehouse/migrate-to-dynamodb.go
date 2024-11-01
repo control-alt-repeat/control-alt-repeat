@@ -17,6 +17,13 @@ func MigrateToDynamoDb(ctx context.Context) error {
 			return err
 		}
 
+		ebayListingInternal, err := persistence.LoadEbayListing(ctx, persistence.LoadEbayListingOptions{
+			ID: item.EbayListingID,
+		})
+		if err != nil {
+			return err
+		}
+
 		if item.AddedTime.IsZero() {
 			ebayItemSource, err := ebay.GetItem(ctx, item.EbayListingID, []string{
 				"ListingDetails",
@@ -29,6 +36,9 @@ func MigrateToDynamoDb(ctx context.Context) error {
 				return err
 			}
 		}
+
+		item.Title = ebayListingInternal.Title
+		item.PictureURL = ebayListingInternal.PictureURL
 
 		return persistence.SaveItem(ctx, persistence.SaveItemOptions{
 			Item: item,
