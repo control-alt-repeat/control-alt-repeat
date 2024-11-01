@@ -102,7 +102,13 @@ func QueryItems(ctx context.Context, opt QueryItemsOptions) ([]models.WarehouseI
 	items := []models.WarehouseItem{}
 
 	for _, item := range result {
-		items = append(items, item.Map())
+		mappedItem := item.Map()
+
+		if mappedItem.Shelf == UnsetShelfDefault {
+			mappedItem.Shelf = ""
+		}
+
+		items = append(items, mappedItem)
 	}
 
 	return items, nil

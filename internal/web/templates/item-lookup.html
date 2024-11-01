@@ -6,18 +6,47 @@
     </form>
 
     <div x-show="item" class="bg-white col-12 col-md-6 mx-auto p-4 rounded shadow mt-4">
-        <h2 class="mb-3">Item ID: <span x-text="item.id"></span></h4>
-        <h4 class="mb-3">
-            Shelf: <span x-text="item.shelf"></span>
-            <a :href="'/item-move?id=' + item.id + '&shelf=' + item.shelf" class="btn btn-primary btn-block w-100">Move</a>
-        </h3>
-        <template x-for="ebayReference in item.ebayReferences">
-            <div>
-                <img x-bind:src="ebayReference.imageURL" class="img-fluid rounded mb-3" alt="Item Image" style="max-width: 150px;">
-                <p><a x-bind:href="ebayReference.listingURL" class="link-primary" target="_blank">eBay: <span x-text="ebayReference.title"></span></a></p>
-                <button @click="printShelfLabel()" class="btn btn-success w-100">Print Shelf Label</button>
+        <img x-bind:src="item.imageURL" class="card-img-top img-fluid" alt="Item Image" style="object-fit: cover; height: 300px;">
+        
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <span x-text="item.id"></span>
+            </h5>
+            <!-- <button @click="editing = !editing" class="btn btn-link">
+                <span x-text="editing ? 'Done' : 'Edit'"> </span><i class="bi bi-pencil"></i>
+            </button> -->
+        </div>
+
+        <div class="card-body">
+            <div class="mb-3">
+                <strong>Title: </strong>
+                <span x-text="item.title"></span>
             </div>
-        </template>
+            <div class="mb-3">
+                <strong>Shelf: </strong>
+                <span x-show="!editing" x-text="item.shelf"></span>
+                <a :href="'/item-move?id=' + item.id + '&shelf=' + item.shelf" class="me-2">
+                    <i class="bi bi-pencil-square"></i>
+                </a>
+                <input x-show="editing" type="text" class="form-control" x-model="item.newShelf">
+            </div>
+            <div class="mb-3">
+                <strong>Owner: </strong>
+                <span x-show="!editing" x-text="item.owner"></span>
+                <input x-show="editing" type="text" class="form-control" x-model="item.newOwner">
+            </div>
+            <div class="mb-3">
+                <a x-bind:href="item.ebayListingURL" class="link-primary" target="_blank">View on eBay</a></p>
+            </div>
+            <div x-show="!editing" class="d-flex justify-content-start">
+                <button @click="printShelfLabel()" class="btn btn-success me-2">Print Shelf Label</button>
+            </div>
+            
+            <div x-show="editing" class="d-flex justify-content-end">
+                <button x-show="editing" @click="editing = false" class="btn btn-primary me-2">Save</button>
+                <button x-show="editing" @click="editing = false; item.shelf = item.shelf; item.owner = item.owner;" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
     </div>
 </div>
 <script>
@@ -28,6 +57,7 @@ document.addEventListener("DOMContentLoaded", function() {
 function page() {
     return {
         id: "",
+        editing: false,
         item: null,
         init() {
             const urlParams = new URLSearchParams(window.location.search);

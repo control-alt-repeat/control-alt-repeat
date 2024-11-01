@@ -14,6 +14,7 @@ type Item struct {
 	FreeagentOwnerID string          `json:"freeagentOwnerID"`
 	OwnerDisplayName string          `json:"ownerDisplayName"`
 	EbayListingURL   string          `json:"ebayListingURL"`
+	ImageURL         string          `json:"imageURL"`
 }
 
 type EbayReference struct {
@@ -31,5 +32,6 @@ func Map(i models.WarehouseItem) Item {
 		FreeagentOwnerID: i.FreeagentOwnerID,
 		OwnerDisplayName: i.OwnerDisplayName,
 		EbayListingURL:   fmt.Sprintf("https://www.ebay.co.uk/itm/%s", i.EbayListingID),
+		EbayReferences:   []EbayReference{},
 	}
 }
