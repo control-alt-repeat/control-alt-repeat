@@ -109,6 +109,7 @@ func run() int {
 		return 1
 	}
 	cmdItem.AddCommand(cmdItemPrintShelfLabel)
+	cmdItem.AddCommand(cmdItemMigrateToDynamoDB)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

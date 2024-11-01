@@ -7,19 +7,19 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
-type S3 struct {
+type s3 struct {
 	client *minio.Client
 	once   sync.Once
 }
 
-var instance *S3
+var instance *s3
 
-func getClient() (*S3, error) {
+func getClient() (*s3, error) {
 	if instance != nil {
 		return instance, nil
 	}
 
-	instance = &S3{}
+	instance = &s3{}
 	var err error
 	instance.once.Do(func() {
 		instance.client, err = minio.New("s3.amazonaws.com", &minio.Options{

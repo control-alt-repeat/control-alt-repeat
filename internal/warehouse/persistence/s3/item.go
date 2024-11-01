@@ -3,7 +3,6 @@ package s3
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"strings"
 	"time"
 
@@ -15,6 +14,9 @@ type Item struct {
 	Shelf              string    `json:"shelf"`
 	AddedTime          time.Time `json:"addedTime"`
 	EbayListingIDs     []string  `json:"ebayListingIDs"`
+	EbayListingID      string    `json:"ebayListingID"`
+	FreeagentOwnerID   string    `json:"freeagentOwnerID"`
+	OwnerDisplayName   string    `json:"ownerDisplayName"`
 }
 
 type SaveItemOptions struct {
@@ -31,8 +33,6 @@ func SaveItem(ctx context.Context, opt SaveItemOptions) error {
 	if err != nil {
 		return err
 	}
-
-	fmt.Println(jsonData)
 
 	_, err = s3.client.PutObject(
 		ctx,
@@ -67,4 +67,29 @@ func LoadItem(ctx context.Context, opt LoadItemOptions) (Item, error) {
 	}
 
 	return item, nil
+}
+
+func IterateS3Objects(ctx context.Context, f func(context.Context, string) error) error {
+	s3, err := getClient()
+	if err != nil {
+		return err
+	}
+
+	opts := minio.ListObjectsOptions{
+		UseV1:     true,
+		Recursive: true,
+	}
+
+	for object := range s3.client.ListObjects(ctx, "control-alt-repeat-warehouse", opts) {
+		if object.Err != nil {
+			return err
+		}
+
+		err := f(ctx, object.Key)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

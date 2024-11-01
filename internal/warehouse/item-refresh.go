@@ -1,25 +1,24 @@
-package internal
+package warehouse
 
 import (
 	"context"
 	"time"
 
-	"github.com/control-alt-repeat/control-alt-repeat/internal/aws"
 	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay"
-	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse/persistence"
 )
 
 func RefreshItemsFromEbay(ctx context.Context) error {
-	return aws.IterateS3Objects(ctx, "control-alt-repeat-warehouse", "eu-west-2", RefreshItemFromEbay)
+	return persistence.IterateItems(ctx, RefreshItemFromEbay)
 }
 
 func RefreshItemFromEbay(ctx context.Context, itemID string) error {
-	warehouseItem, err := warehouse.LoadItem(ctx, itemID)
+	warehouseItem, err := persistence.LoadItem(ctx, persistence.LoadItemOptions{ID: itemID})
 	if err != nil {
 		return err
 	}
 
-	ebayItemInternal, err := warehouse.LoadEbayListing(ctx, warehouseItem.EbayListingID)
+	ebayItemInternal, err := persistence.LoadEbayListing(ctx, persistence.LoadEbayListingOptions{ID: warehouseItem.EbayListingID})
 	if err != nil {
 		return err
 	}
@@ -35,7 +34,7 @@ func RefreshItemFromEbay(ctx context.Context, itemID string) error {
 		return err
 	}
 
-	startTime, err := time.Parse(ebayItemSource.ListingDetails.StartTime, time.RFC3339)
+	startTime, err := time.Parse(time.RFC3339, ebayItemSource.ListingDetails.StartTime)
 	if err != nil {
 		return err
 	}
@@ -45,5 +44,5 @@ func RefreshItemFromEbay(ctx context.Context, itemID string) error {
 	ebayItemInternal.ViewItemURL = ebayItemSource.ListingDetails.ViewItemURL
 	ebayItemInternal.StartTime = startTime
 
-	return warehouse.SaveEbayListing(ctx, ebayItemInternal)
+	return persistence.SaveEbayListing(ctx, persistence.SaveEbayListingOptions{EbayListing: ebayItemInternal})
 }

@@ -11,6 +11,8 @@ type WarehouseItem struct {
 	Shelf              string
 	AddedTime          time.Time
 	EbayListingID      string
+	FreeagentOwnerID   string
+	OwnerDisplayName   string
 }
 
 const SKURegex = `(?m)^\(?(?P<Shelf>\d+[A-Z]+)?\)?( )?(?P<ID>[A-Z]{3}\-[0-9]{3})?`

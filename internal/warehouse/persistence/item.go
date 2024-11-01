@@ -2,8 +2,10 @@ package persistence
 
 import (
 	"context"
+	"time"
 
 	models "github.com/control-alt-repeat/control-alt-repeat/internal/models"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse/persistence/dynamodb"
 	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse/persistence/s3"
 )
 
@@ -12,11 +14,32 @@ type SaveItemOptions struct {
 }
 
 func SaveItem(ctx context.Context, opt SaveItemOptions) error {
-	return s3.SaveItem(ctx, s3.SaveItemOptions{Item: s3.Item{
+	err := s3.SaveItem(ctx, s3.SaveItemOptions{Item: s3.Item{
 		ControlAltRepeatID: opt.Item.ControlAltRepeatID,
 		Shelf:              opt.Item.Shelf,
 		AddedTime:          opt.Item.AddedTime,
 		EbayListingIDs:     []string{opt.Item.EbayListingID},
+		EbayListingID:      opt.Item.EbayListingID,
+		FreeagentOwnerID:   opt.Item.FreeagentOwnerID,
+		OwnerDisplayName:   opt.Item.OwnerDisplayName,
+	}})
+	if err != nil {
+		return err
+	}
+
+	shelf := opt.Item.Shelf
+	if shelf == "" {
+		shelf = "NOT_SET_YET"
+	}
+
+	return dynamodb.SaveItem(ctx, dynamodb.SaveItemOptions{Item: dynamodb.Item{
+		ID:               opt.Item.ControlAltRepeatID,
+		Shelf:            shelf,
+		EbayListingID:    opt.Item.EbayListingID,
+		FreeagentOwnerID: opt.Item.FreeagentOwnerID,
+		OwnerDisplayName: opt.Item.OwnerDisplayName,
+		CreatedAt:        opt.Item.AddedTime.Unix(),
+		UpdatedAt:        time.Now().Unix(),
 	}})
 }
 
@@ -33,4 +56,8 @@ func LoadItem(ctx context.Context, opt LoadItemOptions) (models.WarehouseItem, e
 		AddedTime:          result.AddedTime,
 		EbayListingID:      result.EbayListingIDs[0],
 	}, err
+}
+
+func IterateItems(ctx context.Context, f func(context.Context, string) error) error {
+	return s3.IterateS3Objects(ctx, f)
 }
