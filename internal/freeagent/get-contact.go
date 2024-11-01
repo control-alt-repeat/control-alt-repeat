@@ -3,22 +3,27 @@ package freeagent
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 )
 
-func GetContact(ctx context.Context, contactID string) (Contact, error) {
-	var response ContactResponse
-	opts := GetOpts{
-		Path: fmt.Sprintf("contacts/%s", contactID),
+func GetContact(ctx context.Context, opts GetContactOptions) (Contact, error) {
+	var response GetContactResponse
+	apiopts := ApiGetOptions{
+		Path: fmt.Sprintf("contacts/%s", opts.ContactID),
 	}
-	if err := FreeagentApiGet(ctx, opts, &response); err != nil {
+	if err := FreeagentApiGet(ctx, apiopts, &response); err != nil {
 		return Contact{}, err
 	}
 
 	return response.Contact, nil
 }
 
-type ContactResponse struct {
+type GetContactOptions struct {
+	ContactID string
+}
+
+type GetContactResponse struct {
 	Contact Contact `json:"contact,omitempty"`
 }
 
@@ -50,4 +55,27 @@ type Contact struct {
 	Status                     string    `json:"status,omitempty"`
 	CreatedAt                  time.Time `json:"created_at,omitempty"`
 	UpdatedAt                  time.Time `json:"updated_at,omitempty"`
+}
+
+func (c Contact) ID() string {
+	parts := strings.Split(c.URL, "/")
+	lastSegment := parts[len(parts)-1]
+	return lastSegment
+}
+
+func (c Contact) DisplayName() string {
+	var displayName = ""
+	if c.FirstName != "" || c.LastName != "" {
+		displayName = strings.TrimSpace(strings.Join([]string{c.FirstName, c.LastName}, " "))
+	}
+
+	if c.OrganisationName == "" {
+		return displayName
+	}
+
+	if displayName == "" {
+		return c.OrganisationName
+	}
+
+	return strings.Join([]string{c.OrganisationName, displayName}, " - ")
 }

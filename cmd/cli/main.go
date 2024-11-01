@@ -82,6 +82,7 @@ func run() int {
 		return 1
 	}
 	cmdFreeagent.AddCommand(cmdFreeagentGetContact)
+	cmdFreeagent.AddCommand(cmdFreeagentListContacts)
 
 	cmdRoot.AddCommand(cmdItem)
 

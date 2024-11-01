@@ -3,29 +3,34 @@ package freeagent
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 
 	access_tokens "github.com/control-alt-repeat/control-alt-repeat/internal/freeagent/access-tokens"
 )
 
-type GetOpts struct {
+type ApiGetOptions struct {
 	Path            string
 	QueryParameters map[string]string
 }
 
 const BaseUrl = "https://api.freeagent.com/v2/"
 
-func FreeagentApiGet[T any](ctx context.Context, opts GetOpts, target *T) error {
+func FreeagentApiGet[T any](ctx context.Context, opts ApiGetOptions, target *T) error {
 	access_token, err := access_tokens.GetAccessToken()
 	if err != nil {
 		return err
 	}
 
+	fmt.Println(access_token[0:20])
+
 	newURL, err := opts.buildUrl()
 	if err != nil {
 		return err
 	}
+
+	fmt.Println(newURL)
 
 	req, err := http.NewRequest("GET", newURL, nil)
 	if err != nil {
@@ -52,7 +57,12 @@ func FreeagentApiGet[T any](ctx context.Context, opts GetOpts, target *T) error 
 	return nil
 }
 
-func (o GetOpts) buildUrl() (string, error) {
+func (o ApiGetOptions) buildUrl() (string, error) {
+	u, err := url.Parse(BaseUrl)
+	if err != nil {
+		return "", err
+	}
+
 	values := url.Values{}
 	if o.QueryParameters != nil {
 		for key, value := range o.QueryParameters {
@@ -60,5 +70,7 @@ func (o GetOpts) buildUrl() (string, error) {
 		}
 	}
 
-	return url.JoinPath(BaseUrl, o.Path, values.Encode())
+	u.Path += o.Path
+	u.RawQuery = values.Encode()
+	return u.String(), nil
 }

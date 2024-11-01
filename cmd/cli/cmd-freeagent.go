@@ -16,11 +16,18 @@ var cmdFreeagent = &cobra.Command{
 	Short: "Freeagent related operations",
 }
 
-// Import listing subcommand: "car freeagent get-contact"
+// Import freeagent subcommand: "car freeagent get-contact"
 var cmdFreeagentGetContact = &cobra.Command{
 	Use:   "get-contact",
 	Short: "Gets a contact from freeagent",
 	Run:   freeagentGetContact,
+}
+
+// Import freeagent subcommand: "car freeagent list-contacts"
+var cmdFreeagentListContacts = &cobra.Command{
+	Use:   "list-contacts",
+	Short: "Lists contacts from freeagent",
+	Run:   freeagentListContacts,
 }
 
 func freeagentGetContact(cmd *cobra.Command, args []string) {
@@ -30,11 +37,25 @@ func freeagentGetContact(cmd *cobra.Command, args []string) {
 	}
 	fmt.Println("Fetching contact from Freeagent with ID:", contactID)
 
-	contact, err := freeagent.GetContact(cmd.Context(), contactID)
+	contact, err := freeagent.GetContact(cmd.Context(), freeagent.GetContactOptions{ContactID: contactID})
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
 	fmt.Println(contact.FirstName)
+}
+
+func freeagentListContacts(cmd *cobra.Command, args []string) {
+	fmt.Println("Fetching contacts from Freeagent", contactID)
+
+	contacts, err := freeagent.ListContacts(cmd.Context(), freeagent.ListContactsOptions{})
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	for _, contact := range contacts {
+		fmt.Printf("%s %s\n", contact.ID(), contact.DisplayName())
+	}
 }
