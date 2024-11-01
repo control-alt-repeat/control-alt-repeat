@@ -100,6 +100,7 @@ func QueryItems(ctx context.Context, opts QueryItemsOptions) ([]Item, error) {
 func (i Item) Map() models.WarehouseItem {
 	return models.WarehouseItem{
 		ControlAltRepeatID: i.ID,
+		Title:              i.Title,
 		Shelf:              i.Shelf,
 		AddedTime:          time.Unix(i.CreatedAt, 0),
 		EbayListingID:      i.EbayListingID,

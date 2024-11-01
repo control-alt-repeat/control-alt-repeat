@@ -1,6 +1,8 @@
 package web
 
 import (
+	"fmt"
+
 	"github.com/control-alt-repeat/control-alt-repeat/internal/models"
 )
 
@@ -9,8 +11,9 @@ type Item struct {
 	Title            string          `json:"title"`
 	Shelf            string          `json:"shelf"`
 	EbayReferences   []EbayReference `json:"ebayReferences"`
-	FreeagentOwnerID string          `json:"FreeagentOwnerID"`
-	OwnerDisplayName string          `json:"OwnerDisplayName"`
+	FreeagentOwnerID string          `json:"freeagentOwnerID"`
+	OwnerDisplayName string          `json:"ownerDisplayName"`
+	EbayListingURL   string          `json:"ebayListingURL"`
 }
 
 type EbayReference struct {
@@ -27,5 +30,6 @@ func Map(i models.WarehouseItem) Item {
 		Shelf:            i.Shelf,
 		FreeagentOwnerID: i.FreeagentOwnerID,
 		OwnerDisplayName: i.OwnerDisplayName,
+		EbayListingURL:   fmt.Sprintf("https://www.ebay.co.uk/itm/%s", i.EbayListingID),
 	}
 }

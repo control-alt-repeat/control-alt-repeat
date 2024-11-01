@@ -1,14 +1,116 @@
-<h2 class="text-center mb-4">Warehouse Management</h2>
-<div class="row justify-content-center mb-4">
-    <div class="col-12 col-sm-6 col-md-4 mb-2 d-flex flex-column">
-        <a href="/item-move" class="btn btn-primary btn-block mb-2">
-            <i class="bi bi-bookshelf"></i> Shelve
-        </a>
-        <a href="/item-lookup" class="btn btn-primary btn-block mb-2">
-            <i class="bi bi-search"></i> Lookup Item
-        </a>
-        <a href="/ebay-import-listing" class="btn btn-primary btn-block">
-            <i class="bi bi-list-columns"></i> Import eBay Listing
-        </a>
+<div x-data="page()">
+    <h2 class="text-center mb-4">Warehouse Management</h2>
+    <div class="row justify-content-center mb-4">
+        <div class="col-12 col-sm-6 col-md-4 mb-2 d-flex flex-column">
+            <a href="/item-move" class="btn btn-primary btn-block mb-2">
+                <i class="bi bi-bookshelf"></i> Shelve
+            </a>
+            <a href="/item-lookup" class="btn btn-primary btn-block mb-2">
+                <i class="bi bi-search"></i> Lookup Item
+            </a>
+            <a href="/ebay-import-listing" class="btn btn-primary btn-block">
+                <i class="bi bi-list-columns"></i> Import eBay Listing
+            </a>
+        </div>
     </div>
+
+    <div x-show="items" class="row d-none d-md-flex bg-light border-bottom text-start">
+        <div class="col-1"><strong>ID</strong></div>
+        <div class="col-5"><strong>Title</strong></div>
+        <div class="col-2"><strong>Shelf</strong></div>
+        <div class="col-3"><strong>Owner</strong></div>
+        <div class="col-1"><strong>eBay Link</strong></div>
+    </div>
+
+    <!-- Inventory items -->
+    <template x-for="item in items">
+        <div x-show="items" class="row text-start">
+            <!-- Desktop row view -->
+            <div class="col-12 d-none d-md-flex border-bottom py-2">
+            <div class="col-1">
+                <a :href="'/item-lookup?id=' + item.id" class="me-2">
+                    <i class="bi bi-binoculars"></i>
+                    <span x-text="item.id"></span>
+                </a>
+            </div>
+            <div class="col-5"><span x-text="item.title"></span></div>
+            <div class="col-2">
+                <span x-text="item.shelf"></span>
+                <a :href="'/item-move?id=' + item.id" class="me-2">
+                    <i class="bi bi-pencil-square"></i>
+                </a>
+            </div>
+            <div class="col-3"><span x-text="item.ownerDisplayName"></span></div>
+            <div class="col-2"><a x-bind:href="item.ebayListingURL" class="link-primary" target="_blank">Open</a></div>
+            </div>
+            <!-- Mobile card view -->
+            <div class="card d-md-none mb-3">
+                <div class="card-body text-start">
+                    <h5 class="card-title">
+                        <span x-text="item.id"></span>
+                    </h5>
+                    <p class="card-text">
+                        <strong></strong> <span x-text="item.title"></span>
+                    </p>
+                    <p class="card-text">
+                        <strong>Shelf: </strong>
+                        <span x-text="item.shelf"></span>
+                        <a :href="'/item-move?id=' + item.id + '&shelf=' + item.shelf" class="me-2">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                    </p>
+                    <p class="card-text">
+                        <strong>Owner:</strong> <span x-text="item.ownerDisplayName"></span>
+                    </p>
+                    <p class="card-text">
+                        <strong>Link:</strong> <a x-bind:href="item.ebayListingURL" class="link-primary" target="_blank">Open</a></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </template>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    
+});
+
+function page() {
+    return {
+        items: {},
+        init() {
+            this.getUnshelvedItems()
+        },
+        getUnshelvedItems() {
+            console.log("Fetching items-unshelved")
+            fetch("items-unshelved", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams()
+            })
+            .then(response => {
+                // Check if response is ok (status in the range 200-299)
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        console.log(err)
+                        throw new Error(err.error || 'An unknown error occurred');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data)
+                this.items = data.items;        // Store the item data
+                this.showError = false;  // Hide any previous error
+            })
+            .catch(error => {
+                this.errorMessage = error.message || 'An unknown error occurred';
+                this.showError = true;   // Show the Bootstrap alert
+            });
+        }
+    }
+}
+</script>
