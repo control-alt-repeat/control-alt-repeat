@@ -32,11 +32,9 @@ func findItem(c echo.Context) error {
 		})
 	}
 
-	item := &Item{
-		ID:             warehouseItem.ControlAltRepeatID,
-		Shelf:          warehouseItem.Shelf,
-		EbayReferences: []EbayReference{},
-	}
+	item := Map(warehouseItem)
+
+	item.ImageURL = ebayInternalItems[0].PictureURL
 
 	for _, ebayReference := range ebayInternalItems {
 		item.EbayReferences = append(item.EbayReferences, EbayReference{

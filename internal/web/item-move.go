@@ -45,9 +45,12 @@ func itemMove(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"message": "Successfully moved the item"})
 }
 
+type ItemsUnshelvedResponse struct {
+	Items []Item `json:"items"`
+}
+
 func itemsUnshelved(c echo.Context) error {
 	items, err := warehouse.LoadUnshelvedItems(c.Request().Context())
-
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
@@ -58,5 +61,7 @@ func itemsUnshelved(c echo.Context) error {
 		result = append(result, Map(item))
 	}
 
-	return c.JSON(http.StatusOK, result)
+	return c.JSON(http.StatusOK, ItemsUnshelvedResponse{
+		Items: result,
+	})
 }

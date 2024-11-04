@@ -68,7 +68,7 @@ data "aws_iam_policy_document" "allow_warehouse_read" {
     ]
 
     resources = [
-      aws_s3_bucket.warehouse.arn
+      aws_s3_bucket.warehouse.arn,
     ]
   }
 
@@ -82,6 +82,21 @@ data "aws_iam_policy_document" "allow_warehouse_read" {
       "${aws_s3_bucket.warehouse.arn}/*",
     ]
   }
+
+    statement {
+    effect = "Allow"
+    actions = [
+      "dynamodb:GetItem",
+      "dynamodb:BatchGetItem",
+      "dynamodb:Query",
+      "dynamodb:Scan"
+    ]
+
+    resources = [
+      aws_dynamodb_table.warehouse.arn,
+      "${aws_dynamodb_table.warehouse.arn}/index/*",
+    ]
+  }
 }
 
 data "aws_iam_policy_document" "allow_warehouse_write" {
@@ -92,7 +107,26 @@ data "aws_iam_policy_document" "allow_warehouse_write" {
     ]
 
     resources = [
-      aws_s3_bucket.warehouse.arn
+      aws_s3_bucket.warehouse.arn,
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "dynamodb:GetItem",
+      "dynamodb:PutItem",
+      "dynamodb:UpdateItem",
+      "dynamodb:DeleteItem",
+      "dynamodb:BatchGetItem",
+      "dynamodb:BatchWriteItem",
+      "dynamodb:Query",
+      "dynamodb:Scan"
+    ]
+
+    resources = [
+      aws_dynamodb_table.warehouse.arn,
+      "${aws_dynamodb_table.warehouse.arn}/index/*",
     ]
   }
 
