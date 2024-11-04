@@ -12,39 +12,67 @@
             <h5 class="mb-0">
                 <span x-text="item.id"></span>
             </h5>
-            <!-- <button @click="editing = !editing" class="btn btn-link">
-                <span x-text="editing ? 'Done' : 'Edit'"> </span><i class="bi bi-pencil"></i>
-            </button> -->
         </div>
 
         <div class="card-body">
-            <div class="mb-3">
-                <strong>Title: </strong>
-                <span x-text="item.title"></span>
+
+            <!-- TITLE -->
+            <div class="row mb-3 align-items-center">
+                <div class="col-2 fw-bold text-end">Title</div>
+                <div class="col-8">
+                    <span x-text="item.title"></span>
+                </div>
             </div>
-            <div class="mb-3">
-                <strong>Shelf: </strong>
-                <span x-show="!editing" x-text="item.shelf"></span>
-                <a :href="'/item-move?id=' + item.id + '&shelf=' + item.shelf" class="me-2">
-                    <i class="bi bi-pencil-square"></i>
-                </a>
-                <input x-show="editing" type="text" class="form-control" x-model="item.newShelf">
+
+
+            <!-- SHELF -->
+            <div class="row mb-3 align-items-center">
+                <div class="col-2 fw-bold text-end">Shelf</div>
+                <div class="col-7">
+                    <span x-text="item.shelf"></span>
+                </div>
+                <div class="col-3 text-end">
+                    <a :href="'/item-move?id=' + item.id + '&shelf=' + item.shelf" class="me-2">
+                        <button class="btn btn-primary btn-sm">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                    </a>
+                </div>
             </div>
-            <div class="mb-3">
-                <strong>Owner: </strong>
-                <span x-show="!editing" x-text="item.owner"></span>
-                <input x-show="editing" type="text" class="form-control" x-model="item.newOwner">
+
+
+            <!-- OWNER -->
+            <div class="row mb-3 align-items-center">
+                <div class="col-2 fw-bold text-end">Owner</div>
+                <div class="col-7">
+                    <span x-show="editing !== 'shelf'" x-text="item.ownerDisplayName"></span>
+                    <input x-show="editing === 'shelf'" type="text" x-model="contactSearchQuery" @input="filterContacts" placeholder="Search contacts..." class="form-control" />                    
+                    <ul x-show="filteredContacts.length > 0" @click.away="closeDropdown" class="dropdown-menu show" style="position: absolute; z-index: 1000;">
+                        <template x-for="contact in filteredContacts" :key="contact.id">
+                            <li @click="selectContact(contact)" class="dropdown-item" x-text="contact.name"></li>
+                        </template>
+                    </ul>
+                </div>
+                <div class="col-3 text-end">
+                    <button x-show="editing !== 'shelf'" @click="editing = 'shelf'" class="btn btn-primary btn-sm">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <div x-show="editing === 'shelf'">
+                        <button @click="saveOwner()" class="btn btn-success btn-sm">
+                            <i class="bi bi-check"></i>
+                        </button>
+                        <button @click="editing = null" class="btn btn-danger btn-sm">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
+
             <div class="mb-3">
                 <a x-bind:href="item.ebayListingURL" class="link-primary" target="_blank">View on eBay</a></p>
             </div>
-            <div x-show="!editing" class="d-flex justify-content-start">
+            <div class="d-flex justify-content-start">
                 <button @click="printShelfLabel()" class="btn btn-success me-2">Print Shelf Label</button>
-            </div>
-            
-            <div x-show="editing" class="d-flex justify-content-end">
-                <button x-show="editing" @click="editing = false" class="btn btn-primary me-2">Save</button>
-                <button x-show="editing" @click="editing = false; item.shelf = item.shelf; item.owner = item.owner;" class="btn btn-secondary">Cancel</button>
             </div>
         </div>
     </div>
@@ -57,13 +85,18 @@ document.addEventListener("DOMContentLoaded", function() {
 function page() {
     return {
         id: "",
-        editing: false,
+        editing: null,
+        contacts: [],
+        filteredContacts: [],
+        contactSearchQuery: "",
+        newOwnerID: "",
         item: null,
         init() {
             const urlParams = new URLSearchParams(window.location.search);
             this.id = urlParams.get('id') || '';
             if (this.id) {
                 this.itemLookup()
+                this.contactsList()
             }
         },
         itemLookup() {
@@ -95,6 +128,75 @@ function page() {
                 this.showError = true;   // Show the Bootstrap alert
             });
         },
+        contactsList() {
+            fetch("contacts-list", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({ id: this.id })
+            })
+            .then(response => {
+                // Check if response is ok (status in the range 200-299)
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.error || 'An unknown error occurred');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                this.contacts = data.contacts;        // Store the item data
+                this.showError = false;  // Hide any previous error
+
+                console.log(this.contacts)
+            })
+            .catch(error => {
+                this.errorMessage = error.message || 'An unknown error occurred';
+                this.showError = true;
+            });
+        },
+        filterContacts() {
+            this.filteredContacts = this.contacts.filter(contact => 
+                contact.name.toLowerCase().includes(this.contactSearchQuery.toLowerCase())
+            );
+        },
+        selectContact(contact) {
+            this.contactSearchQuery = contact.name;
+            this.newOwnerID = contact.id;
+            this.filteredContacts = [];
+        },
+        saveOwner() {
+            fetch("owner-save", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({ id: this.id, ownerId: this.newOwnerID, newOwnerName: this.contactSearchQuery })
+            })
+            .then(response => {
+                // Check if response is ok (status in the range 200-299)
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.error || 'An unknown error occurred');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                this.item.ownerDisplayName = this.contactSearchQuery;
+                this.editing = null;
+                this.filteredContacts = [];
+                this.showError = false;  // Hide any previous error
+            })
+            .catch(error => {
+                this.errorMessage = error.message || 'An unknown error occurred';
+                this.showError = true;   // Show the Bootstrap alert
+            });
+        },
+        closeDropdown() {
+            this.filteredContacts = [];
+        },
         printShelfLabel() {
             console.log("Printing shelf label for item: ", this.id);
 
@@ -115,7 +217,6 @@ function page() {
                 return response.json();
             })
             .then(data => {
-                this.item = data;        // Store the item data
                 this.showError = false;  // Hide any previous error
             })
             .catch(error => {

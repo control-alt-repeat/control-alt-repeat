@@ -14,6 +14,22 @@ func SaveItem(ctx context.Context, item models.WarehouseItem) error {
 	return persistence.SaveItem(ctx, persistence.SaveItemOptions{Item: item})
 }
 
+func UpdateOwner(ctx context.Context, itemID, newOwnerID, newOwnerName string) error {
+	return persistence.UpdateItem(ctx, persistence.UpdateItemOptions{
+		ItemID: itemID,
+		UpdateItemAttributes: []persistence.UpdateItemAttributes{
+			{
+				Name:  "FreeagentOwnerID",
+				Value: newOwnerID,
+			},
+			{
+				Name:  "OwnerDisplayName",
+				Value: newOwnerName,
+			},
+		},
+	})
+}
+
 func LoadItem(ctx context.Context, itemID string) (models.WarehouseItem, error) {
 	items, err := persistence.QueryItems(ctx, persistence.ItemByIDQuery(itemID))
 	if err != nil {

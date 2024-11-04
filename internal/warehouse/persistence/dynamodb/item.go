@@ -2,6 +2,8 @@ package dynamodb
 
 import (
 	"context"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
@@ -50,6 +52,53 @@ func SaveItem(ctx context.Context, opts SaveItemOptions) error {
 	}
 
 	return nil
+}
+
+type UpdateItemOptions struct {
+	ItemID               string
+	UpdateItemAttributes []UpdateItemAttributes
+}
+
+type UpdateItemAttributes struct {
+	Name  string
+	Value string
+}
+
+func UpdateItem(ctx context.Context, opts UpdateItemOptions) error {
+	instance, err := getClient(ctx)
+	if err != nil {
+		return err
+	}
+
+	var updateExpressions []string
+	expressionAttributeNames := make(map[string]string)
+	expressionAttributeValues := make(map[string]types.AttributeValue)
+
+	for _, opt := range opts.UpdateItemAttributes {
+		placeholderName := fmt.Sprintf("#%s", opt.Name)
+		expressionAttributeNames[placeholderName] = opt.Name
+
+		placeholderValue := fmt.Sprintf(":val_%s", opt.Name)
+		expressionAttributeValues[placeholderValue] = &types.AttributeValueMemberS{Value: opt.Value}
+
+		updateExpressions = append(updateExpressions, fmt.Sprintf("%s = %s", placeholderName, placeholderValue))
+	}
+
+	updateExpression := strings.Join(updateExpressions, ", ")
+
+	input := &dynamodb.UpdateItemInput{
+		TableName: aws.String("control-alt-repeat-warehouse"),
+		Key: map[string]types.AttributeValue{
+			"ID": &types.AttributeValueMemberS{Value: opts.ItemID},
+		},
+		UpdateExpression:          aws.String("SET " + updateExpression),
+		ExpressionAttributeNames:  expressionAttributeNames,
+		ExpressionAttributeValues: expressionAttributeValues,
+	}
+
+	_, err = instance.client.UpdateItem(ctx, input)
+
+	return err
 }
 
 type QueryItemsOptions struct {

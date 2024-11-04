@@ -1,7 +1,6 @@
 package web
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -23,10 +22,7 @@ func ebayImportListing(c echo.Context) error {
 
 	warehouseID, err := internal.ImportEbayListingByID(c.Request().Context(), listingID)
 	if err != nil {
-		fmt.Println(err)
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"error": err.Error(),
-		})
+		return handleError(c, err)
 	}
 
 	return c.JSON(http.StatusOK, echo.Map{"warehouseID": warehouseID})

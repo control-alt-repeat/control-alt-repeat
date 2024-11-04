@@ -66,6 +66,32 @@ func IterateItems(ctx context.Context, f func(context.Context, string) error) er
 	return s3.IterateS3Objects(ctx, f)
 }
 
+type UpdateItemOptions struct {
+	ItemID               string
+	UpdateItemAttributes []UpdateItemAttributes
+}
+
+type UpdateItemAttributes struct {
+	Name  string
+	Value string
+}
+
+func UpdateItem(ctx context.Context, opts UpdateItemOptions) error {
+	atts := []dynamodb.UpdateItemAttributes{}
+
+	for _, att := range opts.UpdateItemAttributes {
+		atts = append(atts, dynamodb.UpdateItemAttributes{
+			Name:  att.Name,
+			Value: att.Value,
+		})
+	}
+
+	return dynamodb.UpdateItem(ctx, dynamodb.UpdateItemOptions{
+		ItemID:               opts.ItemID,
+		UpdateItemAttributes: atts,
+	})
+}
+
 type QueryItemsOptions struct {
 	IndexName              string
 	KeyConditionExpression string

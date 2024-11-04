@@ -7,12 +7,16 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/control-alt-repeat/control-alt-repeat/internal"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/freeagent"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse"
 )
 
 func initialiseItemLookup(e *echo.Echo) {
 	e.GET("item-lookup", renderItemLookupPage)
 	e.POST("item-lookup", findItem)
 	e.POST("item-print-shelf-label", printLabel)
+	e.POST("contacts-list", listContacts)
+	e.POST("owner-save", saveOwner)
 }
 
 func renderItemLookupPage(c echo.Context) error {
@@ -26,13 +30,10 @@ func findItem(c echo.Context) error {
 
 	warehouseItem, ebayInternalItems, err := internal.LookupItem(c.Request().Context(), itemID)
 	if err != nil {
-		fmt.Println(err)
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"error": err.Error(),
-		})
+		return handleError(c, err)
 	}
 
-	item := Map(warehouseItem)
+	item := MapToWebItem(warehouseItem)
 
 	item.ImageURL = ebayInternalItems[0].PictureURL
 
@@ -47,14 +48,45 @@ func findItem(c echo.Context) error {
 	return c.JSON(http.StatusOK, item)
 }
 
+type ListContactsResponse struct {
+	Contacts []Contact `json:"contacts"`
+}
+
+func listContacts(c echo.Context) error {
+	contacts, err := freeagent.ListContacts(c.Request().Context(), freeagent.ListContactsOptions{})
+	if err != nil {
+		return handleError(c, err)
+	}
+
+	return c.JSON(http.StatusOK, &ListContactsResponse{Contacts: MapSlice(contacts, MapToWebContact)})
+}
+
+type PrintLabelResponse struct {
+	Message string `json:"message"`
+}
+
 func printLabel(c echo.Context) error {
 	itemID := c.FormValue("id")
 
 	err := internal.ItemPrintShelfLabel(c.Request().Context(), itemID)
-
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+		return handleError(c, err)
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{"message": "Shelf label printed successfully"})
+	return c.JSON(http.StatusOK, &PrintLabelResponse{Message: "Shelf label printed successfully"})
+}
+
+func saveOwner(c echo.Context) error {
+	itemID := c.FormValue("id")
+	newOwnerID := c.FormValue("ownerId")
+	newOwnerName := c.FormValue("newOwnerName")
+
+	fmt.Printf("Updating item %s with new owner %s %s\n", itemID, newOwnerID, newOwnerName)
+
+	err := warehouse.UpdateOwner(c.Request().Context(), itemID, newOwnerID, newOwnerName)
+	if err != nil {
+		return handleError(c, err)
+	}
+
+	return c.JSON(http.StatusOK, &PrintLabelResponse{Message: "Shelf label printed successfully"})
 }

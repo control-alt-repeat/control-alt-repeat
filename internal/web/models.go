@@ -3,6 +3,7 @@ package web
 import (
 	"fmt"
 
+	"github.com/control-alt-repeat/control-alt-repeat/internal/freeagent"
 	"github.com/control-alt-repeat/control-alt-repeat/internal/models"
 )
 
@@ -24,7 +25,12 @@ type EbayReference struct {
 	ListingURL  string `json:"listingURL"`
 }
 
-func Map(i models.WarehouseItem) Item {
+type Contact struct {
+	Name        string `json:"name"`
+	FreeagentID string `json:"id"`
+}
+
+func MapToWebItem(i models.WarehouseItem) Item {
 	return Item{
 		ID:               i.ControlAltRepeatID,
 		Title:            i.Title,
@@ -34,4 +40,19 @@ func Map(i models.WarehouseItem) Item {
 		EbayListingURL:   fmt.Sprintf("https://www.ebay.co.uk/itm/%s", i.EbayListingID),
 		EbayReferences:   []EbayReference{},
 	}
+}
+
+func MapToWebContact(fc freeagent.Contact) Contact {
+	return Contact{
+		Name:        fc.DisplayName(),
+		FreeagentID: fc.ID(),
+	}
+}
+
+func MapSlice[T any, U any](input []T, mapper func(T) U) []U {
+	result := make([]U, len(input))
+	for i, item := range input {
+		result[i] = mapper(item)
+	}
+	return result
 }

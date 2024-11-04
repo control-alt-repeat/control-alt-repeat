@@ -32,14 +32,17 @@ func itemMove(c echo.Context) error {
 	}
 
 	matched, err := regexp.MatchString(`^[A-Z]{3}-[0-9]{3}$`, itemMove.ItemID)
-	if err != nil || !matched {
-		return c.JSON(http.StatusInternalServerError, err)
+	if err != nil {
+		return handleError(c, err)
+	}
+
+	if !matched {
+		return c.JSON(http.StatusBadRequest, nil)
 	}
 
 	err = internal.MoveItem(c.Request().Context(), itemMove.ItemID, itemMove.Shelf)
-
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+		return handleError(c, err)
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"message": "Successfully moved the item"})
@@ -50,18 +53,12 @@ type ItemsUnshelvedResponse struct {
 }
 
 func itemsUnshelved(c echo.Context) error {
-	items, err := warehouse.LoadUnshelvedItems(c.Request().Context())
+	warehouseItems, err := warehouse.LoadUnshelvedItems(c.Request().Context())
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
-	}
-
-	result := []Item{}
-
-	for _, item := range items {
-		result = append(result, Map(item))
+		return handleError(c, err)
 	}
 
 	return c.JSON(http.StatusOK, ItemsUnshelvedResponse{
-		Items: result,
+		Items: MapSlice(warehouseItems, MapToWebItem),
 	})
 }
