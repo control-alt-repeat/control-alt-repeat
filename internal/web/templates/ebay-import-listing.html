@@ -14,8 +14,6 @@ function page() {
     return {
         listingID: "",
         ebayImportListing() {
-            console.log("Lookup item: ", this.id);
-
             fetch("ebay-import-listing", {
                 method: "POST",
                 headers: {

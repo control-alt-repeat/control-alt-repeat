@@ -23,6 +23,9 @@ func (r *CustomRenderer) Render(w io.Writer, name string, data interface{}, c ec
 //go:embed templates/*
 var templates embed.FS
 
+//go:embed public/*
+var public embed.FS
+
 func Init(e *echo.Echo) error {
 	t, err := template.ParseFS(templates, "templates/*")
 	if err != nil {
@@ -45,6 +48,11 @@ func Init(e *echo.Echo) error {
 	initialiseItemLookup(e)
 	initialiseItemMove(e)
 	initialiseEbayImportListing(e)
+
+	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
+		Root:       "public",
+		Filesystem: http.FS(public),
+	}))
 
 	return nil
 }
