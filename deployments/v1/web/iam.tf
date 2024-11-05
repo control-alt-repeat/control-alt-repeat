@@ -35,7 +35,72 @@ resource "aws_iam_policy" "function_logging_policy" {
   policy      = data.aws_iam_policy_document.allow_lambda_logging.json
 }
 
+data "aws_iam_policy_document" "allow_lambda_logging" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
 
+    resources = [
+      "arn:aws:logs:*:*:*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "freeagent_auth_ssm_access_policy" {
+  statement {
+    actions = [
+      "ssm:GetParameter",
+      "ssm:GetParameters",
+      "ssm:GetParametersByPath"
+    ]
+
+    resources = [
+      "arn:aws:ssm:*:*:parameter/control_alt_repeat/freeagent/live/*"
+    ]
+
+    effect = "Allow"
+  }
+
+  statement {
+    actions = [
+      "ssm:PutParameter"
+    ]
+
+    resources = [
+      "arn:aws:ssm:*:*:parameter/control_alt_repeat/freeagent/live/access_token",
+      "arn:aws:ssm:*:*:parameter/control_alt_repeat/freeagent/live/expires_in"
+    ]
+
+    effect = "Allow"
+  }
+
+  statement {
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:GenerateDataKey"
+    ]
+
+    resources = [
+      "*"
+    ]
+
+    effect = "Allow"
+  }
+}
+
+resource "aws_iam_policy" "freeagent_auth_ssm_access_policy" {
+  name   = "freeagent-auth-ssm-access-policy"
+  policy = data.aws_iam_policy_document.freeagent_auth_ssm_access_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "freeagent_auth_ssm_policy_attachment" {
+  role       = aws_iam_role.lambda.id
+  policy_arn = aws_iam_policy.freeagent_auth_ssm_access_policy.arn
+}
 
 resource "aws_iam_role_policy_attachment" "lambda_logging_policy_attachment" {
   role       = aws_iam_role.lambda.id
