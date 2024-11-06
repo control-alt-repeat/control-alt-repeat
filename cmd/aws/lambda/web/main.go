@@ -4,35 +4,32 @@ import (
 	"context"
 
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/pkgerrors"
 	"github.com/ziflex/lecho/v3"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	echoadapter "github.com/awslabs/aws-lambda-go-api-proxy/echo"
 
+	"github.com/control-alt-repeat/control-alt-repeat/internal/logger"
 	"github.com/control-alt-repeat/control-alt-repeat/internal/web"
 
 	"github.com/labstack/echo/v4"
 )
-
-var log zerolog.Logger
 
 var (
 	echoLambda *echoadapter.EchoLambdaV2
 )
 
 func init() {
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
+	log := logger.Get()
 
 	log.With().
 		Timestamp().
 		Str("service", "web").
 		Logger().
-		Level(zerolog.DebugLevel)
+		Level(zerolog.InfoLevel)
 
-	e := echo.New()
+	var e = echo.New()
 
 	logger := lecho.From(log)
 	e.Logger = logger
