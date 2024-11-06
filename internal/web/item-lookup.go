@@ -68,7 +68,9 @@ type PrintLabelResponse struct {
 func printLabel(c echo.Context) error {
 	itemID := c.FormValue("id")
 
-	err := internal.ItemPrintShelfLabel(c.Request().Context(), itemID)
+	err := internal.ItemPrintShelfLabel(c.Request().Context(), internal.ItemPrintShelfLabelOptions{
+		ItemID: itemID,
+	})
 	if err != nil {
 		return handleError(c, err)
 	}

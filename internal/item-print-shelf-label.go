@@ -2,34 +2,32 @@ package internal
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
 	"github.com/control-alt-repeat/control-alt-repeat/internal/labels"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/logger"
 	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse"
 )
 
-func ItemPrintShelfLabel(ctx context.Context, itemID string) error {
-	warehouseItem, err := warehouse.LoadItem(ctx, itemID)
+type ItemPrintShelfLabelOptions struct {
+	ItemID string
+}
+
+func ItemPrintShelfLabel(ctx context.Context, opts ItemPrintShelfLabelOptions) error {
+	log := logger.Instance
+	log.Info().Fields(opts).Msg("Loading item from warehouse")
+
+	item, err := warehouse.LoadItem(ctx, opts.ItemID)
 	if err != nil {
 		return err
 	}
 
-	ebayItemInternal, err := warehouse.LoadEbayListing(ctx, warehouseItem.EbayListingID)
+	log.Info().Msg("Generating label")
+	log.Debug().Fields(item).Msg("")
+	label, name, err := labels.CreateShelfLabelFromItem(ctx, item)
 	if err != nil {
 		return err
 	}
 
-	label, err := labels.Create102x152mmItemLabel(
-		warehouseItem.ControlAltRepeatID,
-		ebayItemInternal.Title,
-		strings.Join([]string{"https://www.ebay.co.uk/itm", ebayItemInternal.ID}, "/"),
-	)
-	if err != nil {
-		return err
-	}
-
-	key := fmt.Sprintf("102x152-%s.png", warehouseItem.ControlAltRepeatID)
-
-	return labels.UploadFileFromBytes(label, key)
+	log.Info().Msgf("Sending label to the label printer as '%s'", name)
+	return labels.UploadFileFromBytes(label, name)
 }

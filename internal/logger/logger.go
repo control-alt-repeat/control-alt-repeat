@@ -13,9 +13,9 @@ import (
 
 var once sync.Once
 
-var log zerolog.Logger
+var Instance zerolog.Logger
 
-func Get(output io.Writer) zerolog.Logger {
+func Get(output io.Writer) {
 	once.Do(func() {
 		zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 		zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
@@ -37,7 +37,7 @@ func Get(output io.Writer) zerolog.Logger {
 			}
 		}
 
-		log = zerolog.New(output).
+		Instance = zerolog.New(output).
 			Level(zerolog.Level(logLevel)).
 			With().
 			Timestamp().
@@ -45,6 +45,4 @@ func Get(output io.Writer) zerolog.Logger {
 			Str("go_version", buildInfo.GoVersion).
 			Logger()
 	})
-
-	return log
 }

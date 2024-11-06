@@ -10,6 +10,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/rs/zerolog"
+	"github.com/ziflex/lecho/v3"
+
+	"github.com/control-alt-repeat/control-alt-repeat/internal/logger"
 )
 
 type CustomRenderer struct {
@@ -26,10 +29,26 @@ var templates embed.FS
 //go:embed public/*
 var public embed.FS
 
-func Init(e *echo.Echo) error {
+func Init(logOutput io.Writer) (*echo.Echo, error) {
+	logger.Get(logOutput)
+
+	logger.Instance.With().
+		Timestamp().
+		Str("service", "web").
+		Logger()
+
+	var e = echo.New()
+
+	log := lecho.From(logger.Instance)
+	e.Logger = log
+
+	e.Use(lecho.Middleware(lecho.Config{
+		Logger: log,
+	}))
+
 	t, err := template.ParseFS(templates, "templates/*")
 	if err != nil {
-		return err
+		return e, err
 	}
 
 	e.Renderer = &CustomRenderer{templates: t}
@@ -53,7 +72,7 @@ func Init(e *echo.Echo) error {
 		Filesystem: http.FS(public),
 	}))
 
-	return nil
+	return e, nil
 }
 
 func showIndex(c echo.Context) error {

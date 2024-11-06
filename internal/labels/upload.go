@@ -2,7 +2,6 @@ package labels
 
 import (
 	"bytes"
-	"fmt"
 	"mime/multipart"
 	"net/http"
 
@@ -10,9 +9,6 @@ import (
 )
 
 func UploadFileFromBytes(imageBytes []byte, filename string) error {
-	sizeMB := float64(len(imageBytes)) / (1024 * 1024) // Convert bytes to MB
-	fmt.Printf("Data size: %.2f MB\n", sizeMB)
-
 	labelPrinterDomain, err := aws.GetParameterValue("eu-west-2", "/control_alt_repeat/ebay/live/label_printer/host_domain")
 	if err != nil {
 		return err
@@ -20,7 +16,6 @@ func UploadFileFromBytes(imageBytes []byte, filename string) error {
 
 	printURL := labelPrinterDomain + "/print"
 
-	fmt.Println("Sending print job to: ", printURL)
 	// Create a buffer and multipart writer
 	var body bytes.Buffer
 	writer := multipart.NewWriter(&body)

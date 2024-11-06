@@ -1,6 +1,7 @@
 package labels
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -11,7 +12,7 @@ import (
 	"golang.org/x/image/math/fixed"
 )
 
-func Create102x152mmItemLabel(warehouseID string, itemDescription string, qrValue string) ([]byte, error) {
+func Create102x152mmItemLabel(warehouseID string, itemDescription string, qrValue string) (label []byte, name string, err error) {
 	width := 1660
 	height := 1164
 	// marginTop := 300
@@ -22,7 +23,7 @@ func Create102x152mmItemLabel(warehouseID string, itemDescription string, qrValu
 	// Draw the QR code on the right-hand side
 	qrCode, err := newQRCode(qrValue) // QR Code content
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	qrCodeSize := 600                         // Size of QR code
 	qrPos := image.Pt(width-qrCodeSize-20, 0) // Position with margin
@@ -30,11 +31,11 @@ func Create102x152mmItemLabel(warehouseID string, itemDescription string, qrValu
 
 	fontFace50, err := loadFontFace(50)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	fontFace250, err := loadFontFace(250)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	drawTextBox(img, 100, 500, 800, itemDescription, fontFace50)
@@ -43,7 +44,9 @@ func Create102x152mmItemLabel(warehouseID string, itemDescription string, qrValu
 	addLabel(img, 20, 200, warehouseID, fontFace250)
 
 	// return writeImageToPNG(rot90(img))
-	return writeImageToPNG(rot90(rot90(rot90(img))))
+	label, err = writeImageToPNG(rot90(rot90(rot90(img))))
+
+	return label, fmt.Sprintf("%s.png", warehouseID), err
 }
 
 // addText adds text to the image at specified coordinates

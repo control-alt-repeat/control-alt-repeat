@@ -98,7 +98,9 @@ func itemPrintShelfLabel(cmd *cobra.Command, args []string) {
 	}
 	fmt.Println("Printing shelf label for item ID:", itemID)
 
-	err = internal.ItemPrintShelfLabel(cmd.Context(), itemID)
+	err = internal.ItemPrintShelfLabel(cmd.Context(), internal.ItemPrintShelfLabelOptions{
+		ItemID: itemID,
+	})
 
 	if err != nil {
 		fmt.Println(err)
