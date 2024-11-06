@@ -18,8 +18,17 @@ func ImportEbayListing(ctx context.Context, ebayListing *ebay.EbayItem) (string,
 		}
 	}
 
-	warehouseItem := &models.WarehouseItem{}
-	warehouseItem.EbayListingID = ebayListing.ItemID
+	startTime, err := time.Parse(time.RFC3339, ebayListing.ListingDetails.StartTime)
+	if err != nil {
+		return "", err
+	}
+
+	warehouseItem := &models.WarehouseItem{
+		Title:         ebayListing.Title,
+		PictureURL:    ebayListing.PictureDetails.PictureURL[0],
+		AddedTime:     startTime,
+		EbayListingID: ebayListing.ItemID,
+	}
 
 	warehouseItem.InitialiseFromSKU(ebayListing.SKU)
 
@@ -36,11 +45,6 @@ func ImportEbayListing(ctx context.Context, ebayListing *ebay.EbayItem) (string,
 		if err := ebay.ReviseSKU(ctx, ebayListing.ItemID, newSKU); err != nil {
 			return "", err
 		}
-	}
-
-	startTime, err := time.Parse(time.RFC3339, ebayListing.ListingDetails.StartTime)
-	if err != nil {
-		return "", err
 	}
 
 	ebayItemInternal := &models.WarehouseEbayListing{
