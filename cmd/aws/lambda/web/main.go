@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"os"
 
 	"github.com/rs/zerolog"
 	"github.com/ziflex/lecho/v3"
@@ -21,7 +22,7 @@ var (
 )
 
 func init() {
-	log := logger.Get()
+	log := logger.Get(os.Stdout)
 
 	log.With().
 		Timestamp().

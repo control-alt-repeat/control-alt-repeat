@@ -6,7 +6,6 @@ import (
 	"runtime/debug"
 	"strconv"
 	"sync"
-	"time"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
@@ -16,7 +15,7 @@ var once sync.Once
 
 var log zerolog.Logger
 
-func Get() zerolog.Logger {
+func Get(output io.Writer) zerolog.Logger {
 	once.Do(func() {
 		zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 		zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
@@ -24,11 +23,6 @@ func Get() zerolog.Logger {
 		logLevel, err := strconv.ParseInt(os.Getenv("LOG_LEVEL"), 10, 8)
 		if err != nil {
 			logLevel = int64(zerolog.InfoLevel)
-		}
-
-		var output io.Writer = zerolog.ConsoleWriter{
-			Out:        os.Stdout,
-			TimeFormat: time.RFC3339,
 		}
 
 		var gitRevision string

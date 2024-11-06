@@ -1,6 +1,9 @@
 package main
 
 import (
+	"os"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog"
 	"github.com/ziflex/lecho/v3"
@@ -10,7 +13,10 @@ import (
 )
 
 func main() {
-	log := logger.Get()
+	log := logger.Get(zerolog.ConsoleWriter{
+		Out:        os.Stdout,
+		TimeFormat: time.RFC3339,
+	})
 
 	log.With().
 		Timestamp().
