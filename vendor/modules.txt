@@ -319,6 +319,9 @@ github.com/yeqown/go-qrcode/writer/standard/imgkit
 ## explicit
 github.com/yeqown/reedsolomon
 github.com/yeqown/reedsolomon/binary
+# github.com/ziflex/lecho/v3 v3.7.0
+## explicit; go 1.17
+github.com/ziflex/lecho/v3
 # golang.org/x/crypto v0.28.0
 ## explicit; go 1.20
 golang.org/x/crypto/acme

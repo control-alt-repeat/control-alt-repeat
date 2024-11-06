@@ -2,7 +2,6 @@ package web
 
 import (
 	"embed"
-	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/rs/zerolog"
 )
 
 type CustomRenderer struct {
@@ -35,7 +35,6 @@ func Init(e *echo.Echo) error {
 	e.Renderer = &CustomRenderer{templates: t}
 
 	// Middleware
-	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
 	// e.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
@@ -58,12 +57,15 @@ func Init(e *echo.Echo) error {
 }
 
 func showIndex(c echo.Context) error {
-	fmt.Println("showIndex")
-
 	return render(http.StatusOK, "index.html", nil, c)
 }
 
 func render(code int, templateName string, data map[string]interface{}, c echo.Context) error {
+	c.Logger().Print("Echo interface")
+	zerolog.Ctx(c.Request().Context()).Printf("Zerolog interface")
+	zerolog.Ctx(c.Request().Context()).Info().Fields(data).
+		Msgf("Rendering '%s' with code %d", templateName, code)
+
 	var builder strings.Builder
 
 	if err := c.Echo().Renderer.Render(&builder, templateName, data, c); err != nil {

@@ -1,27 +1,31 @@
 package main
 
 import (
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/pkgerrors"
-
 	"github.com/labstack/echo/v4"
+	"github.com/rs/zerolog"
+	"github.com/ziflex/lecho/v3"
 
+	"github.com/control-alt-repeat/control-alt-repeat/internal/logger"
 	"github.com/control-alt-repeat/control-alt-repeat/internal/web"
 )
 
-var log zerolog.Logger
-
 func main() {
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
+	log := logger.Get()
 
 	log.With().
 		Timestamp().
 		Str("service", "web").
 		Logger().
-		Level(zerolog.DebugLevel)
+		Level(zerolog.InfoLevel)
 
 	var e = echo.New()
+
+	logger := lecho.From(log)
+	e.Logger = logger
+
+	e.Use(lecho.Middleware(lecho.Config{
+		Logger: logger,
+	}))
 
 	err := web.Init(e)
 

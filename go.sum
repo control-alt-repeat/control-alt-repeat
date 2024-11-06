@@ -136,6 +136,8 @@ github.com/yeqown/go-qrcode/writer/standard v1.2.4 h1:41e/aLr1AMVWlug6oUMkDg2r0+
 github.com/yeqown/go-qrcode/writer/standard v1.2.4/go.mod h1:H8nLSGYUWBpNyBPjDcJzAanMzYBBYMFtrU2lwoSRn+k=
 github.com/yeqown/reedsolomon v1.0.0 h1:x1h/Ej/uJnNu8jaX7GLHBWmZKCAWjEJTetkqaabr4B0=
 github.com/yeqown/reedsolomon v1.0.0/go.mod h1:P76zpcn2TCuL0ul1Fso373qHRc69LKwAw/Iy6g1WiiM=
+github.com/ziflex/lecho/v3 v3.7.0 h1:MSzYINEHtAaCx2XpbdF1A85aSyXitNJxF4T9dG6jzRQ=
+github.com/ziflex/lecho/v3 v3.7.0/go.mod h1:LBlLsyIwa0MFxtJ2WU5WzHfuMR/jnq26TXddWfJ+s/0=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.28.0 h1:GBDwsMXVQi34v5CCYUm2jkJvu4cbtru2U4TN2PSyQnw=
 golang.org/x/crypto v0.28.0/go.mod h1:rmgy+3RHxRZMyY0jjAJShp2zgEdOqj2AO7U0pYmeQ7U=

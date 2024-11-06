@@ -5,6 +5,7 @@ import (
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
+	"github.com/ziflex/lecho/v3"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -32,6 +33,14 @@ func init() {
 		Level(zerolog.DebugLevel)
 
 	e := echo.New()
+
+	logger := lecho.From(log)
+	e.Logger = logger
+
+	e.Use(lecho.Middleware(lecho.Config{
+		Logger: logger,
+	}))
+
 	err := web.Init(e)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to initialize Echo app")

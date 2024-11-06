@@ -18,6 +18,7 @@ require (
 	github.com/spf13/cobra v1.8.1
 	github.com/yeqown/go-qrcode/v2 v2.2.4
 	github.com/yeqown/go-qrcode/writer/standard v1.2.4
+	github.com/ziflex/lecho/v3 v3.7.0
 	golang.org/x/image v0.21.0
 )
 
