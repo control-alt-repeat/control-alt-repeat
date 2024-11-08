@@ -79,7 +79,7 @@
         <!-- Action Buttons -->
         <section class="mb-4 p-4 bg-light rounded">
             <h4>Item Actions</h4>
-            <button @click="printShelfLabel()" class="btn btn-primary w-100 mb-2">Print Shelf Label</button>
+            <button @click="printShelfLabel()" x-bind:disabled="isPrinting" class="btn btn-primary w-100 mb-2">Print Shelf Label</button>
             <a x-bind:href="item.ebayListingURL" class="link-primary" target="_blank">
                 <button class="btn btn-info w-100">View on eBay</button>
             </a>
@@ -100,6 +100,7 @@ function page() {
         filteredContacts: [],
         contactSearchQuery: "",
         newOwnerID: "",
+        isPrinting: false,
         item: null,
         init() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -211,6 +212,8 @@ function page() {
             this.filteredContacts = [];
         },
         printShelfLabel() {
+            this.isPrinting = true;
+
             fetch("item-print-shelf-label", {
                 method: "POST",
                 headers: {
@@ -229,10 +232,13 @@ function page() {
             })
             .then(data => {
                 this.showError = false;  // Hide any previous error
+
+                this.isPrinting = false;
             })
             .catch(error => {
                 this.errorMessage = error.message || 'An unknown error occurred';
                 this.showError = true;   // Show the Bootstrap alert
+                this.isPrinting = false;
             });
         }
     }

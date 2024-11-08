@@ -41,7 +41,7 @@
             <!-- Search Box -->
             <div x-data="lookup()" class="input-group mb-3" style="max-width:175px">
                 <input type="text" x-model="id" class="form-control" x-on:input="formatId()" placeholder="ABC-123..." aria-label="Find">
-                <button @click="window.location.href = '/item-lookup?id=' + id" class="btn btn-outline-secondary" type="button">Find</button>
+                <button @click="window.location.href = '/item-lookup?id=' + id" class="btn btn-outline-success" type="button">Find</button>
             </div>
         </header>
               
