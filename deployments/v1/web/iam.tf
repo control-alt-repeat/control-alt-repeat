@@ -57,7 +57,8 @@ data "aws_iam_policy_document" "freeagent_auth_ssm_access_policy" {
 
     resources = [
       "arn:aws:ssm:*:*:parameter/control_alt_repeat/freeagent/live/access_token",
-      "arn:aws:ssm:*:*:parameter/control_alt_repeat/freeagent/live/expires_in"
+      "arn:aws:ssm:*:*:parameter/control_alt_repeat/freeagent/live/expires_in",
+      "arn:aws:ssm:*:*:parameter/control_alt_repeat/freeagent/live/timestamp"
     ]
 
     effect = "Allow"

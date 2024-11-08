@@ -20,7 +20,8 @@ data "aws_iam_policy_document" "ebay_auth_ssm_access_policy" {
 
     resources = [
       "arn:aws:ssm:*:*:parameter/control_alt_repeat/ebay/live/access_token",
-      "arn:aws:ssm:*:*:parameter/control_alt_repeat/ebay/live/expires_in"
+      "arn:aws:ssm:*:*:parameter/control_alt_repeat/ebay/live/expires_in",
+      "arn:aws:ssm:*:*:parameter/control_alt_repeat/ebay/live/timestamp"
     ]
 
     effect = "Allow"
