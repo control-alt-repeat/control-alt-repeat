@@ -30,13 +30,17 @@ func UpdateOwner(ctx context.Context, itemID, newOwnerID, newOwnerName string) e
 	})
 }
 
-func LoadItem(ctx context.Context, itemID string) (models.WarehouseItem, error) {
+func LoadItem(ctx context.Context, itemID string) (models.WarehouseItem, bool, error) {
 	items, err := persistence.QueryItems(ctx, persistence.ItemByIDQuery(itemID))
 	if err != nil {
-		return models.WarehouseItem{}, err
+		return models.WarehouseItem{}, false, err
 	}
 
-	return items[0], err
+	if len(items) == 0 {
+		return models.WarehouseItem{}, false, nil
+	}
+
+	return items[0], true, err
 }
 
 func LoadUnshelvedItems(ctx context.Context) ([]models.WarehouseItem, error) {

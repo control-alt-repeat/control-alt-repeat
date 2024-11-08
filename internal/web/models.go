@@ -2,6 +2,7 @@ package web
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/control-alt-repeat/control-alt-repeat/internal/freeagent"
 	"github.com/control-alt-repeat/control-alt-repeat/internal/models"
@@ -16,6 +17,7 @@ type Item struct {
 	OwnerDisplayName string          `json:"ownerDisplayName"`
 	EbayListingURL   string          `json:"ebayListingURL"`
 	ImageURL         string          `json:"imageURL"`
+	AddedTime        time.Time       `json:"addedTime"`
 }
 
 type EbayReference struct {
@@ -39,6 +41,7 @@ func MapToWebItem(i models.WarehouseItem) Item {
 		OwnerDisplayName: i.OwnerDisplayName,
 		EbayListingURL:   fmt.Sprintf("https://www.ebay.co.uk/itm/%s", i.EbayListingID),
 		EbayReferences:   []EbayReference{},
+		AddedTime:        i.AddedTime,
 	}
 }
 

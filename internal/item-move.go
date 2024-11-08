@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 
 	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay"
@@ -12,9 +13,13 @@ import (
 func MoveItem(ctx context.Context, itemID string, newShelf string) error {
 	var warehouseItem models.WarehouseItem
 
-	warehouseItem, err := warehouse.LoadItem(ctx, itemID)
+	warehouseItem, exists, err := warehouse.LoadItem(ctx, itemID)
 	if err != nil {
 		return err
+	}
+
+	if !exists {
+		return fmt.Errorf("item does not exist for ID '%s'", itemID)
 	}
 
 	warehouseItem.Shelf = newShelf

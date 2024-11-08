@@ -1,6 +1,6 @@
 <div x-data="page()" class="row">
     <!-- Left Column (Main Content) -->
-    <div class="col-lg-8 mb-4">
+    <div class="col-lg-8 mb-4" x-show="item">
         <!-- Featured Image -->
         <img x-bind:src="item.imageURL" class="img-fluid rounded mb-4">
 
@@ -22,7 +22,7 @@
                         Item listed on eBay with ID
                         <a x-bind:href="item.ebayListingURL" class="link-primary" target="_blank">123456789</a>
                     </p>
-                    <p class="card-text"><small class="text-muted">3 days ago</small></p>
+                    <p class="card-text"><small class="text-muted"><span x-text="formatDate()"></span></small></p>
                 </div>
             </div>
             <!-- Additional updates can be added similarly -->
@@ -30,21 +30,18 @@
     </div>
 
     <!-- Right Column (Sidebar) -->
-    <div class="col-lg-4">
+    <div class="col-lg-4" x-show="item">
         <!-- Shelf -->
         <section class="mb-4 p-4 bg-light rounded">
             <h4>Shelf</h4>
-                <h5>
-                    <span x-text="item.shelf"></span>
-                </h5>
-                <!-- <div class="progress mb-3" style="height: 24px;">
-                    <div class="progress-bar bg-success" role="progressbar" style="width: 45%;" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100">£4,500 of £10,000</div>
-                </div> -->
-                <button 
-                    @click="window.location.href = '/item-move?id=' + item.id + '&shelf=' + item.shelf" 
-                    class="btn btn-outline-primary w-100">
-                    Change Shelf
-                </button>
+                <div class="input-group input-group">
+                    <span class="input-group-text flex-grow-1" x-text="item.shelf"></span>
+                    <button 
+                        class="btn btn-outline-primary ms-auto" 
+                        @click="window.location.href = '/item-move?id=' + item.id + '&shelf=' + item.shelf">
+                        Change Shelf
+                    </button>
+                </div>
         </section>
 
         <!-- Owner / Source -->
@@ -55,7 +52,7 @@
                 <div x-show="editing !== 'owner'">
                     <h5 class="mb-0"><span x-text="item.ownerDisplayName"></span></h5>
                     <p class="mb-0"><span x-text="item.freeagentOwnerID"></span></p>
-                    <button @click="editing = 'owner'" class="btn btn-outline-primary w-100">
+                    <button @click="startEditingOwner()" class="btn btn-outline-primary w-100">
                         Change Owner/Source
                     </button>
                 </div>
@@ -109,8 +106,10 @@ function page() {
             this.id = urlParams.get('id') || '';
             if (this.id) {
                 this.itemLookup()
-                this.contactsList()
             }
+        },
+        formatDate() {
+            return moment(this.item.addedTime).fromNow();
         },
         itemLookup() {
             fetch("item-lookup", {
@@ -175,6 +174,10 @@ function page() {
             this.newOwnerID = contact.id;
             this.filteredContacts = [];
         },
+        startEditingOwner() {
+            this.editing = 'owner'
+            this.contactsList()
+        },
         saveOwner() {
             fetch("owner-save", {
                 method: "POST",
@@ -235,3 +238,4 @@ function page() {
     }
 }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>

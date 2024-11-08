@@ -1,18 +1,16 @@
 <div x-data="page()">
-    <h2 class="text-center mb-4">Warehouse Management</h2>
-    <div class="row justify-content-center mb-4">
-        <div class="col-12 col-sm-6 col-md-4 mb-2 d-flex flex-column">
-            <a href="/item-move" class="btn btn-primary btn-block mb-2">
-                <i class="bi bi-bookshelf"></i> Shelve
-            </a>
-            <a href="/item-lookup" class="btn btn-primary btn-block mb-2">
-                <i class="bi bi-search"></i> Lookup Item
-            </a>
-            <a href="/ebay-import-listing" class="btn btn-primary btn-block">
-                <i class="bi bi-list-columns"></i> Import eBay Listing
-            </a>
-        </div>
-    </div>
+    <!-- <div class="d-flex justify-content-center">
+        <a href="/item-move" class="btn btn-primary mb-2 mx-2 w-100 w-md-auto text-center">
+            <i class="bi bi-bookshelf me-2 d-none d-sm-inline"></i>
+            <span class="d-none d-sm-inline">Shelve</span>
+            <i class="bi bi-bookshelf d-sm-none"></i>
+        </a>
+        <a href="/ebay-import-listing" class="btn btn-primary mb-2 mx-2 w-100 w-md-auto text-center">
+            <i class="bi bi-list-columns me-2 d-none d-sm-inline"></i>
+            <span class="d-none d-sm-inline">Import eBay Listing</span>
+            <i class="bi bi-list-columns d-sm-none"></i>
+        </a>
+    </div>     -->
 
     <div x-show="items" class="row d-none d-md-flex bg-light border-bottom text-start">
         <div class="col-1"><strong>ID</strong></div>

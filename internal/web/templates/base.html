@@ -39,18 +39,11 @@
             </div>
         
             <!-- Search Box -->
-            <div x-data="lookup()" class="d-flex">
-                <!-- <form  @submit.prevent="itemLookup()" style="width: 100%; max-width: 200px;"> -->
-                    <input type="text" x-model="id" class="form-control me-2" placeholder="ABC-123..." aria-label="Search" required>
-                    <button @click="window.location.href = '/item-lookup?id=' + id" class="btn btn-primary">Find</button>
-                <!-- </form> -->
+            <div x-data="lookup()" class="input-group mb-3" style="max-width:175px">
+                <input type="text" x-model="id" class="form-control" x-on:input="formatId()" placeholder="ABC-123..." aria-label="Find">
+                <button @click="window.location.href = '/item-lookup?id=' + id" class="btn btn-outline-secondary" type="button">Find</button>
             </div>
         </header>
-
-        <!-- <form @submit.prevent="itemLookup()" class="bg-white col-12 col-md-6 mx-auto p-4 rounded shadow">
-            <input id="id" type="text" x-model="id" placeholder="Enter Item ID" autocomplete="off" class="form-control mb-3 w-100" required>
-            <button id="lookup-button" type="submit" class="btn btn-success w-100">Find Item</button>
-        </form> -->
               
         <main>
             <div x-data="{ errorMessage: '', showError: false }">
@@ -72,37 +65,13 @@
             init() {
                 const urlParams = new URLSearchParams(window.location.search);
                 this.id = urlParams.get('id') || '';
-                if (this.id) {
-                    this.itemLookup()
-                    this.contactsList()
-                }
             },
-            itemLookup() {
-                fetch("item-lookup", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                    body: new URLSearchParams({ id: this.id })
-                })
-                .then(response => {
-                    // Check if response is ok (status in the range 200-299)
-                    if (!response.ok) {
-                        return response.json().then(err => {
-                            console.log(err)
-                            throw new Error(err.error || 'An unknown error occurred');
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    this.item = data;        // Store the item data
-                    this.showError = false;  // Hide any previous error
-                })
-                .catch(error => {
-                    this.errorMessage = error.message || 'An unknown error occurred';
-                    this.showError = true;   // Show the Bootstrap alert
-                });
+            formatId() {
+                this.id = this.id
+                    .trim()
+                    .toUpperCase()
+                    .replace(/[^A-Z0-9-]/g, '')
+                    .slice(0, 7)
             }
         }
     }
