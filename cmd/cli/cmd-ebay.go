@@ -11,31 +11,39 @@ import (
 	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay"
 )
 
-// eBay command: "car ebay"
 var cmdEbay = &cobra.Command{
 	Use:   "ebay",
 	Short: "eBay related operations",
 }
 
-// Import listing subcommand: "car ebay import-listing"
 var cmdEbayImportListing = &cobra.Command{
 	Use:   "import-listing",
 	Short: "Import a listing from eBay",
 	Run:   ebayImportListing,
 }
 
-// Import listing subcommand: "car ebay get-notification-preferences"
 var cmdEbayGetNotificationUsage = &cobra.Command{
 	Use:   "get-notification-usage",
 	Short: "Get notification usage from eBay",
 	Run:   ebayGetNotificationUsage,
 }
 
-// Import listing subcommand: "car ebay set-notification-preferences"
 var cmdEbaySetNotificationPreferences = &cobra.Command{
 	Use:   "set-notification-preferences",
 	Short: "Set notification preferences on eBay",
 	Run:   ebaySetNotificationPreferences,
+}
+
+var cmdEbayInventorySetup = &cobra.Command{
+	Use:   "inventory-setup",
+	Short: "Setting up inventory on eBay",
+	Run:   ebayInventorySetup,
+}
+
+var cmdEbayInventoryImportListing = &cobra.Command{
+	Use:   "inventory-import-listing",
+	Short: "Import a listing into inventory on eBay",
+	Run:   ebayInventoryImportListing,
 }
 
 func ebayImportListing(cmd *cobra.Command, args []string) {
@@ -65,6 +73,22 @@ func ebayGetNotificationUsage(cmd *cobra.Command, args []string) {
 func ebaySetNotificationPreferences(cmd *cobra.Command, args []string) {
 	err := ebay.SetNotificationPreferences(cmd.Context())
 
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
+
+func ebayInventorySetup(cmd *cobra.Command, args []string) {
+	err := ebay.SetControlAltRepeatWorkshopLocation(cmd.Context())
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
+
+func ebayInventoryImportListing(cmd *cobra.Command, args []string) {
+	err := ebay.InventoryImportListing(cmd.Context(), ebayListingID)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

@@ -106,6 +106,15 @@ var UnshelvedItemsQuery = QueryItemsOptions{
 	},
 }
 
+var MostRecentItems = QueryItemsOptions{
+
+	IndexName:              "GSI_Shelf",
+	KeyConditionExpression: "CreatedAt = :createdAt",
+	StringExpressionValues: map[string]string{
+		":createdAt": UnsetShelfDefault,
+	},
+}
+
 func ItemByIDQuery(id string) QueryItemsOptions {
 	return QueryItemsOptions{
 		KeyConditionExpression: "ID = :id",

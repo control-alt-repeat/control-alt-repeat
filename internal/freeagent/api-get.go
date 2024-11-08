@@ -32,7 +32,7 @@ func FreeagentApiGet[T any](ctx context.Context, opts ApiGetOptions, target *T) 
 
 	fmt.Println(newURL)
 
-	req, err := http.NewRequest("GET", newURL, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", newURL, nil)
 	if err != nil {
 		return err
 	}

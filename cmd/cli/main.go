@@ -73,6 +73,14 @@ func run() int {
 	}
 	cmdEbay.AddCommand(cmdEbayGetNotificationUsage)
 	cmdEbay.AddCommand(cmdEbaySetNotificationPreferences)
+	cmdEbay.AddCommand(cmdEbayInventorySetup)
+
+	cmdEbayInventoryImportListing.Flags().StringVar(&ebayListingID, "ebay-listing-id", "", "eBay listing ID")
+	if err := cmdEbayInventoryImportListing.MarkFlagRequired("ebay-listing-id"); err != nil {
+		log.Error().Err(err).Msg("")
+		return 1
+	}
+	cmdEbay.AddCommand(cmdEbayInventoryImportListing)
 
 	cmdRoot.AddCommand(cmdFreeagent)
 
