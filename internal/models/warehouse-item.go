@@ -20,7 +20,7 @@ type WarehouseItem struct {
 const SKURegex = `(?m)^\(?(?P<Shelf>\d+[A-Z]+)?\)?( )?(?P<ID>[A-Z]{3}\-[0-9]{3})?`
 
 func (i WarehouseItem) ToEbaySKU() string {
-	return fmt.Sprintf("(%s) %s", i.Shelf, i.ControlAltRepeatID)
+	return i.ControlAltRepeatID
 }
 
 func (wi *WarehouseItem) InitialiseFromSKU(sku string) {
