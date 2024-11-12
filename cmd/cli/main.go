@@ -16,6 +16,7 @@ var log zerolog.Logger
 var (
 	ebayListingID string
 	itemID        string
+	file          string
 	shelf         string
 	contactID     string
 	all           bool
@@ -56,6 +57,15 @@ func run() int {
 		Str("service", "cli").
 		Logger().
 		Level(zerolog.DebugLevel)
+
+	cmdRoot.AddCommand(cmdAccounting)
+
+	cmdAccountingExplainEbay.Flags().StringVar(&file, "file", "", "eBay transactions CSV")
+	if err := cmdAccountingExplainEbay.MarkFlagRequired("file"); err != nil {
+		log.Error().Err(err).Msg("")
+		return 1
+	}
+	cmdAccounting.AddCommand(cmdAccountingExplainEbay)
 
 	cmdRoot.AddCommand(cmdEbay)
 
