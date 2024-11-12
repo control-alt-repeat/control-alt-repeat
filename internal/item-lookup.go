@@ -18,8 +18,6 @@ func LookupItem(ctx context.Context, itemID string) (models.WarehouseItem, []mod
 		return models.WarehouseItem{}, nil, fmt.Errorf("item does not exist for ID '%s'", itemID)
 	}
 
-	fmt.Println("SHOULD NOT SEE THIS")
-
 	ebayListing, err := warehouse.LoadEbayListing(ctx, warehouseItem.EbayListingID)
 	if err != nil {
 		return models.WarehouseItem{}, nil, err

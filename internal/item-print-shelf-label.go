@@ -14,6 +14,15 @@ type ItemPrintShelfLabelOptions struct {
 }
 
 func ItemPrintShelfLabel(ctx context.Context, opts ItemPrintShelfLabelOptions) error {
+	printer, err := labels.CheckPrinterOnline(ctx, "102x152")
+	if err != nil {
+		return err
+	}
+
+	if !printer.Active {
+		return fmt.Errorf("printer '%s' for label size '%s' is not active", printer.Name, printer.Format)
+	}
+
 	log := logger.Instance
 	log.Info().Fields(opts).Msg("Loading item from warehouse")
 

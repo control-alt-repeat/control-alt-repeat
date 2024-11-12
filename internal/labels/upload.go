@@ -2,11 +2,58 @@ package labels
 
 import (
 	"bytes"
+	"context"
+	"encoding/json"
+	"fmt"
 	"mime/multipart"
 	"net/http"
 
 	"github.com/control-alt-repeat/control-alt-repeat/internal/aws"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/models"
 )
+
+type PrinterResponse struct {
+	Model  string `json:"model"`
+	Active bool   `json:"active"`
+	Label  string `json:"label"`
+}
+
+func CheckPrinterOnline(ctx context.Context, labelSize string) (models.LabelPrinter, error) {
+	labelPrinterDomain, err := aws.GetParameterValue("eu-west-2", "/control_alt_repeat/ebay/live/label_printer/host_domain")
+	if err != nil {
+		return models.LabelPrinter{}, err
+	}
+
+	printerURL := fmt.Sprintf("%s/printer?label=%s", labelPrinterDomain, labelSize)
+
+	req, err := http.NewRequestWithContext(ctx, "GET", printerURL, nil)
+	if err != nil {
+		return models.LabelPrinter{}, err
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return models.LabelPrinter{}, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return models.LabelPrinter{}, err
+	}
+
+	var printerResponse PrinterResponse
+
+	if err := json.NewDecoder(resp.Body).Decode(&printerResponse); err != nil {
+		return models.LabelPrinter{}, err
+	}
+
+	return models.LabelPrinter{
+		Name:   printerResponse.Model,
+		Active: printerResponse.Active,
+		Format: printerResponse.Label,
+	}, nil
+}
 
 func UploadFileFromBytes(imageBytes []byte, filename string) error {
 	labelPrinterDomain, err := aws.GetParameterValue("eu-west-2", "/control_alt_repeat/ebay/live/label_printer/host_domain")
