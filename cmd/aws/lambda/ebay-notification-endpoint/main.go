@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
 
-	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-lambda-go/lambda"
-
-	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay/traditionalapi"
 )
 
 var log zerolog.Logger
@@ -28,7 +27,7 @@ func init() {
 }
 
 func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	if err := ebay.HandleNotification(ctx, req.Body); err != nil {
+	if err := traditionalapi.HandleNotification(ctx, req.Body); err != nil {
 		fmt.Println(err)
 		return events.APIGatewayProxyResponse{
 			// this is our eBay notification endpoint. If they see errors one this they may cut us off.

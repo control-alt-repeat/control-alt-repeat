@@ -9,6 +9,7 @@ import (
 
 	"github.com/control-alt-repeat/control-alt-repeat/internal"
 	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay/traditionalapi"
 )
 
 var cmdEbay = &cobra.Command{
@@ -62,7 +63,7 @@ func ebayImportListing(cmd *cobra.Command, args []string) {
 }
 
 func ebayGetNotificationUsage(cmd *cobra.Command, args []string) {
-	err := ebay.GetNotificationUsage(cmd.Context(), ebayListingID)
+	err := traditionalapi.GetNotificationUsage(cmd.Context(), ebayListingID)
 
 	if err != nil {
 		fmt.Println(err)
@@ -71,7 +72,7 @@ func ebayGetNotificationUsage(cmd *cobra.Command, args []string) {
 }
 
 func ebaySetNotificationPreferences(cmd *cobra.Command, args []string) {
-	err := ebay.SetNotificationPreferences(cmd.Context())
+	err := traditionalapi.SetNotificationPreferences(cmd.Context())
 
 	if err != nil {
 		fmt.Println(err)

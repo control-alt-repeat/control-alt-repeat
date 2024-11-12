@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay/traditionalapi"
 	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse/persistence"
 )
 
@@ -25,7 +25,7 @@ func MigrateToDynamoDb(ctx context.Context) error {
 		}
 
 		if item.AddedTime.IsZero() {
-			ebayItemSource, err := ebay.GetItem(ctx, item.EbayListingID, []string{
+			ebayItemSource, err := traditionalapi.GetItem(ctx, item.EbayListingID, []string{
 				"ListingDetails",
 			})
 			if err != nil {

@@ -1,4 +1,4 @@
-package ebay
+package traditionalapi
 
 import (
 	"context"

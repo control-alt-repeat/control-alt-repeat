@@ -1,7 +1,7 @@
 // https://developer.ebay.com/api-docs/static/platform-notifications-landing.html
 // https://developer.ebay.com/Devzone/XML/docs/Reference/eBay/SetNotificationPreferences.html#Request.UserDeliveryPreferenceArray
 
-package ebay
+package traditionalapi
 
 import (
 	"context"

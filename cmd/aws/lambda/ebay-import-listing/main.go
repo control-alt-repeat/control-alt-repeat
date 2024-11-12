@@ -16,7 +16,7 @@ import (
 	"github.com/rs/zerolog/pkgerrors"
 
 	"github.com/control-alt-repeat/control-alt-repeat/internal"
-	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay/traditionalapi"
 )
 
 var log zerolog.Logger
@@ -58,7 +58,7 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 		if err != nil {
 			return fmt.Errorf("failed to read object body: %v", err)
 		}
-		var notification ebay.ItemNotificationEnvelope
+		var notification traditionalapi.ItemNotificationEnvelope
 		err = xml.Unmarshal(body, &notification)
 		if err != nil {
 			return fmt.Errorf("failed to Unmarshal body: %v", err)

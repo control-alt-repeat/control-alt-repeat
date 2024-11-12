@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay/traditionalapi"
 	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse/persistence"
 )
 
@@ -23,7 +23,7 @@ func RefreshItemFromEbay(ctx context.Context, itemID string) error {
 		return err
 	}
 
-	ebayItemSource, err := ebay.GetItem(ctx, warehouseItem.EbayListingID, []string{
+	ebayItemSource, err := traditionalapi.GetItem(ctx, warehouseItem.EbayListingID, []string{
 		"ItemID",
 		"Title",
 		"PictureDetails",
