@@ -3,7 +3,6 @@ package freeagent
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 
@@ -23,14 +22,10 @@ func FreeagentApiGet[T any](ctx context.Context, opts ApiGetOptions, target *T) 
 		return err
 	}
 
-	fmt.Println(access_token[0:20])
-
 	newURL, err := opts.buildUrl()
 	if err != nil {
 		return err
 	}
-
-	fmt.Println(newURL)
 
 	req, err := http.NewRequestWithContext(ctx, "GET", newURL, nil)
 	if err != nil {

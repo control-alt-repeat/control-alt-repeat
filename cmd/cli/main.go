@@ -20,6 +20,10 @@ var (
 	shelf         string
 	contactID     string
 	all           bool
+	closingFunds  string
+	fromDate      string
+	toDate        string
+	bankAccountID string
 )
 
 // Root command: "car"
@@ -62,6 +66,26 @@ func run() int {
 
 	cmdAccountingExplainEbay.Flags().StringVar(&file, "file", "", "eBay transactions CSV")
 	if err := cmdAccountingExplainEbay.MarkFlagRequired("file"); err != nil {
+		log.Error().Err(err).Msg("")
+		return 1
+	}
+	cmdAccountingExplainEbay.Flags().StringVar(&closingFunds, "closing-funds", "", "Expected closing funds, used to verify before upload, e.g. 30.55")
+	if err := cmdAccountingExplainEbay.MarkFlagRequired("closing-funds"); err != nil {
+		log.Error().Err(err).Msg("")
+		return 1
+	}
+	cmdAccountingExplainEbay.Flags().StringVar(&fromDate, "from-date", "", "Date to start explaining")
+	if err := cmdAccountingExplainEbay.MarkFlagRequired("from-date"); err != nil {
+		log.Error().Err(err).Msg("")
+		return 1
+	}
+	cmdAccountingExplainEbay.Flags().StringVar(&toDate, "to-date", "", "Date to start explaining")
+	if err := cmdAccountingExplainEbay.MarkFlagRequired("to-date"); err != nil {
+		log.Error().Err(err).Msg("")
+		return 1
+	}
+	cmdAccountingExplainEbay.Flags().StringVar(&bankAccountID, "bank-account-id", "", "FreeAgent bank account ID to explain transactions")
+	if err := cmdAccountingExplainEbay.MarkFlagRequired("bank-account-id"); err != nil {
 		log.Error().Err(err).Msg("")
 		return 1
 	}
