@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"context"
+	"strconv"
 	"time"
 
 	models "github.com/control-alt-repeat/control-alt-repeat/internal/models"
@@ -106,13 +107,14 @@ var UnshelvedItemsQuery = QueryItemsOptions{
 	},
 }
 
-var MostRecentItems = QueryItemsOptions{
-
-	IndexName:              "GSI_Shelf",
-	KeyConditionExpression: "CreatedAt = :createdAt",
-	StringExpressionValues: map[string]string{
-		":createdAt": UnsetShelfDefault,
-	},
+func ItemsUpdatedSince(since time.Time) ScanItemsOptions {
+	return ScanItemsOptions{
+		IndexName:        "UpdatedAtIndex",
+		FilterExpression: "UpdatedAt > :since",
+		NumberExpressionValues: map[string]string{
+			":since": strconv.Itoa(int(since.Unix())),
+		},
+	}
 }
 
 func ItemByIDQuery(id string) QueryItemsOptions {
@@ -129,6 +131,37 @@ func QueryItems(ctx context.Context, opt QueryItemsOptions) ([]models.WarehouseI
 		IndexName:              opt.IndexName,
 		KeyConditionExpression: opt.KeyConditionExpression,
 		StringExpressionValues: opt.StringExpressionValues,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	items := []models.WarehouseItem{}
+
+	for _, item := range result {
+		mappedItem := item.Map()
+
+		if mappedItem.Shelf == UnsetShelfDefault {
+			mappedItem.Shelf = ""
+		}
+
+		items = append(items, mappedItem)
+	}
+
+	return items, nil
+}
+
+type ScanItemsOptions struct {
+	IndexName              string
+	FilterExpression       string
+	NumberExpressionValues map[string]string
+}
+
+func ScanItems(ctx context.Context, opt ScanItemsOptions) ([]models.WarehouseItem, error) {
+	result, err := dynamodb.ScanItems(ctx, dynamodb.ScanItemsOptions{
+		IndexName:              opt.IndexName,
+		FilterExpression:       opt.FilterExpression,
+		NumberExpressionValues: opt.NumberExpressionValues,
 	})
 	if err != nil {
 		return nil, err

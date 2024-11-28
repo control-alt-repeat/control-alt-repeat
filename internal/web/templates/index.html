@@ -1,90 +1,28 @@
 <div x-data="page()">
-    <!-- <div class="d-flex justify-content-center">
-        <a href="/item-move" class="btn btn-primary mb-2 mx-2 w-100 w-md-auto text-center">
-            <i class="bi bi-bookshelf me-2 d-none d-sm-inline"></i>
-            <span class="d-none d-sm-inline">Shelve</span>
-            <i class="bi bi-bookshelf d-sm-none"></i>
-        </a>
-        <a href="/ebay-import-listing" class="btn btn-primary mb-2 mx-2 w-100 w-md-auto text-center">
-            <i class="bi bi-list-columns me-2 d-none d-sm-inline"></i>
-            <span class="d-none d-sm-inline">Import eBay Listing</span>
-            <i class="bi bi-list-columns d-sm-none"></i>
-        </a>
-    </div>     -->
-
-    <div x-show="items" class="row d-none d-md-flex bg-light border-bottom text-start">
-        <div class="col-1"><strong>ID</strong></div>
-        <div class="col-5"><strong>Title</strong></div>
-        <div class="col-2"><strong>Shelf</strong></div>
-        <div class="col-3"><strong>Owner</strong></div>
-        <div class="col-1"><strong>eBay Link</strong></div>
-    </div>
-
-    <!-- Inventory items -->
-    <template x-for="item in items">
-        <div x-show="items" class="row text-start">
-            <!-- Desktop row view -->
-            <div class="col-12 d-none d-md-flex border-bottom py-2">
-                <div class="col-1">
-                    <a :href="'/item-lookup?id=' + item.id" class="me-2">
-                        <i class="bi bi-binoculars"></i>
-                        <span x-text="item.id"></span>
-                    </a>
-                </div>
-                <div class="col-5"><span x-text="item.title"></span></div>
-                <div class="col-2">
-                    <span x-text="item.shelf"></span>
-                    <a :href="'/item-move?id=' + item.id" class="me-2">
-                        <i class="bi bi-pencil-square"></i>
-                    </a>
-                </div>
-                <div class="col-3"><span x-text="item.ownerDisplayName"></span></div>
-                <div class="col-2"><a x-bind:href="item.ebayListingURL" class="link-primary" target="_blank">Open</a>
-                </div>
-            </div>
-            <!-- Mobile card view -->
-            <div class="card d-md-none mb-3">
-                <div class="card-body text-start">
-                    <h5 class="card-title">
-                        <span x-text="item.id"></span>
-                    </h5>
-                    <p class="card-text">
-                        <strong></strong> <span x-text="item.title"></span>
-                    </p>
-                    <p class="card-text">
-                        <strong>Shelf: </strong>
-                        <span x-text="item.shelf"></span>
-                        <a :href="'/item-move?id=' + item.id + '&shelf=' + item.shelf" class="me-2">
-                            <i class="bi bi-pencil-square"></i>
-                        </a>
-                    </p>
-                    <p class="card-text">
-                        <strong>Owner:</strong> <span x-text="item.ownerDisplayName"></span>
-                    </p>
-                    <p class="card-text">
-                        <strong>Link:</strong> <a x-bind:href="item.ebayListingURL" class="link-primary"
-                            target="_blank">Open</a></span>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </template>
-    <template x-for="item in itemsz" :key="item.id">
+    <template x-for="item in sortedItems()" :key="item.id">
         <div class="col-12 mb-3">
             <div class="card h-100 shadow-sm">
                 <div class="card-body d-flex flex-column flex-md-row align-items-start">
                     <div class="flex-grow-1">
-                        <h6 class="card-title text-truncate">
-                            <span x-text="item.id"></span> (<span x-text="item.shelf"></span>)
+                        <h6 class="card-title">
+                            <a :href="'/item-lookup?id=' + item.id"><span x-text="item.id"></span> (<span x-text="item.shelf"></span>)</a>
                         </h6>
-                        <p class="card-text col-6 text-truncate text-muted">
-                            <span x-text="item.description"></span>
+                        <p class="card-text col-12 text-muted">
+                            <span x-text="item.title"></span>
                         </p>
                     </div>
                     <div class="w-100 w-md-auto">
                         <div class="btn-toolbar justify-content-start justify-content-md-end" role="toolbar">
                             <div class="btn-group btn-group-sm btn-group-md" role="group">
                                 <!-- Steps -->
+                                <button type="button" class="btn btn-sm me-1" :class="{
+                                    'btn-outline-secondary': item.ebayListingURL === '',
+                                    'btn-success': item.ebayListingURL !== '',
+                                }" :title="item.ebayListingURL || ''"
+                                @click="window.location.href = item.ebayListingURL">
+                                <i class="bi-clipboard">
+                                </i>
+                            </button>
                                 <template x-for="[key, step] in Object.entries(item.steps)" :key="key">
                                     <button type="button" class="btn btn-sm me-1" :class="{
                                             'btn-outline-secondary': step.status === 'pending',
@@ -123,48 +61,43 @@
 
     function page() {
         return {
-            itemsz: [
-                {
-                    id: 'JAM-370',
-                    shelf: '5D',
-                    description: 'LUMINOX CAMERA 5 Mega Pixels May Even Be Working??!!?',
-                    steps: {
-                        listed: { status: 'completed', note: 'Listed on 2024-11-10' },
-                        shelved: { status: 'completed', note: '5G' },
-                        ownerAssigned: { status: 'pending', note: 'Awaiting assignment' },
-                        sold: { status: 'failed', note: 'Buyer canceled' },
-                        dispatched: { status: 'pending' },
-                        delivered: { status: 'pending' },
-                        coolingOff: { status: 'pending' },
-                        feedbackReceived: { status: 'pending' },
-                        creditNoteIssued: { status: 'pending' },
-                        creditNoteFulfilled: { status: 'pending' }
-                    }
-                },
-                {
-                    id: 'HGC-783',
-                    shelf: '5D',
-                    description: 'Netgear AD6612 Power Supply AC-DC Adapter Black 12-Volt 1.5A Portable Wall Mount',
-                    steps: {
-                        listed: { status: 'completed', note: 'Listed on 2024-11-12' },
-                        shelved: { status: 'failed', note: '3A' },
-                        ownerAssigned: { status: 'completed', note: 'Assigned to John Doe' },
-                        sold: { status: 'completed' },
-                        dispatched: { status: 'pending' },
-                        delivered: { status: 'pending' },
-                        coolingOff: { status: 'pending' },
-                        feedbackReceived: { status: 'pending' },
-                        creditNoteIssued: { status: 'pending' },
-                        creditNoteFulfilled: { status: 'pending' }
-                    }
-                }
-            ],
             items: {},
+            sortedItems() {
+                return this.items.sort((a, b) => new Date(b.addedTime) - new Date(a.addedTime));
+            },
             init() {
+                this.getItems();
                 this.getUnshelvedItems()
             },
+            getItems() {
+                fetch("items", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                })
+                .then(response => {
+                        // Check if response is ok (status in the range 200-299)
+                        if (!response.ok) {
+                            return response.json().then(err => {
+                                console.log(err)
+                                throw new Error(err.error || 'An unknown error occurred');
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(data)
+                        this.items = data.items;        // Store the item data
+                        this.showError = false;  // Hide any previous error
+                    })
+                    .catch(error => {
+                        this.errorMessage = error.message || 'An unknown error occurred';
+                        this.showError = true;   // Show the Bootstrap alert
+                    });
+            },
             getUnshelvedItems() {
-                fetch("items-unshelved", {
+                /* fetch("items-unshelved", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
@@ -189,7 +122,7 @@
                     .catch(error => {
                         this.errorMessage = error.message || 'An unknown error occurred';
                         this.showError = true;   // Show the Bootstrap alert
-                    });
+                    }); */
             }
         }
     }

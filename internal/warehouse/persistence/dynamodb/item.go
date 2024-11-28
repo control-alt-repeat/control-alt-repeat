@@ -146,6 +146,51 @@ func QueryItems(ctx context.Context, opts QueryItemsOptions) ([]Item, error) {
 	return items, nil
 }
 
+type ScanItemsOptions struct {
+	IndexName              string
+	FilterExpression       string
+	NumberExpressionValues map[string]string
+}
+
+func ScanItems(ctx context.Context, opts ScanItemsOptions) ([]Item, error) {
+	expressionAttributeValues := map[string]types.AttributeValue{}
+	for k, v := range opts.NumberExpressionValues {
+		expressionAttributeValues[k] = &types.AttributeValueMemberN{Value: v}
+	}
+
+	input := &dynamodb.ScanInput{
+		TableName:                 aws.String("control-alt-repeat-warehouse"),
+		FilterExpression:          aws.String(opts.FilterExpression),
+		ExpressionAttributeValues: expressionAttributeValues,
+	}
+
+	if opts.IndexName != "" {
+		input.IndexName = aws.String(opts.IndexName)
+	}
+
+	instance, err := getClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	result, err := instance.client.Scan(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	var items []Item
+	for _, item := range result.Items {
+		var i Item
+		err = attributevalue.UnmarshalMap(item, &i)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+
+	return items, nil
+}
+
 func (i Item) Map() models.WarehouseItem {
 	return models.WarehouseItem{
 		ControlAltRepeatID: i.ID,

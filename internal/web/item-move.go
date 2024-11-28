@@ -19,10 +19,24 @@ func initialiseItemMove(e *echo.Echo) {
 	e.GET("item-move", renderItemMovePage)
 	e.POST("item-move", itemMove)
 	e.POST("items-unshelved", itemsUnshelved)
+	e.POST("items", items)
 }
 
 func renderItemMovePage(c echo.Context) error {
 	return render(http.StatusOK, "item-move.html", nil, c)
+}
+
+type ItemsResponse struct {
+	Items []Item `json:"items"`
+}
+
+func items(c echo.Context) error {
+	items, err := warehouse.LoadAllItems(c.Request().Context())
+	if err != nil {
+		return handleError(c, err)
+	}
+
+	return c.JSON(http.StatusOK, ItemsResponse{Items: MapSlice(items, MapToWebItem)})
 }
 
 func itemMove(c echo.Context) error {

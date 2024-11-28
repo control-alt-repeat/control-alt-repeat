@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"math/big"
 	"strings"
+	"time"
 
 	"github.com/control-alt-repeat/control-alt-repeat/internal/models"
 	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse/persistence"
@@ -53,6 +54,10 @@ func LoadItem(ctx context.Context, itemID string) (models.WarehouseItem, bool, e
 	}
 
 	return items[0], true, err
+}
+
+func LoadAllItems(ctx context.Context) ([]models.WarehouseItem, error) {
+	return persistence.ScanItems(ctx, persistence.ItemsUpdatedSince(time.Now().Add(-365*24*time.Hour)))
 }
 
 func LoadUnshelvedItems(ctx context.Context) ([]models.WarehouseItem, error) {
