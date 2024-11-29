@@ -19,7 +19,6 @@ var (
 	file          string
 	shelf         string
 	contactID     string
-	all           bool
 	closingFunds  string
 	fromDate      string
 	toDate        string
@@ -140,18 +139,12 @@ func run() int {
 	}
 	cmdItem.AddCommand(cmdItemMove)
 
-	cmdItemRefresh.Flags().StringVar(&itemID, "item-id", "", "Item ID")
-	cmdItemRefresh.Flags().BoolVar(&all, "all", false, "All items")
-	cmdItemRefresh.MarkFlagsOneRequired("item-id", "all")
-	cmdItem.AddCommand(cmdItemRefresh)
-
 	cmdItemPrintShelfLabel.Flags().StringVar(&itemID, "item-id", "", "Item ID")
 	if err := cmdItemPrintShelfLabel.MarkFlagRequired("item-id"); err != nil {
 		log.Error().Err(err).Msg("")
 		return 1
 	}
 	cmdItem.AddCommand(cmdItemPrintShelfLabel)
-	cmdItem.AddCommand(cmdItemMigrateToDynamoDB)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

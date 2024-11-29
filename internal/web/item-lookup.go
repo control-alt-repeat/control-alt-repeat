@@ -90,5 +90,5 @@ func saveOwner(c echo.Context) error {
 		return handleError(c, err)
 	}
 
-	return c.JSON(http.StatusOK, &PrintLabelResponse{Message: "Shelf label printed successfully"})
+	return c.JSON(http.StatusOK, &PrintLabelResponse{Message: "Owner saved successfully"})
 }

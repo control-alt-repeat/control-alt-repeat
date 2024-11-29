@@ -63,7 +63,7 @@ func ImportEbayListing(ctx context.Context, ebayListing *traditionalapi.EbayItem
 		return "", err
 	}
 
-	err = warehouse.SaveItem(ctx, *warehouseItem)
+	err = warehouse.OverwriteItem(ctx, *warehouseItem)
 	if err != nil {
 		fmt.Printf("Failed to save warehouse item '%s'\n", warehouseItem.ControlAltRepeatID)
 		return "", err

@@ -31,7 +31,7 @@ type ItemsResponse struct {
 }
 
 func items(c echo.Context) error {
-	items, err := warehouse.LoadAllItems(c.Request().Context())
+	items, err := warehouse.GetItemsUpdatedInLastYear(c.Request().Context())
 	if err != nil {
 		return handleError(c, err)
 	}

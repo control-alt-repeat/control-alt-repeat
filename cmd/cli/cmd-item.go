@@ -8,7 +8,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/control-alt-repeat/control-alt-repeat/internal"
-	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse"
 )
 
 // Item command: "car item"
@@ -24,25 +23,11 @@ var cmdItemMove = &cobra.Command{
 	Run:   itemMove,
 }
 
-// Import listing subcommand: "car item refresh"
-var cmdItemRefresh = &cobra.Command{
-	Use:   "refresh",
-	Short: "Refreshes internal item from source",
-	Run:   itemRefresh,
-}
-
 // Import listing subcommand: "car item print-shelf-label"
 var cmdItemPrintShelfLabel = &cobra.Command{
 	Use:   "print-shelf-label",
 	Short: "Prints a shelf label for the item",
 	Run:   itemPrintShelfLabel,
-}
-
-// Import listing subcommand: "car item migrate-to-dynamodb"
-var cmdItemMigrateToDynamoDB = &cobra.Command{
-	Use:   "migrate-to-dynamodb",
-	Short: "Migrates items from S3 to DynamoDB",
-	Run:   itemMigrateToDynamoDB,
 }
 
 func itemMove(cmd *cobra.Command, args []string) {
@@ -54,35 +39,6 @@ func itemMove(cmd *cobra.Command, args []string) {
 	fmt.Println("Moving item with ID:", itemID, "to shelf:", shelf)
 
 	err = internal.MoveItem(cmd.Context(), itemID, shelf)
-
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-}
-
-func itemRefresh(cmd *cobra.Command, args []string) {
-	// Parse flags
-	all, _ := cmd.Flags().GetBool("all")
-	itemID, _ = cmd.Flags().GetString("item-id")
-
-	// Check for conflicting or missing flags
-	if all && itemID != "" {
-		fmt.Println("Error: You cannot specify both --all and --item-id.")
-		os.Exit(1)
-	}
-
-	if !all && itemID == "" {
-		fmt.Println("Error: You must specify either --all or --item-id.")
-		os.Exit(1)
-	}
-
-	var err error
-	if all {
-		err = warehouse.RefreshItemsFromEbay(cmd.Context())
-	} else if itemID != "" {
-		err = warehouse.RefreshItemFromEbay(cmd.Context(), itemID)
-	}
 
 	if err != nil {
 		fmt.Println(err)
@@ -103,15 +59,6 @@ func itemPrintShelfLabel(cmd *cobra.Command, args []string) {
 	})
 
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-}
-
-func itemMigrateToDynamoDB(cmd *cobra.Command, args []string) {
-	fmt.Println("Migrating items to DynamoDB")
-
-	if err := warehouse.MigrateToDynamoDb(cmd.Context()); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}

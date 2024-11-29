@@ -31,8 +31,6 @@ function page() {
             const urlParams = new URLSearchParams(window.location.search);
             this.id = urlParams.get('id') || '';
             this.shelf = urlParams.get('shelf') || '';
-
-            this.getUnshelvedItems()
         },
         itemMove() {
             fetch("item-move", {
@@ -51,32 +49,6 @@ function page() {
                     });
                 }
                 window.location.href = `/item-lookup?id=${this.id}`;
-            })
-            .then(data => {
-                this.item = data;        // Store the item data
-                this.showError = false;  // Hide any previous error
-            })
-            .catch(error => {
-                this.errorMessage = error.message || 'An unknown error occurred';
-                this.showError = true;   // Show the Bootstrap alert
-            });
-        },
-        getUnshelvedItems() {
-            fetch("items-unshelved", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams()
-            })
-            .then(response => {
-                // Check if response is ok (status in the range 200-299)
-                if (!response.ok) {
-                    return response.json().then(err => {
-                        console.log(err)
-                        throw new Error(err.error || 'An unknown error occurred');
-                    });
-                }
             })
             .then(data => {
                 this.item = data;        // Store the item data

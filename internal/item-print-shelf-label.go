@@ -2,7 +2,6 @@ package internal
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/control-alt-repeat/control-alt-repeat/internal/labels"
 	"github.com/control-alt-repeat/control-alt-repeat/internal/logger"
@@ -17,13 +16,9 @@ func ItemPrintShelfLabel(ctx context.Context, opts ItemPrintShelfLabelOptions) e
 	log := logger.Instance
 	log.Info().Fields(opts).Msg("Loading item from warehouse")
 
-	item, exists, err := warehouse.LoadItem(ctx, opts.ItemID)
+	item, err := warehouse.GetItem(ctx, opts.ItemID)
 	if err != nil {
 		return err
-	}
-
-	if !exists {
-		return fmt.Errorf("item does not exist for ID '%s'", opts.ItemID)
 	}
 
 	log.Info().Msg("Generating label")

@@ -11,57 +11,28 @@ import (
 	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse/persistence"
 )
 
-func SaveItem(ctx context.Context, item models.WarehouseItem) error {
-	return persistence.SaveItem(ctx, persistence.SaveItemOptions{Item: item})
+func OverwriteItem(ctx context.Context, item models.WarehouseItem) error {
+	return persistence.OverwriteItem(ctx, item)
 }
 
 func UpdateOwner(ctx context.Context, itemID, newOwnerID, newOwnerName string) error {
-	return persistence.UpdateItem(ctx, persistence.UpdateItemOptions{
-		ItemID: itemID,
-		UpdateItemAttributes: []persistence.UpdateItemAttributes{
-			{
-				Name:  "FreeagentOwnerID",
-				Value: newOwnerID,
-			},
-			{
-				Name:  "OwnerDisplayName",
-				Value: newOwnerName,
-			},
-		},
-	})
+	return persistence.UpdateOwner(ctx, itemID, newOwnerID, newOwnerName)
 }
 
 func UpdateShelf(ctx context.Context, itemID, newShelf string) error {
-	return persistence.UpdateItem(ctx, persistence.UpdateItemOptions{
-		ItemID: itemID,
-		UpdateItemAttributes: []persistence.UpdateItemAttributes{
-			{
-				Name:  "Shelf",
-				Value: newShelf,
-			},
-		},
-	})
+	return persistence.UpdateShelf(ctx, itemID, newShelf)
 }
 
-func LoadItem(ctx context.Context, itemID string) (models.WarehouseItem, bool, error) {
-	items, err := persistence.QueryItems(ctx, persistence.ItemByIDQuery(itemID))
-	if err != nil {
-		return models.WarehouseItem{}, false, err
-	}
-
-	if len(items) == 0 {
-		return models.WarehouseItem{}, false, nil
-	}
-
-	return items[0], true, err
+func GetItem(ctx context.Context, itemID string) (models.WarehouseItem, error) {
+	return persistence.GetItem(ctx, itemID)
 }
 
-func LoadAllItems(ctx context.Context) ([]models.WarehouseItem, error) {
-	return persistence.ScanItems(ctx, persistence.ItemsUpdatedSince(time.Now().Add(-365*24*time.Hour)))
+func GetItemsUpdatedInLastYear(ctx context.Context) ([]models.WarehouseItem, error) {
+	return persistence.GetItemsUpdatedSince(ctx, time.Now().Add(-365*24*time.Hour))
 }
 
 func LoadUnshelvedItems(ctx context.Context) ([]models.WarehouseItem, error) {
-	return persistence.QueryItems(ctx, persistence.UnshelvedItemsQuery)
+	return persistence.GetUnshelvedItems(ctx)
 }
 
 func GenerateControlAltRepeatID() (string, error) {

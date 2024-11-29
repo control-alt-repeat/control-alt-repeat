@@ -8,12 +8,8 @@ import (
 	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse/persistence"
 )
 
-func RefreshItemsFromEbay(ctx context.Context) error {
-	return persistence.IterateItems(ctx, RefreshItemFromEbay)
-}
-
 func RefreshItemFromEbay(ctx context.Context, itemID string) error {
-	warehouseItem, err := persistence.LoadItem(ctx, persistence.LoadItemOptions{ID: itemID})
+	warehouseItem, err := persistence.GetItem(ctx, itemID)
 	if err != nil {
 		return err
 	}
