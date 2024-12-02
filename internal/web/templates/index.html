@@ -22,6 +22,24 @@
                                 @click="window.location.href = item.ebayListingURL">
                                 <i class="bi-clipboard">
                                 </i>
+
+                                <!-- Shelf -->
+                                <button type="button" class="btn btn-sm me-1" :class="{
+                                    'btn-outline-secondary': item.shelf === '',
+                                    'btn-success': item.shelf !== '',
+                                }" :title="item.shelf || ''"
+                                @click="window.location.href = 'item-move?id=' + item.id + '&shelf=' + item.shelf">
+                                <i class="bi-box">
+                                </i>
+
+                                <!-- Owner -->
+                                <button type="button" class="btn btn-sm me-1" :class="{
+                                    'btn-outline-secondary': item.freeagentOwnerID === '',
+                                    'btn-success': item.freeagentOwnerID !== '',
+                                }" :title="item.ownerDisplayName || ''"
+                                @click="window.location.href = 'item-lookup?id=' + item.id">
+                                <i class="bi-person-check">
+                                </i>
                             </button>
                                 <template x-for="[key, step] in Object.entries(item.steps)" :key="key">
                                     <button type="button" class="btn btn-sm me-1" :class="{
@@ -95,34 +113,6 @@
                         this.errorMessage = error.message || 'An unknown error occurred';
                         this.showError = true;   // Show the Bootstrap alert
                     });
-            },
-            getUnshelvedItems() {
-                /* fetch("items-unshelved", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                    body: new URLSearchParams()
-                })
-                    .then(response => {
-                        // Check if response is ok (status in the range 200-299)
-                        if (!response.ok) {
-                            return response.json().then(err => {
-                                console.log(err)
-                                throw new Error(err.error || 'An unknown error occurred');
-                            });
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log(data)
-                        this.items = data.items;        // Store the item data
-                        this.showError = false;  // Hide any previous error
-                    })
-                    .catch(error => {
-                        this.errorMessage = error.message || 'An unknown error occurred';
-                        this.showError = true;   // Show the Bootstrap alert
-                    }); */
             }
         }
     }
