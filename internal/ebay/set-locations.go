@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay/sell/inventory"
+	"github.com/control-alt-repeat/control-alt-repeat/pkg/ebay/sell/inventory"
 )
 
 const merchantLocationKey = "CONTROLALTREPEAT501A"
@@ -92,14 +92,14 @@ func SetControlAltRepeatWorkshopLocation(ctx context.Context) error {
 }
 
 func createWorkshop(ctx context.Context) error {
-	return inventory.CreateLocation(ctx, inventory.CreateLocationOptions{
+	return CreateLocation(ctx, inventory.CreateLocationOptions{
 		MerchantLocationKey: merchantLocationKey,
 		InventoryLocation:   controlAltRepeatWorkshop,
 	})
 }
 
 func updateWorkshop(ctx context.Context) error {
-	return inventory.UpdateLocation(ctx, inventory.UpdateLocationOptions{
+	return UpdateLocation(ctx, inventory.UpdateLocationOptions{
 		MerchantLocationKey: merchantLocationKey,
 		InventoryLocation:   controlAltRepeatWorkshop,
 	})

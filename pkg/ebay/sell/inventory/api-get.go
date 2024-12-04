@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
-	access_tokens "github.com/control-alt-repeat/control-alt-repeat/internal/ebay/access-tokens"
+	access_tokens "github.com/control-alt-repeat/control-alt-repeat/pkg/ebay/access-tokens"
 )
 
 type requestOptions struct {

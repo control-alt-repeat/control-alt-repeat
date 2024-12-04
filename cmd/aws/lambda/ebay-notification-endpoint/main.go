@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
 
-	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay/traditionalapi"
+	"github.com/control-alt-repeat/control-alt-repeat/pkg/ebay/traditionalapi"
 )
 
 var log zerolog.Logger

@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay/traditionalapi"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay"
 	"github.com/control-alt-repeat/control-alt-repeat/internal/models"
 	"github.com/control-alt-repeat/control-alt-repeat/internal/warehouse"
+	"github.com/control-alt-repeat/control-alt-repeat/pkg/ebay/traditionalapi"
 )
 
 func ImportEbayListing(ctx context.Context, ebayListing *traditionalapi.EbayItem) (string, error) {
@@ -42,7 +43,7 @@ func ImportEbayListing(ctx context.Context, ebayListing *traditionalapi.EbayItem
 
 		newSKU := warehouseItem.ToEbaySKU()
 
-		if err := traditionalapi.ReviseSKU(ctx, ebayListing.ItemID, newSKU); err != nil {
+		if err := ebay.SetSKU(ctx, ebayListing.ItemID, newSKU); err != nil {
 			return "", err
 		}
 	}
@@ -82,7 +83,7 @@ func ImportEbayListingByID(ctx context.Context, ebayListingID string) (string, e
 
 	fmt.Printf("Listing ID valid: %s\n", ebayListingID)
 
-	ebayListing, err := traditionalapi.GetItem(ctx, ebayListingID, []string{
+	ebayListing, err := ebay.GetItem(ctx, ebayListingID, []string{
 		"ItemID",
 		"Title",
 		"Description",

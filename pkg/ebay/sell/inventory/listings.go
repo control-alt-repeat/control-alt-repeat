@@ -16,7 +16,7 @@ type BulkMigrateRequestListing struct {
 	ListingID string `json:"listingId"`
 }
 
-func BulkMigrateListing(ctx context.Context, opts BulkMigrateListingOptions) error {
+func BulkMigrateListings(ctx context.Context, opts BulkMigrateListingOptions) error {
 	apiopts := requestOptions{
 		Path: "/bulk_migrate_listing",
 	}
