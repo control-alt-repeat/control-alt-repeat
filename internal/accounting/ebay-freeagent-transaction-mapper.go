@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/control-alt-repeat/control-alt-repeat/internal/ebay/reports"
 	"github.com/control-alt-repeat/control-alt-repeat/internal/freeagent"
 )
@@ -48,24 +50,12 @@ func MapEbayTransactionsToFreeAgent(ctx context.Context, t reports.Transaction) 
 	explanations := []freeagent.BankTransactionExplanation{}
 
 	if t.Type == EbayOrder || t.Type == EbayRefund {
-		finalValueFixed := explanation
-		finalValueFixed.Category = FreeAgentCommissionPaid
-		finalValueFixed.GrossValue = t.FinalValueFeeFixed.Decimal.StringFixedBank(2)
-		finalValueFixed.Description = fmt.Sprintf("%s | Fixed Fee", explanation.Description)
-
-		finalValueVariable := explanation
-		finalValueVariable.Category = FreeAgentCommissionPaid
-		finalValueVariable.GrossValue = t.FinalValueFeeVariable.Decimal.StringFixedBank(2)
-		finalValueVariable.Description = fmt.Sprintf("%s | Variable Fee", explanation.Description)
-
-		regulatoryOperatingFee := explanation
-		regulatoryOperatingFee.Category = FreeAgentCommissionPaid
-		regulatoryOperatingFee.GrossValue = t.RegulatoryOperatingFee.Decimal.StringFixedBank(2)
-		regulatoryOperatingFee.Description = fmt.Sprintf("%s | Regulatory Operating Fee", explanation.Description)
-
-		explanations = append(explanations, finalValueFixed)
-		explanations = append(explanations, finalValueVariable)
-		explanations = append(explanations, regulatoryOperatingFee)
+		explanations = addCommissionPaidIfNotZero(explanations, t.FinalValueFeeFixed, fmt.Sprintf("%s | Fixed Fee", explanation.Description))
+		explanations = addCommissionPaidIfNotZero(explanations, t.FinalValueFeeVariable, fmt.Sprintf("%s | Variable Fee", explanation.Description))
+		explanations = addCommissionPaidIfNotZero(explanations, t.RegulatoryOperatingFee, fmt.Sprintf("%s | Regulatory Operating Fee", explanation.Description))
+		explanations = addCommissionPaidIfNotZero(explanations, t.VeryHighItemNotAsDescribedFee, fmt.Sprintf("%s | Very High Item Not As Described Fee", explanation.Description))
+		explanations = addCommissionPaidIfNotZero(explanations, t.BelowStandardPerformanceFee, fmt.Sprintf("%s | Below Standard Performance Fee", explanation.Description))
+		explanations = addCommissionPaidIfNotZero(explanations, t.InternationalFee, fmt.Sprintf("%s | International Fee", explanation.Description))
 
 		explanation.Description = explanation.Description + " | " + t.Type
 	}
@@ -73,6 +63,19 @@ func MapEbayTransactionsToFreeAgent(ctx context.Context, t reports.Transaction) 
 	explanations = append(explanations, explanation)
 
 	return explanations, nil
+}
+
+func addCommissionPaidIfNotZero(explanations []freeagent.BankTransactionExplanation, value decimal.NullDecimal, description string) []freeagent.BankTransactionExplanation {
+	if !value.Valid || value.Decimal.Sign() == 0 {
+		return explanations
+	}
+
+	explanation := freeagent.BankTransactionExplanation{}
+	explanation.Category = FreeAgentCommissionPaid
+	explanation.GrossValue = value.Decimal.StringFixedBank(2)
+	explanation.Description = description
+
+	return append(explanations, explanation)
 }
 
 func mapEbayTransactionType(eBayTransactionType string) (string, error) {
