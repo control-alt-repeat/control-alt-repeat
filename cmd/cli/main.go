@@ -115,6 +115,13 @@ func run() int {
 	}
 	cmdEbay.AddCommand(cmdEbayInventoryImportListing)
 
+	cmdEbayListingTransactions.Flags().StringVar(&ebayListingID, "ebay-listing-id", "", "eBay listing ID")
+	if err := cmdEbayListingTransactions.MarkFlagRequired("ebay-listing-id"); err != nil {
+		log.Error().Err(err).Msg("")
+		return 1
+	}
+	cmdEbay.AddCommand(cmdEbayListingTransactions)
+
 	cmdRoot.AddCommand(cmdFreeagent)
 
 	cmdFreeagentGetContact.Flags().StringVar(&contactID, "contact-id", "", "Freeagent contact ID")

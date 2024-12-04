@@ -11,6 +11,10 @@ func GetItem(ctx context.Context, ebayListingID string, outputSelector []string)
 	return traditionalapi.GetItem(ctx, ebayListingID, outputSelector)
 }
 
+func GetItemTransactions(ctx context.Context, ebayListingID string) (*traditionalapi.GetItemTransactionsResponse, error) {
+	return traditionalapi.GetItemTransactions(ctx, ebayListingID)
+}
+
 func SetSKU(ctx context.Context, ebayListingID string, sku string) error {
 	return traditionalapi.ReviseSKU(ctx, ebayListingID, sku)
 }

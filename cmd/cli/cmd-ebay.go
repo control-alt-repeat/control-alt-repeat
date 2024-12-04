@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
@@ -44,6 +45,12 @@ var cmdEbayInventoryImportListing = &cobra.Command{
 	Use:   "inventory-import-listing",
 	Short: "Import a listing into inventory on eBay",
 	Run:   ebayInventoryImportListing,
+}
+
+var cmdEbayListingTransactions = &cobra.Command{
+	Use:   "listing-transactions",
+	Short: "Get listing transactions from eBay",
+	Run:   ebayListingTransactions,
 }
 
 func ebayImportListing(cmd *cobra.Command, args []string) {
@@ -93,4 +100,19 @@ func ebayInventoryImportListing(cmd *cobra.Command, args []string) {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+func ebayListingTransactions(cmd *cobra.Command, args []string) {
+	transactions, err := ebay.GetItemTransactions(cmd.Context(), ebayListingID)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	jsonBytes, err := json.MarshalIndent(transactions, "", "  ")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println(string(jsonBytes))
 }
