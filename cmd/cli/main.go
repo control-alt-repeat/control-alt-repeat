@@ -121,7 +121,8 @@ func run() int {
 		return 1
 	}
 	cmdEbay.AddCommand(cmdEbayListingTransactions)
-
+	cmdEbay.AddCommand(cmdEbayCreateSigningKey)
+	cmdEbay.AddCommand(cmdEbayVerifySignature)
 	cmdRoot.AddCommand(cmdFreeagent)
 
 	cmdFreeagentGetContact.Flags().StringVar(&contactID, "contact-id", "", "Freeagent contact ID")

@@ -1,0 +1,1 @@
+https://developer.ebay.com/api-docs/sell/inventory/static/overview.html

@@ -15,10 +15,11 @@ func GetItemTransactions(ctx context.Context, ebayListingID string) (*GetItemTra
 	}
 
 	payload := GetItemTransactionsRequest{
-		Xmlns:                "urn:ebay:apis:eBLBaseComponents",
-		RequesterCredentials: *requesterCredentials,
-		ItemID:               ebayListingID,
-		IncludeFinalValueFee: true,
+		Xmlns:                  "urn:ebay:apis:eBLBaseComponents",
+		RequesterCredentials:   *requesterCredentials,
+		ItemID:                 ebayListingID,
+		IncludeFinalValueFee:   true,
+		IncludeContainingOrder: true,
 	}
 
 	resp, err := request.Post(ctx, payload)
@@ -39,11 +40,12 @@ func GetItemTransactions(ctx context.Context, ebayListingID string) (*GetItemTra
 }
 
 type GetItemTransactionsRequest struct {
-	XMLName              xml.Name             `xml:"GetItemTransactionsRequest"`
-	Xmlns                string               `xml:"xmlns,attr"`
-	RequesterCredentials RequesterCredentials `xml:"RequesterCredentials"`
-	ItemID               string               `xml:"ItemID"`
-	IncludeFinalValueFee bool                 `xml:"IncludeFinalValueFee"`
+	XMLName                xml.Name             `xml:"GetItemTransactionsRequest"`
+	Xmlns                  string               `xml:"xmlns,attr"`
+	RequesterCredentials   RequesterCredentials `xml:"RequesterCredentials"`
+	ItemID                 string               `xml:"ItemID"`
+	IncludeFinalValueFee   bool                 `xml:"IncludeFinalValueFee"`
+	IncludeContainingOrder bool                 `xml:"IncludeContainingOrder"`
 }
 
 // GetItemTransactionsResponse was generated 2024-12-04 16:50:04 by https://xml-to-go.github.io/ in Ukraine.
@@ -128,10 +130,6 @@ type GetItemTransactionsResponse struct {
 				Text       string `xml:",chardata"`
 				CurrencyID string `xml:"currencyID,attr"`
 			} `xml:"CurrentPrice"`
-			FinalValueFee struct {
-				Text       string `xml:",chardata"`
-				CurrencyID string `xml:"currencyID,attr"`
-			} `xml:"FinalValueFee"`
 			QuantitySold  string `xml:"QuantitySold"`
 			ListingStatus string `xml:"ListingStatus"`
 		} `xml:"SellingStatus"`
@@ -152,6 +150,21 @@ type GetItemTransactionsResponse struct {
 				Text       string `xml:",chardata"`
 				CurrencyID string `xml:"currencyID,attr"`
 			} `xml:"AdjustmentAmount"`
+			ContainingOrder struct {
+				Text                        string `xml:",chardata"`
+				CancelReason                string `xml:"CancelReason"`
+				CancelStatus                string `xml:"CancelStatus"`
+				ContainseBayPlusTransaction string `xml:"ContainseBayPlusTransaction"`
+				CreatingUserRole            string `xml:"CreatingUserRole"`
+				ExtendedOrderID             string `xml:"ExtendedOrderID"`
+				OrderID                     string `xml:"OrderID"`
+				OrderLineItemCount          string `xml:"OrderLineItemCount"`
+				OrderStatus                 string `xml:"OrderStatus"`
+			} `xml:"ContainingOrder"`
+			FinalValueFee struct {
+				Text       string `xml:",chardata"`
+				CurrencyID string `xml:"currencyID,attr"`
+			} `xml:"FinalValueFee"`
 			ConvertedAdjustmentAmount struct {
 				Text       string `xml:",chardata"`
 				CurrencyID string `xml:"currencyID,attr"`
@@ -216,7 +229,11 @@ type GetItemTransactionsResponse struct {
 					ShippingTimeMin         string `xml:"ShippingTimeMin"`
 					ShippingTimeMax         string `xml:"ShippingTimeMax"`
 				} `xml:"ShippingServiceOptions"`
-				ShippingType                    string `xml:"ShippingType"`
+				ShippingType            string `xml:"ShippingType"`
+				ShipmentTrackingDetails struct {
+					TrackingNumber string `xml:"ShipmentTrackingNumber"`
+					CarrierUsed    string `xml:"ShippingCarrierUsed"`
+				}
 				SellingManagerSalesRecordNumber string `xml:"SellingManagerSalesRecordNumber"`
 				ThirdPartyCheckout              string `xml:"ThirdPartyCheckout"`
 				TaxTable                        string `xml:"TaxTable"`

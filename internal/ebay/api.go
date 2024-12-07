@@ -3,7 +3,10 @@ package ebay
 import (
 	"context"
 
+	"github.com/control-alt-repeat/control-alt-repeat/pkg/ebay/developer/keymanagement"
+	"github.com/control-alt-repeat/control-alt-repeat/pkg/ebay/sell/finances"
 	"github.com/control-alt-repeat/control-alt-repeat/pkg/ebay/sell/inventory"
+	"github.com/control-alt-repeat/control-alt-repeat/pkg/ebay/signing"
 	"github.com/control-alt-repeat/control-alt-repeat/pkg/ebay/traditionalapi"
 )
 
@@ -24,7 +27,7 @@ func GetNotificationsUsage(ctx context.Context, itemID string) error {
 }
 
 func SetNotificationPreferences(ctx context.Context) error {
-	return traditionalapi.SetNotificationPreferences(ctx)
+	return traditionalapi.SetNotificationPreferences(ctx, applicationDeliveryPreferences, userDeliveryPreferenceArray)
 }
 
 func BulkMigrateListings(ctx context.Context, opts inventory.BulkMigrateListingOptions) error {
@@ -41,4 +44,16 @@ func GetLocations(ctx context.Context, opts inventory.GetLocationsOptions) (inve
 
 func UpdateLocation(ctx context.Context, opts inventory.UpdateLocationOptions) error {
 	return inventory.UpdateLocation(ctx, opts)
+}
+
+func GetTransaction(ctx context.Context, orderID string) (finances.GetTransactionResponse, error) {
+	return finances.GetTransaction(ctx, orderID)
+}
+
+func CreateSigningKey(ctx context.Context) (keymanagement.CreateSigningKeyResponse, error) {
+	return keymanagement.CreateSigningKey(ctx)
+}
+
+func VerifySignature(ctx context.Context) error {
+	return signing.VerifyGet(ctx)
 }

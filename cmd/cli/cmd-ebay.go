@@ -53,6 +53,18 @@ var cmdEbayListingTransactions = &cobra.Command{
 	Run:   ebayListingTransactions,
 }
 
+var cmdEbayCreateSigningKey = &cobra.Command{
+	Use:   "create-signing-key",
+	Short: "Create a signing key for eBay",
+	Run:   ebayCreateSigningKey,
+}
+
+var cmdEbayVerifySignature = &cobra.Command{
+	Use:   "verify-signature",
+	Short: "Verify a signature from eBay",
+	Run:   ebayVerifySignature,
+}
+
 func ebayImportListing(cmd *cobra.Command, args []string) {
 	if _, err := strconv.Atoi(ebayListingID); err != nil {
 		fmt.Println("Error: eBay listing ID must be a valid integer")
@@ -103,16 +115,36 @@ func ebayInventoryImportListing(cmd *cobra.Command, args []string) {
 }
 
 func ebayListingTransactions(cmd *cobra.Command, args []string) {
-	transactions, err := ebay.GetItemTransactions(cmd.Context(), ebayListingID)
+	result, err := ebay.GetTransaction(cmd.Context(), ebayListingID)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	jsonBytes, err := json.MarshalIndent(transactions, "", "  ")
+	for _, transaction := range result.Transactions {
+		fmt.Printf("%s: %s\n", transaction.TransactionMemo, transaction.Amount.Value)
+	}
+}
+
+func ebayCreateSigningKey(cmd *cobra.Command, args []string) {
+	signingKey, err := ebay.CreateSigningKey(cmd.Context())
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	jsonBytes, err := json.MarshalIndent(signingKey, "", "  ")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 	fmt.Println(string(jsonBytes))
+}
+
+func ebayVerifySignature(cmd *cobra.Command, args []string) {
+	err := ebay.VerifySignature(cmd.Context())
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }

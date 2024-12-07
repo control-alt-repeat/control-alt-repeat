@@ -1,0 +1,1 @@
+https://developer.ebay.com/api-docs/developer/key-management/overview.html

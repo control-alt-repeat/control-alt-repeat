@@ -20,7 +20,7 @@
                     </h5>
                     <p class="card-text">
                         Item listed on eBay with ID
-                        <a x-bind:href="item.ebayListingURL" class="link-primary" target="_blank">123456789</a>
+                        <a x-bind:href="item.ebayListingURL" class="link-primary" target="_blank"><span x-text="item.ebayListingURL"></span></a>
                     </p>
                     <p class="card-text"><small class="text-muted"><span x-text="formatDate()"></span></small></p>
                 </div>
