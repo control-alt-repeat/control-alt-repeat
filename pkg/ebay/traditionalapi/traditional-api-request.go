@@ -3,6 +3,7 @@ package traditionalapi
 import (
 	"context"
 	"encoding/xml"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -50,6 +51,8 @@ func (r *TraditionalAPIRequest) Post(ctx context.Context, payload interface{}) (
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Println("Response Payload:", string(body))
 
 	return body, nil
 }

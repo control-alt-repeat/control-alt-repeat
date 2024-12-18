@@ -21,10 +21,17 @@ type Item struct {
 }
 
 func (i Item) Map() models.WarehouseItem {
+	var shelf string
+	if i.Shelf == UnsetShelfDefault {
+		shelf = ""
+	} else {
+		shelf = i.Shelf
+	}
+
 	return models.WarehouseItem{
 		ControlAltRepeatID: i.ID,
 		Title:              i.Title,
-		Shelf:              i.Shelf,
+		Shelf:              shelf,
 		AddedTime:          time.Unix(i.CreatedAt, 0),
 		EbayListingID:      i.EbayListingID,
 		FreeagentOwnerID:   i.FreeagentOwnerID,

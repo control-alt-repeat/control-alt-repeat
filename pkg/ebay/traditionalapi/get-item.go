@@ -19,6 +19,7 @@ func GetItem(ctx context.Context, ebayListingID string, outputSelector []string)
 		RequesterCredentials: *requesterCredentials,
 		ItemID:               ebayListingID,
 		OutputSelector:       outputSelector,
+		DetailLevel:          "ReturnAll",
 	}
 
 	resp, err := request.Post(ctx, payload)
@@ -69,6 +70,7 @@ type GetItemRequest struct {
 	RequesterCredentials RequesterCredentials `xml:"RequesterCredentials"`
 	ItemID               string               `xml:"ItemID"`
 	OutputSelector       []string             `xml:"OutputSelector"`
+	DetailLevel          string               `xml:"DetailLevel"`
 }
 
 type GetItemResponse struct {
@@ -141,7 +143,15 @@ type EbayItem struct {
 		CategoryID   string `xml:"CategoryID"`
 		CategoryName string `xml:"CategoryName"`
 	} `xml:"PrimaryCategory"`
-	PrivateListing    string `xml:"PrivateListing"`
+	PrivateListing        string `xml:"PrivateListing"`
+	ProductListingDetails struct {
+		IncludeStockPhotoURL            bool   `xml:"IncludeStockPhotoURL"`
+		IncludePrefilledItemInformation bool   `xml:"IncludePrefilledItemInformation"`
+		UseStockPhotoURLAsGallery       bool   `xml:"UseStockPhotoURLAsGallery"`
+		StockPhotoURL                   string `xml:"StockPhotoURL"`
+		ProductReferenceID              string `xml:"ProductReferenceID"`
+		ISBN                            string `xml:"ISBN"`
+	} `xml:"ProductListingDetails"`
 	Quantity          string `xml:"Quantity"`
 	IsItemEMSEligible string `xml:"IsItemEMSEligible"`
 	ReservePrice      struct {

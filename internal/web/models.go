@@ -16,6 +16,7 @@ type Item struct {
 	FreeagentOwnerID string          `json:"freeagentOwnerID"`
 	OwnerDisplayName string          `json:"ownerDisplayName"`
 	EbayListingURL   string          `json:"ebayListingURL"`
+	EbayListingID    string          `json:"ebayListingID"`
 	ImageURL         string          `json:"imageURL"`
 	AddedTime        time.Time       `json:"addedTime"`
 }
@@ -40,6 +41,7 @@ func MapToWebItem(i models.WarehouseItem) Item {
 		FreeagentOwnerID: i.FreeagentOwnerID,
 		OwnerDisplayName: i.OwnerDisplayName,
 		EbayListingURL:   fmt.Sprintf("https://www.ebay.co.uk/itm/%s", i.EbayListingID),
+		EbayListingID:    i.EbayListingID,
 		EbayReferences:   []EbayReference{},
 		AddedTime:        i.AddedTime,
 	}

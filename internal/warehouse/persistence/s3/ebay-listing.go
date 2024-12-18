@@ -3,7 +3,6 @@ package s3
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"strings"
 	"time"
 
@@ -32,8 +31,6 @@ func SaveEbayListing(ctx context.Context, opt SaveEbayListingOptions) error {
 	if err != nil {
 		return err
 	}
-
-	fmt.Println(jsonData)
 
 	_, err = s3.client.PutObject(
 		ctx,

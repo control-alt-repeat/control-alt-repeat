@@ -24,9 +24,16 @@ func ImportEbayListing(ctx context.Context, ebayListing *traditionalapi.EbayItem
 		return "", err
 	}
 
+	var pictureURL string
+	if len(ebayListing.PictureDetails.PictureURL) > 0 {
+		pictureURL = ebayListing.PictureDetails.PictureURL[0]
+	} else {
+		pictureURL = ebayListing.ProductListingDetails.StockPhotoURL
+	}
+
 	warehouseItem := &models.WarehouseItem{
 		Title:         ebayListing.Title,
-		PictureURL:    ebayListing.PictureDetails.PictureURL[0],
+		PictureURL:    pictureURL,
 		AddedTime:     startTime,
 		EbayListingID: ebayListing.ItemID,
 	}
@@ -51,7 +58,7 @@ func ImportEbayListing(ctx context.Context, ebayListing *traditionalapi.EbayItem
 	ebayItemInternal := &models.WarehouseEbayListing{
 		ID:          ebayListing.ItemID,
 		Title:       ebayListing.Title,
-		PictureURL:  ebayListing.PictureDetails.PictureURL[0],
+		PictureURL:  pictureURL,
 		ViewItemURL: ebayListing.ListingDetails.ViewItemURL,
 		StartTime:   startTime,
 	}
@@ -81,14 +88,13 @@ func ImportEbayListingByID(ctx context.Context, ebayListingID string) (string, e
 		return "", err
 	}
 
-	fmt.Printf("Listing ID valid: %s\n", ebayListingID)
-
 	ebayListing, err := ebay.GetItem(ctx, ebayListingID, []string{
 		"ItemID",
 		"Title",
 		"Description",
 		"PictureDetails",
 		"ListingDetails",
+		"ProductListingDetails",
 		"SKU",
 	})
 	if err != nil {
