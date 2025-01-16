@@ -9,7 +9,7 @@ resource "aws_dynamodb_table" "orders" {
     type = "S"
   }
   
-  attribute {
+  /* attribute {
     name = "ItemID"
     type = "S"
   }
@@ -37,5 +37,5 @@ resource "aws_dynamodb_table" "orders" {
   attribute {
     name = "ShippingCost"
     type = "S"
-  }
+  } */
 }
