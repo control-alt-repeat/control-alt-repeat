@@ -34,6 +34,9 @@ func MapEbayTransactionsToFreeAgent(ctx context.Context, t reports.Transaction) 
 	if t.Type == EbayPayout {
 		return nil, nil // Payouts are "linked transactions" in FreeAgent TODO
 	}
+	if t.Type == EbayHold {
+		return nil, nil // Holds are not actual transactions, they are simply placeholders for later refund or cancellation of refund
+	}
 
 	var explanation freeagent.BankTransactionExplanation
 
@@ -50,12 +53,12 @@ func MapEbayTransactionsToFreeAgent(ctx context.Context, t reports.Transaction) 
 	explanations := []freeagent.BankTransactionExplanation{}
 
 	if t.Type == EbayOrder || t.Type == EbayRefund {
-		explanations = addCommissionPaidIfNotZero(explanations, t.FinalValueFeeFixed, fmt.Sprintf("%s | Fixed Fee", explanation.Description))
-		explanations = addCommissionPaidIfNotZero(explanations, t.FinalValueFeeVariable, fmt.Sprintf("%s | Variable Fee", explanation.Description))
-		explanations = addCommissionPaidIfNotZero(explanations, t.RegulatoryOperatingFee, fmt.Sprintf("%s | Regulatory Operating Fee", explanation.Description))
-		explanations = addCommissionPaidIfNotZero(explanations, t.VeryHighItemNotAsDescribedFee, fmt.Sprintf("%s | Very High Item Not As Described Fee", explanation.Description))
-		explanations = addCommissionPaidIfNotZero(explanations, t.BelowStandardPerformanceFee, fmt.Sprintf("%s | Below Standard Performance Fee", explanation.Description))
-		explanations = addCommissionPaidIfNotZero(explanations, t.InternationalFee, fmt.Sprintf("%s | International Fee", explanation.Description))
+		explanations = addCommissionPaidIfNotZero(explanations, t.FinalValueFeeFixed, fmt.Sprintf("%s | Fixed Fee", explanation.Description), explanation.DatedOn)
+		explanations = addCommissionPaidIfNotZero(explanations, t.FinalValueFeeVariable, fmt.Sprintf("%s | Variable Fee", explanation.Description), explanation.DatedOn)
+		explanations = addCommissionPaidIfNotZero(explanations, t.RegulatoryOperatingFee, fmt.Sprintf("%s | Regulatory Operating Fee", explanation.Description), explanation.DatedOn)
+		explanations = addCommissionPaidIfNotZero(explanations, t.VeryHighItemNotAsDescribedFee, fmt.Sprintf("%s | Very High Item Not As Described Fee", explanation.Description), explanation.DatedOn)
+		explanations = addCommissionPaidIfNotZero(explanations, t.BelowStandardPerformanceFee, fmt.Sprintf("%s | Below Standard Performance Fee", explanation.Description), explanation.DatedOn)
+		explanations = addCommissionPaidIfNotZero(explanations, t.InternationalFee, fmt.Sprintf("%s | International Fee", explanation.Description), explanation.DatedOn)
 
 		explanation.Description = explanation.Description + " | " + t.Type
 	}
@@ -65,7 +68,7 @@ func MapEbayTransactionsToFreeAgent(ctx context.Context, t reports.Transaction) 
 	return explanations, nil
 }
 
-func addCommissionPaidIfNotZero(explanations []freeagent.BankTransactionExplanation, value decimal.NullDecimal, description string) []freeagent.BankTransactionExplanation {
+func addCommissionPaidIfNotZero(explanations []freeagent.BankTransactionExplanation, value decimal.NullDecimal, description string, datedOn freeagent.FreeAgentDate) []freeagent.BankTransactionExplanation {
 	if !value.Valid || value.Decimal.Sign() == 0 {
 		return explanations
 	}
@@ -74,6 +77,7 @@ func addCommissionPaidIfNotZero(explanations []freeagent.BankTransactionExplanat
 	explanation.Category = FreeAgentCommissionPaid
 	explanation.GrossValue = value.Decimal.StringFixedBank(2)
 	explanation.Description = description
+	explanation.DatedOn = datedOn
 
 	return append(explanations, explanation)
 }
@@ -82,7 +86,7 @@ func mapEbayTransactionType(eBayTransactionType string) (string, error) {
 	switch strings.TrimSpace(eBayTransactionType) {
 	case EbayPostageLabel, EbayCharge, EbayOtherFee:
 		return FreeAgentCostOfSales, nil
-	case EbayOrder, EbayHold, EbayRefund:
+	case EbayOrder, EbayRefund:
 		return FreeAgentSales, nil
 	}
 

@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/csv"
 	"os"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -187,7 +188,7 @@ func parsePercentage(value string) (decimal.Decimal, error) {
 }
 
 func parseDecimal(value string) (decimal.Decimal, error) {
-	return decimal.NewFromString(value)
+	return decimal.NewFromFormattedString(value, regexp.MustCompile("[,]"))
 }
 
 func parseNullDecimal(value string) (decimal.NullDecimal, error) {
