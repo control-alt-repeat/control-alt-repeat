@@ -28,6 +28,9 @@ const (
 )
 
 func MapEbayTransactionsToFreeAgent(ctx context.Context, t reports.Transaction) ([]freeagent.BankTransactionExplanation, error) {
+	if t.Type == EbayOrder && t.PayoutCurrency == "--" {
+		return nil, nil // This is an order parent with multiple child orders to follow
+	}
 	if t.PayoutCurrency != "GBP" {
 		return nil, fmt.Errorf("only GBP currency supported - %s no catered for", t.PayoutCurrency)
 	}
@@ -40,7 +43,7 @@ func MapEbayTransactionsToFreeAgent(ctx context.Context, t reports.Transaction) 
 
 	var explanation freeagent.BankTransactionExplanation
 
-	explanation.GrossValue = t.GrossTransactionAmount.StringFixedBank(2)
+	explanation.GrossValue = t.GrossTransactionAmount.Decimal.StringFixedBank(2)
 	explanation.DatedOn = freeagent.FreeAgentDate(t.TransactionCreationDate)
 	explanation.IsDeletable = true
 	explanation.Description = generateDescription(t)

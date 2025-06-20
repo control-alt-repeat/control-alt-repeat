@@ -4,11 +4,13 @@ import (
 	"bufio"
 	"context"
 	"encoding/csv"
+	"fmt"
 	"os"
 	"regexp"
 	"strconv"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
 
@@ -27,7 +29,6 @@ type Transaction struct {
 	PostToProvinceRegionState     string
 	PostToPostcode                string
 	PostToCountry                 string
-	NetAmount                     decimal.Decimal
 	PayoutCurrency                string
 	PayoutDate                    string
 	PayoutID                      string
@@ -50,7 +51,7 @@ type Transaction struct {
 	VeryHighItemNotAsDescribedFee decimal.NullDecimal
 	BelowStandardPerformanceFee   decimal.NullDecimal
 	InternationalFee              decimal.NullDecimal
-	GrossTransactionAmount        decimal.Decimal
+	GrossTransactionAmount        decimal.NullDecimal
 	TransactionCurrency           string
 	ExchangeRate                  decimal.NullDecimal
 	ReferenceID                   string
@@ -80,58 +81,54 @@ func LoadTransactionsFile(ctx context.Context, path string) (TransactionsReport,
 		return report, err
 	}
 
-	for _, record := range records[1:] { // Skipping header
+	for line, record := range records[1:] { // Skipping header
 		creationDate, err := parseDate(record[0])
 		if err != nil {
-			return report, err
-		}
-		netAmount, err := parseDecimal(record[10])
-		if err != nil {
-			return report, err
+			return report, errors.Wrap(err, fmt.Sprintf("parsing creationDate '%v' as Date (line: %d)", record[0], line))
 		}
 		quantity, err := parseInt(record[21])
 		if err != nil {
-			return report, err
+			return report, errors.Wrap(err, fmt.Sprintf("parsing quantity '%v' as Int (line: %d)", record[21], line))
 		}
 		itemSubtotal, err := parseNullDecimal(record[22])
 		if err != nil {
-			return report, err
+			return report, errors.Wrap(err, fmt.Sprintf("parsing itemSubtotal '%v' as NullDecimal (line: %d)", record[22], line))
 		}
 		sellerSpecifiedVATRate, err := parsePercentage(record[26])
 		if err != nil {
-			return report, err
+			return report, errors.Wrap(err, fmt.Sprintf("parsing sellerSpecifiedVATRate '%v' as Percentage (line: %d)", record[26], line))
 		}
 		finalValueFeeFixed, err := parseNullDecimal(record[27])
 		if err != nil {
-			return report, err
+			return report, errors.Wrap(err, fmt.Sprintf("parsing finalValueFeeFixed '%v' as NullDecimal (line: %d)", record[27], line))
 		}
 		finalValueFeeVariable, err := parseNullDecimal(record[28])
 		if err != nil {
-			return report, err
+			return report, errors.Wrap(err, fmt.Sprintf("parsing finalValueFeeVariable '%v' as NullDecimal (line: %d)", record[28], line))
 		}
 		regulatoryOperatingFee, err := parseNullDecimal(record[29])
 		if err != nil {
-			return report, err
+			return report, errors.Wrap(err, fmt.Sprintf("parsing regulatoryOperatingFee '%v' as NullDecimal (line: %d)", record[29], line))
 		}
 		veryHighItemNotAsDescribedFee, err := parseNullDecimal(record[30])
 		if err != nil {
-			return report, err
+			return report, errors.Wrap(err, fmt.Sprintf("parsing veryHighItemNotAsDescribedFee '%v' as NullDecimal (line: %d)", record[30], line))
 		}
 		belowStandardPerformanceFee, err := parseNullDecimal(record[31])
 		if err != nil {
-			return report, err
+			return report, errors.Wrap(err, fmt.Sprintf("parsing belowStandardPerformanceFee '%v' as NullDecimal (line: %d)", record[31], line))
 		}
 		internationalFee, err := parseNullDecimal(record[32])
 		if err != nil {
-			return report, err
+			return report, errors.Wrap(err, fmt.Sprintf("parsing internationalFee '%v' as NullDecimal (line: %d)", record[32], line))
 		}
-		grossTransactionAmount, err := parseDecimal(record[33])
+		grossTransactionAmount, err := parseNullDecimal(record[33])
 		if err != nil {
-			return report, err
+			return report, errors.Wrap(err, fmt.Sprintf("parsing grossTransactionAmount '%v' as NullDecimal (line: %d)", record[33], line))
 		}
 		exchangeRate, err := parseNullDecimal(record[35])
 		if err != nil {
-			return report, err
+			return report, errors.Wrap(err, fmt.Sprintf("parsing exchangeRate '%v' as NullDecimal (line: %d)", record[35], line))
 		}
 
 		report.Transactions = append(report.Transactions, Transaction{
@@ -145,7 +142,6 @@ func LoadTransactionsFile(ctx context.Context, path string) (TransactionsReport,
 			PostToProvinceRegionState:     record[7],
 			PostToPostcode:                record[8],
 			PostToCountry:                 record[9],
-			NetAmount:                     netAmount,
 			PayoutCurrency:                record[11],
 			PayoutDate:                    record[12],
 			PayoutID:                      record[13],

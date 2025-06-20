@@ -50,6 +50,8 @@ func accountingExplainEbay(cmd *cobra.Command, args []string) {
 		handleError(err)
 	}
 
+	fmt.Printf("Filtering transcations by dates %s - %s\n", startDate.Format("2006-01-02"), endDate.Format("2006-01-02"))
+
 	var filtered []reports.Transaction
 	for _, t := range report.Transactions {
 		if !t.TransactionCreationDate.Before(startDate) && !t.TransactionCreationDate.After(endDate) {
@@ -59,7 +61,16 @@ func accountingExplainEbay(cmd *cobra.Command, args []string) {
 
 	explainations := []freeagent.BankTransactionExplanation{}
 
+	var parentTransaction reports.Transaction
+
 	for _, transaction := range filtered {
+		if transaction.Type == accounting.EbayOrder && transaction.TransactionID == "--" {
+			parentTransaction = transaction
+		}
+		if transaction.Type == accounting.EbayOrder && transaction.PayoutCurrency == "--" {
+			transaction.PayoutCurrency = parentTransaction.PayoutCurrency
+		}
+
 		result, err := accounting.MapEbayTransactionsToFreeAgent(cmd.Context(), transaction)
 		if err != nil {
 			fmt.Println(err)
@@ -96,17 +107,26 @@ func accountingExplainEbay(cmd *cobra.Command, args []string) {
 		handleError(fmt.Errorf("expected closing funds (%s) does not match actual (%s)", expectedClosingFunds, newClosingFunds))
 	}
 
+	ticker := time.NewTicker(time.Minute / 115)
+	defer ticker.Stop()
+
 	for _, e := range explainations {
 		e.BankAccount = bankAccount.ID
 
-		err = freeagent.CreateBankTransactionExplaination(cmd.Context(), freeagent.CreateBankTransactionExplainationRequest{
-			BankTransactionExplanation: e,
-		})
-		if err != nil {
-			handleError(err)
-		}
+		select {
+		case <-ticker.C:
 
-		fmt.Printf("Created explanation: %s %6s %s\n", e.DatedOn.ToTime().Format("2006-01-02"), e.GrossValue, e.Description)
+			err = freeagent.CreateBankTransactionExplaination(cmd.Context(), freeagent.CreateBankTransactionExplainationRequest{
+				BankTransactionExplanation: e,
+			})
+			if err != nil {
+				handleError(err)
+			}
+
+			fmt.Printf("Created explanation: %s %6s %s\n", e.DatedOn.ToTime().Format("2006-01-02"), e.GrossValue, e.Description)
+		case <-cmd.Context().Done():
+			fmt.Println("Context done, stopping explanations")
+		}
 	}
 
 	if err != nil {
