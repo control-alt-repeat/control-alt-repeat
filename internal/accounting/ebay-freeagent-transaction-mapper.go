@@ -21,6 +21,7 @@ const (
 	EbayRefund       = "Refund"
 	EbayHold         = "Hold"
 	EbayCharge       = "Charge"
+	EbayClaim        = "Claim"
 
 	FreeAgentSales          = "https://api.freeagent.com/v2/categories/001"
 	FreeAgentCostOfSales    = "https://api.freeagent.com/v2/categories/101"
@@ -55,7 +56,7 @@ func MapEbayTransactionsToFreeAgent(ctx context.Context, t reports.Transaction) 
 
 	explanations := []freeagent.BankTransactionExplanation{}
 
-	if t.Type == EbayOrder || t.Type == EbayRefund {
+	if t.Type == EbayOrder || t.Type == EbayRefund || t.Type == EbayClaim {
 		explanations = addCommissionPaidIfNotZero(explanations, t.FinalValueFeeFixed, fmt.Sprintf("%s | Fixed Fee", explanation.Description), explanation.DatedOn)
 		explanations = addCommissionPaidIfNotZero(explanations, t.FinalValueFeeVariable, fmt.Sprintf("%s | Variable Fee", explanation.Description), explanation.DatedOn)
 		explanations = addCommissionPaidIfNotZero(explanations, t.RegulatoryOperatingFee, fmt.Sprintf("%s | Regulatory Operating Fee", explanation.Description), explanation.DatedOn)
@@ -87,7 +88,7 @@ func addCommissionPaidIfNotZero(explanations []freeagent.BankTransactionExplanat
 
 func mapEbayTransactionType(eBayTransactionType string) (string, error) {
 	switch strings.TrimSpace(eBayTransactionType) {
-	case EbayPostageLabel, EbayCharge, EbayOtherFee:
+	case EbayPostageLabel, EbayCharge, EbayOtherFee, EbayClaim:
 		return FreeAgentCostOfSales, nil
 	case EbayOrder, EbayRefund:
 		return FreeAgentSales, nil
