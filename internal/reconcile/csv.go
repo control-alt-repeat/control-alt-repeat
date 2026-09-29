@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -20,6 +21,8 @@ var defaultDateFormats = []string{
 	"02 Jan 2006",
 	"2 Jan 2006",
 	"02-Jan-2006",
+	"02 Jan, 2006",
+	"2 Jan, 2006",
 	"02/01/06",
 	time.RFC3339,
 	"2006-01-02T15:04:05.000Z",
@@ -37,26 +40,9 @@ type table struct {
 }
 
 func readTable(path string, skipRows int) (*table, error) {
-	f, err := os.Open(path)
+	records, err := readRecords(path)
 	if err != nil {
 		return nil, err
-	}
-	defer f.Close()
-
-	r := csv.NewReader(stripBOM(f))
-	r.FieldsPerRecord = -1
-	r.LazyQuotes = true
-
-	var records [][]string
-	for {
-		rec, err := r.Read()
-		if errors.Is(err, io.EOF) {
-			break
-		}
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", path, err)
-		}
-		records = append(records, rec)
 	}
 	if len(records) <= skipRows {
 		return nil, fmt.Errorf("%s: no header row found", path)
@@ -74,6 +60,35 @@ func readTable(path string, skipRows int) (*table, error) {
 		t.rows = append(t.rows, rec)
 	}
 	return t, nil
+}
+
+// readRecords reads a CSV file, or the first sheet of an Excel .xlsx file.
+func readRecords(path string) ([][]string, error) {
+	if strings.EqualFold(filepath.Ext(path), ".xlsx") {
+		return readXLSXRows(path)
+	}
+
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	r := csv.NewReader(stripBOM(f))
+	r.FieldsPerRecord = -1
+	r.LazyQuotes = true
+
+	var records [][]string
+	for {
+		rec, err := r.Read()
+		if errors.Is(err, io.EOF) {
+			return records, nil
+		}
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", path, err)
+		}
+		records = append(records, rec)
+	}
 }
 
 func stripBOM(r io.Reader) io.Reader {
@@ -161,7 +176,8 @@ func parseMoney(s string) (decimal.Decimal, error) {
 	if neg {
 		d = d.Neg()
 	}
-	return d, nil
+	// Excel cells can carry float noise such as 13.449999999999999.
+	return d.Round(2), nil
 }
 
 func parseDate(s string, formats []string) (time.Time, error) {

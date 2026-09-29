@@ -26,12 +26,21 @@ rules ────┘                                                           
 
 ## Each time
 
-Put inputs in `reconcile-data/` (git-ignored).
+Put inputs in `reconcile-data/` (git-ignored). CSV and Excel `.xlsx` files are both accepted.
+
+Order exports:
+- **eBay**: the "eBay purchase history report" browser add-on's Excel export (profile `ebay`).
+  `OrderTotal` is what was charged, so discounts are spread across the items and £0 orders are ignored.
+- **Amazon**: Account → Request Your Data → Your Orders (profile `amazon`).
+
+If a bank line contains an order number (eBay card charges often read `eBay O*22-12345-67890`),
+it is matched to that exact order.
 
 ```sh
 go run ./cmd/cli reconcile plan \
   --statement reconcile-data/bank-2026-03.csv \
   --purchases amazon=reconcile-data/amazon-orders.csv \
+  --purchases ebay=reconcile-data/Ebay_Purchase_History_2026.xlsx \
   --bank-account "Business Current Account" \
   --out reconcile-data/plan-2026-03.csv
 

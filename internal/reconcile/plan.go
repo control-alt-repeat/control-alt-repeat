@@ -257,6 +257,12 @@ func (m *purchaseMatcher) candidates(l StatementLine, used map[string]bool) (rel
 			before, after = 2, 14
 		}
 
+		// An order number printed on the statement line beats any amount/date inference.
+		if pm, ok := matchByOrderID(l, s, want, used); ok {
+			found = append(found, pm)
+			continue
+		}
+
 		var orderLevel, itemLevel []purchaseMatch
 		for _, p := range s.Purchases {
 			if l.Date.Before(p.Date.AddDate(0, 0, -before)) || l.Date.After(p.Date.AddDate(0, 0, after)) {
@@ -287,6 +293,20 @@ func (m *purchaseMatcher) candidates(l StatementLine, used map[string]bool) (rel
 		}
 	}
 	return relevant, found
+}
+
+func matchByOrderID(l StatementLine, s PurchaseSource, want decimal.Decimal, used map[string]bool) (purchaseMatch, bool) {
+	text := l.Text()
+	for _, p := range s.Purchases {
+		if len(p.OrderID) < 6 || !strings.Contains(text, p.OrderID) {
+			continue
+		}
+		orderKey := s.Profile.Source + "|" + p.OrderID
+		if !used[orderKey] && !used[orderKey+"#partial"] && p.Total().Equal(want) {
+			return purchaseMatch{source: s.Profile, purchase: p, items: p.Items, key: orderKey}, true
+		}
+	}
+	return purchaseMatch{}, false
 }
 
 func (m *purchaseMatcher) match(lines []StatementLine) map[string]purchaseMatch {

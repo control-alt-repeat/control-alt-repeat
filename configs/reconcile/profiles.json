@@ -26,7 +26,8 @@
       "exclude_pattern": "(?i)cancel",
       "bank_payee_pattern": "(?i)amzn|amazon",
       "days_before": 2,
-      "days_after": 21
+      "days_after": 21,
+      "contact": "Amazon"
     },
     "generic": {
       "source": "supplier",
@@ -38,6 +39,24 @@
       "bank_payee_pattern": "(?i)CHANGE-ME",
       "days_before": 2,
       "days_after": 14
+    },
+    "ebay": {
+      "source": "ebay",
+      "contact": "eBay",
+      "order_id_column": "OrderNumber",
+      "date_column": "OrderDate",
+      "date_formats": [
+        "02 Jan, 2006",
+        "2 Jan, 2006"
+      ],
+      "item_total_column": "ItemPrice",
+      "order_total_column": "OrderTotal",
+      "description_column": "ItemName",
+      "quantity_column": "Quantity",
+      "seller_column": "Seller",
+      "bank_payee_pattern": "(?i)ebay",
+      "days_before": 1,
+      "days_after": 7
     }
   }
 }
