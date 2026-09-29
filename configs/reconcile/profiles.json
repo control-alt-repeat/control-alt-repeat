@@ -56,7 +56,8 @@
       "seller_column": "Seller",
       "bank_payee_pattern": "(?i)ebay",
       "days_before": 1,
-      "days_after": 7
+      "days_after": 7,
+      "url_column": "Order Details"
     }
   }
 }

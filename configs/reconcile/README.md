@@ -55,6 +55,17 @@ as the suggested match for its statement line - click **OK**.
 
 When you find yourself coding the same thing by hand twice, add a rule instead.
 
+## What gets matched, in order
+
+1. **Already in Xero** - a transaction or bill payment with the same amount within 3 days → `exists`.
+2. **Unpaid bills** - a bill whose amount due equals the charge, dated up to 7 days after / 120 days
+   before the bank line. A bill number or the supplier's name on the statement settles ties.
+   Posted as a *payment against the bill*, so the cost is never counted twice.
+3. **Marketplace orders** - itemised spend money, with the order details attached as a text file.
+4. **Rules** - `rules.json`, first match wins.
+
+`--bank-account` is needed for 1 and 2 (it reads Xero); without it only 3 and 4 run.
+
 ## Plan statuses
 
 | status  | meaning |
@@ -63,7 +74,7 @@ When you find yourself coding the same thing by hand twice, add a rule instead.
 | review  | needs a decision - `reason` says why. Fill in contact/account_code/tax_type and set to `ready`, or `skip` |
 | skip    | not handled by this tool (e.g. transfers between your own accounts - do those in Xero) |
 | exists  | a transaction with the same amount (±3 days) is already in Xero |
-| applied | posted by this tool; `xero_id` is the Xero BankTransactionID |
+| applied | posted by this tool; `xero_id` is the Xero BankTransactionID or PaymentID |
 
 A bank line split over several order items has one row per item sharing a `line_id`;
 their `line_amount`s must add up to the bank amount or `apply` refuses to run.

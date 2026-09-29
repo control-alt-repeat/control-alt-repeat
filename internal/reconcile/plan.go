@@ -44,13 +44,18 @@ type PlanRow struct {
 	Description     string
 	LineAmount      decimal.Decimal // this row's share, always positive
 	XeroID          string
+	BillID          string // set when the line pays an existing Xero bill
+	OrderURL        string
 }
 
 var planHeader = []string{
 	"line_id", "date", "amount", "bank_payee", "bank_description", "bank_reference",
 	"status", "reason", "source", "order_id", "contact", "account_code", "tax_type",
-	"description", "line_amount", "xero_id",
+	"description", "line_amount", "xero_id", "bill_id", "order_url",
 }
+
+// Columns added after the first release, so older plan files still load.
+var optionalPlanColumns = map[string]bool{"bill_id": true, "order_url": true}
 
 // PurchaseSource is one loaded marketplace export plus how to match it to the bank.
 type PurchaseSource struct {
@@ -63,6 +68,7 @@ type PlanInput struct {
 	Rules    *Rules
 	Sources  []PurchaseSource
 	Existing []xero.BankTransaction // optional: already in Xero for this bank account
+	Bills    []xero.Invoice         // optional: unpaid supplier bills
 	Applied  map[string]string      // optional: line_id -> xero id from the ledger
 }
 
@@ -91,13 +97,28 @@ func BuildPlan(in PlanInput) ([]PlanRow, error) {
 		pending = append(pending, l)
 	}
 
+	billMatches, billReasons := matchBills(pending, in.Bills)
+	unbilled := pending[:0:0]
+	for _, l := range pending {
+		if b, ok := billMatches[l.ID]; ok {
+			rows[l.ID] = []PlanRow{billRow(l, b)}
+			continue
+		}
+		unbilled = append(unbilled, l)
+	}
+
 	m, err := newPurchaseMatcher(in.Sources)
 	if err != nil {
 		return nil, err
 	}
-	matches := m.match(pending)
+	matches := m.match(unbilled)
+	for id, reason := range billReasons {
+		if _, ok := matches[id]; !ok {
+			m.reasons[id] = reason
+		}
+	}
 
-	for _, l := range pending {
+	for _, l := range unbilled {
 		if r, ok := matches[l.ID]; ok {
 			rows[l.ID] = purchaseRows(l, r, in.Rules)
 			continue
@@ -192,6 +213,7 @@ func purchaseRows(l StatementLine, r purchaseMatch, rules *Rules) []PlanRow {
 		row := baseRow(l, StatusReady, "")
 		row.Source = r.source.Source
 		row.OrderID = r.purchase.OrderID
+		row.OrderURL = r.purchase.URL
 		row.Contact = contact
 		row.Description = truncate(fmt.Sprintf("%s %s: %s", row.Contact, r.purchase.OrderID, item.Description), 4000)
 		if item.Quantity > 1 {
@@ -402,7 +424,7 @@ func WritePlan(path string, rows []PlanRow) error {
 		rec := []string{
 			r.LineID, r.Date.Format("2006-01-02"), r.Amount.StringFixed(2), r.BankPayee, r.BankDescription, r.BankReference,
 			r.Status, r.Reason, r.Source, r.OrderID, r.Contact, r.AccountCode, r.TaxType,
-			r.Description, r.LineAmount.StringFixed(2), r.XeroID,
+			r.Description, r.LineAmount.StringFixed(2), r.XeroID, r.BillID, r.OrderURL,
 		}
 		if err := w.Write(rec); err != nil {
 			return err
@@ -429,7 +451,7 @@ func ReadPlan(path string) ([]PlanRow, error) {
 		col[normaliseHeader(h)] = i
 	}
 	for _, h := range planHeader {
-		if _, ok := col[h]; !ok {
+		if _, ok := col[h]; !ok && !optionalPlanColumns[h] {
 			return nil, fmt.Errorf("%s: missing column %q", path, h)
 		}
 	}
@@ -443,7 +465,13 @@ func ReadPlan(path string) ([]PlanRow, error) {
 		if err != nil {
 			return nil, err
 		}
-		get := func(name string) string { return strings.TrimSpace(rec[col[name]]) }
+		get := func(name string) string {
+			i, ok := col[name]
+			if !ok || i >= len(rec) {
+				return ""
+			}
+			return strings.TrimSpace(rec[i])
+		}
 
 		date, err := time.Parse("2006-01-02", get("date"))
 		if err != nil {
@@ -463,6 +491,7 @@ func ReadPlan(path string) ([]PlanRow, error) {
 			Status: strings.ToLower(get("status")), Reason: get("reason"), Source: get("source"), OrderID: get("order_id"),
 			Contact: get("contact"), AccountCode: get("account_code"), TaxType: get("tax_type"),
 			Description: get("description"), LineAmount: lineAmount, XeroID: get("xero_id"),
+			BillID: get("bill_id"), OrderURL: get("order_url"),
 		})
 	}
 }

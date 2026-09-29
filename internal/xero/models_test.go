@@ -22,3 +22,12 @@ func TestBankTransactionFromXeroJSON(t *testing.T) {
 		t.Errorf("date = %v, %v", d, err)
 	}
 }
+
+func TestParseXeroDate(t *testing.T) {
+	for _, s := range []string{"/Date(1772496000000+0000)/", "2026-03-03T00:00:00", "2026-03-03"} {
+		d, err := parseXeroDate(s)
+		if err != nil || d.Format("2006-01-02") != "2026-03-03" {
+			t.Errorf("%s -> %v %v", s, d, err)
+		}
+	}
+}

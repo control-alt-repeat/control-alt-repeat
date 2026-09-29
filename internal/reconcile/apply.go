@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -109,7 +110,10 @@ func (g Group) Validate() error {
 		if !r.Amount.Equal(first.Amount) || !r.Date.Equal(first.Date) {
 			return fmt.Errorf("line %s: rows disagree on bank amount or date", g.LineID)
 		}
-		if r.AccountCode == "" {
+		if r.BillID != "" && len(g.Rows) > 1 {
+			return fmt.Errorf("line %s: a bill payment must be a single row", g.LineID)
+		}
+		if r.AccountCode == "" && r.BillID == "" {
 			return fmt.Errorf("line %s: missing account_code", g.LineID)
 		}
 		if r.Contact == "" {
@@ -206,7 +210,7 @@ func Apply(ctx context.Context, c *xero.Client, ledger *Ledger, rows []PlanRow, 
 			to = d
 		}
 	}
-	existing, err := c.ListBankTransactions(ctx, opts.BankAccountID, from.AddDate(0, 0, -existingMatchDays), to.AddDate(0, 0, existingMatchDays))
+	existing, err := c.ListAccountActivity(ctx, opts.BankAccountID, from.AddDate(0, 0, -existingMatchDays), to.AddDate(0, 0, existingMatchDays))
 	if err != nil {
 		return res, err
 	}
@@ -224,21 +228,56 @@ func Apply(ctx context.Context, c *xero.Client, ledger *Ledger, rows []PlanRow, 
 
 	if !opts.Commit {
 		for _, g := range toPost {
-			t := g.ToBankTransaction(opts.BankAccountID)
-			opts.Log("DRY RUN %s %s %8s %-20s %s", t.Date, t.Type, g.Rows[0].Amount.StringFixed(2), t.Contact.Name, t.Reference)
+			first := g.Rows[0]
+			kind := "SPEND"
+			if first.BillID != "" {
+				kind = "PAY BILL"
+			} else if !first.Amount.IsNegative() {
+				kind = "RECEIVE"
+			}
+			opts.Log("DRY RUN %s %-8s %8s %-20s %s", first.Date.Format("2006-01-02"), kind, first.Amount.StringFixed(2), first.Contact, first.OrderID)
 		}
 		res.DryRun = len(toPost)
 		return res, nil
 	}
 
-	for start := 0; start < len(toPost); start += applyBatchSize {
-		batch := toPost[start:min(start+applyBatchSize, len(toPost))]
-		txns := make([]xero.BankTransaction, len(batch))
+	var bills, txns []Group
+	for _, g := range toPost {
+		if g.Rows[0].BillID != "" {
+			bills = append(bills, g)
+		} else {
+			txns = append(txns, g)
+		}
+	}
+
+	for start := 0; start < len(bills); start += applyBatchSize {
+		batch := bills[start:min(start+applyBatchSize, len(bills))]
+		payments := make([]xero.Payment, len(batch))
 		for i, g := range batch {
-			txns[i] = g.ToBankTransaction(opts.BankAccountID)
+			payments[i] = g.ToPayment(opts.BankAccountID)
+		}
+		created, err := c.CreatePayments(ctx, payments)
+		if err != nil {
+			return res, err
+		}
+		if len(created) != len(batch) {
+			return res, fmt.Errorf("xero returned %d results for %d payments - check Xero before re-running", len(created), len(batch))
+		}
+		for i, g := range batch {
+			if err := settle(g, created[i].PaymentID, created[i].StatusAttributeString, created[i].ValidationErrors, payments[i].Reference, ledger, opts, &res); err != nil {
+				return res, err
+			}
+		}
+	}
+
+	for start := 0; start < len(txns); start += applyBatchSize {
+		batch := txns[start:min(start+applyBatchSize, len(txns))]
+		bankTxns := make([]xero.BankTransaction, len(batch))
+		for i, g := range batch {
+			bankTxns[i] = g.ToBankTransaction(opts.BankAccountID)
 		}
 
-		created, err := c.CreateBankTransactions(ctx, txns)
+		created, err := c.CreateBankTransactions(ctx, bankTxns)
 		if err != nil {
 			return res, err
 		}
@@ -248,28 +287,81 @@ func Apply(ctx context.Context, c *xero.Client, ledger *Ledger, rows []PlanRow, 
 
 		for i, g := range batch {
 			ct := created[i]
-			if ct.StatusAttributeString == "ERROR" || ct.BankTransactionID == "" {
-				msg := "xero rejected it"
-				for _, v := range ct.ValidationErrors {
-					msg += ": " + v.Message
+			if err := settle(g, ct.BankTransactionID, ct.StatusAttributeString, ct.ValidationErrors, bankTxns[i].Reference, ledger, opts, &res); err != nil {
+				return res, err
+			}
+			if g.Rows[0].Status == StatusApplied && g.Rows[0].OrderID != "" {
+				name, body := g.OrderAttachment()
+				// The transaction is already posted and recorded, so a failed upload
+				// is reported but does not stop the run.
+				if err := c.AttachToBankTransaction(ctx, ct.BankTransactionID, name, "text/plain", body); err != nil {
+					opts.Log("WARNING could not attach order details to %s: %v", ct.BankTransactionID, err)
 				}
-				setStatus(g, StatusReview, msg, "")
-				opts.Log("FAILED  %s %8s %s", g.Rows[0].Date.Format("2006-01-02"), g.Rows[0].Amount.StringFixed(2), msg)
-				res.Failed++
-				continue
 			}
-			if err := ledger.record(ledgerEntry{
-				LineID: g.LineID, XeroID: ct.BankTransactionID, PostedAt: time.Now().UTC(),
-				Amount: g.Rows[0].Amount.StringFixed(2), Date: g.Rows[0].Date.Format("2006-01-02"), Reference: txns[i].Reference,
-			}); err != nil {
-				return res, fmt.Errorf("posted %s to xero as %s but could not write ledger: %w", g.LineID, ct.BankTransactionID, err)
-			}
-			setStatus(g, StatusApplied, "", ct.BankTransactionID)
-			opts.Log("POSTED  %s %8s %s", g.Rows[0].Date.Format("2006-01-02"), g.Rows[0].Amount.StringFixed(2), ct.BankTransactionID)
-			res.Posted++
 		}
 	}
 	return res, nil
+}
+
+// settle records the outcome of one posted group in the ledger and the plan.
+func settle(g Group, xeroID, status string, errs []xero.ValidationError, reference string, ledger *Ledger, opts ApplyOptions, res *ApplyResult) error {
+	first := g.Rows[0]
+	if status == "ERROR" || xeroID == "" {
+		msg := "xero rejected it"
+		for _, v := range errs {
+			msg += ": " + v.Message
+		}
+		setStatus(g, StatusReview, msg, "")
+		opts.Log("FAILED  %s %8s %s", first.Date.Format("2006-01-02"), first.Amount.StringFixed(2), msg)
+		res.Failed++
+		return nil
+	}
+	if err := ledger.record(ledgerEntry{
+		LineID: g.LineID, XeroID: xeroID, PostedAt: time.Now().UTC(),
+		Amount: first.Amount.StringFixed(2), Date: first.Date.Format("2006-01-02"), Reference: reference,
+	}); err != nil {
+		return fmt.Errorf("posted %s to xero as %s but could not write ledger: %w", g.LineID, xeroID, err)
+	}
+	setStatus(g, StatusApplied, "", xeroID)
+	opts.Log("POSTED  %s %8s %s", first.Date.Format("2006-01-02"), first.Amount.StringFixed(2), xeroID)
+	res.Posted++
+	return nil
+}
+
+// ToPayment pays an existing bill from the bank account, left unreconciled so it
+// lines up with the statement line in Xero's Reconcile tab.
+func (g Group) ToPayment(bankAccountID string) xero.Payment {
+	first := g.Rows[0]
+	ref := first.BankReference
+	if ref == "" {
+		ref = first.BankPayee
+	}
+	return xero.Payment{
+		Invoice:   &xero.Invoice{InvoiceID: first.BillID},
+		Account:   &xero.Account{AccountID: bankAccountID},
+		Date:      first.Date.Format("2006-01-02"),
+		Amount:    xero.NewMoney(first.Amount.Abs()),
+		Reference: truncate(ref, 255),
+	}
+}
+
+// OrderAttachment is a plain-text record of the marketplace order behind a
+// transaction, kept in Xero as evidence for VAT and margin scheme checks.
+func (g Group) OrderAttachment() (string, []byte) {
+	first := g.Rows[0]
+	var b strings.Builder
+	fmt.Fprintf(&b, "Source:     %s\n", first.Source)
+	fmt.Fprintf(&b, "Order:      %s\n", first.OrderID)
+	if first.OrderURL != "" {
+		fmt.Fprintf(&b, "Order link: %s\n", first.OrderURL)
+	}
+	fmt.Fprintf(&b, "Paid:       %s on %s\n", first.Amount.Abs().StringFixed(2), first.Date.Format("2006-01-02"))
+	fmt.Fprintf(&b, "Bank line:  %s\n\nItems:\n", strings.TrimSpace(first.BankPayee+" "+first.BankDescription))
+	for _, r := range g.Rows {
+		fmt.Fprintf(&b, "  %8s  %s\n", r.LineAmount.StringFixed(2), r.Description)
+	}
+	name := strings.NewReplacer("/", "-", "\\", "-", " ", "_").Replace(fmt.Sprintf("%s-order-%s.txt", first.Source, first.OrderID))
+	return name, []byte(b.String())
 }
 
 func setStatus(g Group, status, reason, xeroID string) {

@@ -61,7 +61,7 @@ func registerReconcileCommands() {
 	f.StringArrayVar(&reconcilePurchases, "purchases", nil, "Marketplace order export as profile=path, repeatable, e.g. amazon=orders.csv")
 	f.StringVar(&reconcileFrom, "from", "", "Only include statement lines on or after this date (yyyy-mm-dd)")
 	f.StringVar(&reconcileTo, "to", "", "Only include statement lines on or before this date (yyyy-mm-dd)")
-	f.StringVar(&reconcileBankAccount, "bank-account", "", "Xero bank account (code, name or id) - when set, lines already in Xero are marked 'exists'")
+	f.StringVar(&reconcileBankAccount, "bank-account", "", "Xero bank account (code, name or id) - when set, lines already in Xero are marked 'exists' and unpaid bills are matched")
 	f.StringVar(&reconcileLedger, "ledger", defaultLedger, "Ledger of lines already posted by this tool")
 	f.StringVar(&reconcilePlan, "out", "plan.csv", "Where to write the plan")
 	_ = cmdReconcilePlan.MarkFlagRequired("statement")
@@ -148,12 +148,19 @@ func reconcilePlanRun(cmd *cobra.Command, args []string) {
 				to = l.Date
 			}
 		}
-		existing, err := c.ListBankTransactions(cmd.Context(), account.AccountID, from.AddDate(0, 0, -3), to.AddDate(0, 0, 3))
+		existing, err := c.ListAccountActivity(cmd.Context(), account.AccountID, from.AddDate(0, 0, -3), to.AddDate(0, 0, 3))
 		if err != nil {
 			handleError(err)
 		}
-		fmt.Printf("Found %d existing Xero transactions on %s\n", len(existing), account.Name)
+		fmt.Printf("Found %d existing Xero transactions and payments on %s\n", len(existing), account.Name)
 		in.Existing = existing
+
+		bills, err := c.ListUnpaidBills(cmd.Context())
+		if err != nil {
+			handleError(err)
+		}
+		fmt.Printf("Found %d unpaid bills\n", len(bills))
+		in.Bills = bills
 	}
 
 	rows, err := reconcile.BuildPlan(in)

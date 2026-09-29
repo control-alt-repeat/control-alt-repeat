@@ -18,6 +18,7 @@ type Purchase struct {
 	OrderID string
 	Date    time.Time
 	Seller  string
+	URL     string
 	Items   []PurchaseItem
 }
 
@@ -53,6 +54,7 @@ type PurchaseProfile struct {
 	DescriptionColumn string `json:"description_column"`
 	QuantityColumn    string `json:"quantity_column,omitempty"`
 	SellerColumn      string `json:"seller_column,omitempty"`
+	URLColumn         string `json:"url_column,omitempty"` // link to the order, attached in Xero
 	// Rows where ExcludeColumn matches ExcludePattern are dropped (e.g. cancelled orders).
 	ExcludeColumn  string `json:"exclude_column,omitempty"`
 	ExcludePattern string `json:"exclude_pattern,omitempty"`
@@ -68,7 +70,7 @@ func LoadPurchases(path string, p PurchaseProfile) ([]Purchase, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := t.require(p.OrderIDColumn, p.DateColumn, p.ItemTotalColumn, p.OrderTotalColumn, p.DescriptionColumn, p.QuantityColumn, p.SellerColumn, p.ExcludeColumn); err != nil {
+	if err := t.require(p.OrderIDColumn, p.DateColumn, p.ItemTotalColumn, p.OrderTotalColumn, p.DescriptionColumn, p.QuantityColumn, p.SellerColumn, p.URLColumn, p.ExcludeColumn); err != nil {
 		return nil, err
 	}
 
@@ -111,7 +113,7 @@ func LoadPurchases(path string, p PurchaseProfile) ([]Purchase, error) {
 			if err != nil {
 				return nil, fmt.Errorf("%s row %d: %w", path, rowNum, err)
 			}
-			purchase = &Purchase{Source: p.Source, OrderID: id, Date: date, Seller: t.value(row, p.SellerColumn)}
+			purchase = &Purchase{Source: p.Source, OrderID: id, Date: date, Seller: t.value(row, p.SellerColumn), URL: t.value(row, p.URLColumn)}
 			byOrder[id] = purchase
 			order = append(order, id)
 

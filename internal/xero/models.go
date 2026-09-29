@@ -90,14 +90,10 @@ const (
 
 // DateValue returns the transaction date regardless of whether it was read or built locally.
 func (b BankTransaction) DateValue() (time.Time, error) {
-	s := b.DateString
-	if s == "" {
-		s = b.Date
+	if b.DateString != "" {
+		return parseXeroDate(b.DateString)
 	}
-	if len(s) >= 10 {
-		s = s[:10]
-	}
-	return time.Parse("2006-01-02", s)
+	return parseXeroDate(b.Date)
 }
 
 // SignedTotal is negative for money out, matching how bank statements present it.
