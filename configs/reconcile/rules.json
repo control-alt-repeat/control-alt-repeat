@@ -3,16 +3,16 @@
   "rules": [
     {
       "name": "Marketplace payouts (posted by Link My Books)",
-      "text": "(?i)ebay|amazon|amzn|shopify|etsy|back ?market",
+      "text": "(?i)ebay commerce|amazon payments|etsy ireland",
       "direction": "in",
       "skip": true
     },
     {
-      "name": "eBay purchases (cleared through Link My Books)",
+      "name": "eBay purchases",
       "text": "(?i)ebay",
       "direction": "out",
       "contact": "eBay",
-      "account_code": "LMB49",
+      "account_code": "310",
       "tax_type": "NONE"
     }
   ]

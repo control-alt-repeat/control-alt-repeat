@@ -12,6 +12,16 @@
       "debit_column": "Debit",
       "credit_column": "Credit",
       "description_column": "Description"
+    },
+    "starling": {
+      "date_column": "Date",
+      "date_formats": [
+        "02/01/2006"
+      ],
+      "amount_column": "Amount (GBP)",
+      "payee_column": "Counter Party",
+      "reference_column": "Reference",
+      "description_column": "Type"
     }
   },
   "purchases": {
