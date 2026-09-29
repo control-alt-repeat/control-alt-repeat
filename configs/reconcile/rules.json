@@ -14,6 +14,22 @@
       "contact": "eBay",
       "account_code": "310",
       "tax_type": "NONE"
+    },
+    {
+      "name": "Phone Works stock",
+      "text": "(?i)phone ?works",
+      "direction": "out",
+      "contact": "Phone Works",
+      "account_code": "310",
+      "tax_type": "INPUT2"
+    },
+    {
+      "name": "Lees Games stock",
+      "text": "(?i)lees games",
+      "direction": "out",
+      "contact": "Lees Games Limited",
+      "account_code": "310",
+      "tax_type": "NONE"
     }
   ]
 }
