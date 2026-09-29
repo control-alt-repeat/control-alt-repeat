@@ -1,0 +1,19 @@
+{
+  "default_purchase_account_code": "",
+  "rules": [
+    {
+      "name": "Marketplace payouts (posted by Link My Books)",
+      "text": "(?i)ebay|amazon|amzn|shopify|etsy|back ?market",
+      "direction": "in",
+      "skip": true
+    },
+    {
+      "name": "eBay purchases (cleared through Link My Books)",
+      "text": "(?i)ebay",
+      "direction": "out",
+      "contact": "eBay",
+      "account_code": "LMB49",
+      "tax_type": "NONE"
+    }
+  ]
+}

@@ -3,6 +3,7 @@ package reconcile
 import (
 	"context"
 	"encoding/json"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -230,5 +231,24 @@ func TestParseMoney(t *testing.T) {
 		if err != nil || got.String() != want {
 			t.Errorf("parseMoney(%q) = %s, %v; want %s", in, got, err, want)
 		}
+	}
+}
+
+func TestSkipRule(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "rules.json")
+	if err := os.WriteFile(path, []byte(`{"rules":[{"name":"payouts","text":"(?i)ebay","direction":"in","skip":true}]}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	rules, err := LoadRules(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	line := StatementLine{ID: "p", Amount: decimal.RequireFromString("100"), Payee: "EBAY COMMERCE UK"}
+	rows, err := BuildPlan(PlanInput{Lines: []StatementLine{line}, Rules: rules})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if rows[0].Status != StatusSkip {
+		t.Errorf("got %s", rows[0].Status)
 	}
 }

@@ -163,6 +163,11 @@ func ruleRow(l StatementLine, rules *Rules, purchaseReason string) PlanRow {
 			row.Status = StatusReview
 			row.Reason = "rule asks for manual review"
 		}
+		if rule.Skip {
+			row.Status = StatusSkip
+			row.Reason = "handled elsewhere (rule: " + rule.Name + ")"
+			return row
+		}
 	}
 
 	// A marketplace charge that could not be tied to an order is worth a look even

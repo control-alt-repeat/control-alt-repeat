@@ -36,6 +36,8 @@ type Rule struct {
 	Narrative   string `json:"narrative,omitempty"`
 	// Leave the line for a human even though the coding is known (e.g. mixed-use cards).
 	Review bool `json:"review,omitempty"`
+	// Never post this line, e.g. marketplace payouts Link My Books already accounts for.
+	Skip bool `json:"skip,omitempty"`
 
 	textRe *regexp.Regexp
 	itemRe *regexp.Regexp
@@ -55,7 +57,7 @@ func LoadRules(path string) (*Rules, error) {
 		if rule.Name == "" {
 			return nil, fmt.Errorf("%s: rule %d has no name", path, i+1)
 		}
-		if rule.AccountCode == "" {
+		if rule.AccountCode == "" && !rule.Skip {
 			return nil, fmt.Errorf("%s: rule %q has no account_code", path, rule.Name)
 		}
 		if rule.Direction != "" && rule.Direction != "in" && rule.Direction != "out" {
