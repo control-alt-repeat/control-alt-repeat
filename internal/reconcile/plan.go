@@ -126,6 +126,8 @@ func BuildPlan(in PlanInput) ([]PlanRow, error) {
 		rows[l.ID] = []PlanRow{ruleRow(l, in.Rules, m.reasons[l.ID])}
 	}
 
+	codeRefunds(lines, rows, in.Rules)
+
 	out := make([]PlanRow, 0, len(lines))
 	for _, l := range lines {
 		out = append(out, rows[l.ID]...)
