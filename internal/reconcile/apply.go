@@ -119,7 +119,9 @@ func (g Group) Validate() error {
 		if r.Contact == "" {
 			return fmt.Errorf("line %s: missing contact", g.LineID)
 		}
-		if r.LineAmount.IsNegative() {
+		// Negative line amounts are deductions within one transaction, e.g. Stripe
+		// fees netted off a payout; the total check below still has to hold.
+		if r.LineAmount.IsNegative() && len(g.Rows) == 1 {
 			return fmt.Errorf("line %s: line_amount must be positive", g.LineID)
 		}
 		total = total.Add(r.LineAmount)

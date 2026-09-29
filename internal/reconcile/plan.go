@@ -69,6 +69,7 @@ type PlanInput struct {
 	Sources  []PurchaseSource
 	Existing []xero.BankTransaction // optional: already in Xero for this bank account
 	Bills    []xero.Invoice         // optional: unpaid supplier bills
+	Payouts  []Payout               // optional: payment processor payouts (Stripe)
 	Applied  map[string]string      // optional: line_id -> xero id from the ledger
 }
 
@@ -97,6 +98,20 @@ func BuildPlan(in PlanInput) ([]PlanRow, error) {
 		pending = append(pending, l)
 	}
 
+	payoutMatches, payoutReasons, err := matchPayouts(pending, in.Payouts, in.Rules.Stripe)
+	if err != nil {
+		return nil, err
+	}
+	unpaid := pending[:0:0]
+	for _, l := range pending {
+		if p, ok := payoutMatches[l.ID]; ok {
+			rows[l.ID] = payoutRows(l, p, in.Rules.Stripe)
+			continue
+		}
+		unpaid = append(unpaid, l)
+	}
+	pending = unpaid
+
 	billMatches, billReasons := matchBills(pending, in.Bills)
 	unbilled := pending[:0:0]
 	for _, l := range pending {
@@ -112,6 +127,9 @@ func BuildPlan(in PlanInput) ([]PlanRow, error) {
 		return nil, err
 	}
 	matches := m.match(unbilled)
+	for id, reason := range payoutReasons {
+		billReasons[id] = reason
+	}
 	for id, reason := range billReasons {
 		if _, ok := matches[id]; !ok {
 			m.reasons[id] = reason

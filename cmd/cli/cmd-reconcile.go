@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -10,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/control-alt-repeat/control-alt-repeat/internal/reconcile"
+	"github.com/control-alt-repeat/control-alt-repeat/internal/stripe"
 	"github.com/control-alt-repeat/control-alt-repeat/internal/xero"
 )
 
@@ -25,6 +27,7 @@ var (
 	reconcileLedger           string
 	reconcilePlan             string
 	reconcileCommit           bool
+	reconcileStripe           bool
 )
 
 // Reconcile command: "car reconcile"
@@ -64,6 +67,7 @@ func registerReconcileCommands() {
 	f.StringVar(&reconcileBankAccount, "bank-account", "", "Xero bank account (code, name or id) - when set, lines already in Xero are marked 'exists' and unpaid bills are matched")
 	f.StringVar(&reconcileLedger, "ledger", defaultLedger, "Ledger of lines already posted by this tool")
 	f.StringVar(&reconcilePlan, "out", "plan.csv", "Where to write the plan")
+	f.BoolVar(&reconcileStripe, "stripe", false, "Split Stripe payouts into sales, refunds and fees using the Stripe API (STRIPE_API_KEY)")
 	_ = cmdReconcilePlan.MarkFlagRequired("statement")
 
 	f = cmdReconcileApply.Flags()
@@ -163,6 +167,14 @@ func reconcilePlanRun(cmd *cobra.Command, args []string) {
 		in.Bills = bills
 	}
 
+	if reconcileStripe {
+		payouts, err := loadStripePayouts(cmd.Context(), lines)
+		if err != nil {
+			handleError(err)
+		}
+		in.Payouts = payouts
+	}
+
 	rows, err := reconcile.BuildPlan(in)
 	if err != nil {
 		handleError(err)
@@ -218,6 +230,36 @@ func reconcileApplyRun(cmd *cobra.Command, args []string) {
 	if res.Posted > 0 {
 		fmt.Println("In Xero, open the bank account's Reconcile tab and click OK on each suggested match.")
 	}
+}
+
+func loadStripePayouts(ctx context.Context, lines []reconcile.StatementLine) ([]reconcile.Payout, error) {
+	c, err := stripe.NewClientFromEnv()
+	if err != nil {
+		return nil, err
+	}
+	from, to := lines[0].Date, lines[0].Date
+	for _, l := range lines {
+		if l.Date.Before(from) {
+			from = l.Date
+		}
+		if l.Date.After(to) {
+			to = l.Date
+		}
+	}
+	payouts, err := c.ListPayouts(ctx, from.AddDate(0, 0, -7), to.AddDate(0, 0, 7))
+	if err != nil {
+		return nil, err
+	}
+	out := make([]reconcile.Payout, 0, len(payouts))
+	for _, p := range payouts {
+		txns, err := c.PayoutTransactions(ctx, p.ID)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, reconcile.StripePayout(p, txns))
+	}
+	fmt.Printf("Loaded %d Stripe payouts\n", len(out))
+	return out, nil
 }
 
 func filterLines(lines []reconcile.StatementLine, from, to string) ([]reconcile.StatementLine, error) {

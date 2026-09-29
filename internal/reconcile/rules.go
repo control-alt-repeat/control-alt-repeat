@@ -16,6 +16,9 @@ type Rules struct {
 	DefaultPurchaseAccountCode string `json:"default_purchase_account_code"`
 	DefaultPurchaseTaxType     string `json:"default_purchase_tax_type,omitempty"`
 
+	// How Stripe payouts are split into sales, refunds and fees.
+	Stripe *PayoutCoding `json:"stripe,omitempty"`
+
 	Rules []Rule `json:"rules"`
 }
 

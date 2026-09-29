@@ -1,5 +1,13 @@
 {
   "default_purchase_account_code": "",
+  "stripe": {
+    "contact": "Stripe",
+    "payee_pattern": "(?i)stripe",
+    "sales_account": "200",
+    "sales_tax": "OUTPUT2",
+    "fees_account": "504",
+    "fees_tax": "NONE"
+  },
   "rules": [
     {
       "name": "Marketplace payouts (posted by Link My Books)",

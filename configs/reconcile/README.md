@@ -50,6 +50,8 @@ go run ./cmd/cli reconcile apply --plan reconcile-data/plan-2026-03.csv --bank-a
 go run ./cmd/cli reconcile apply --plan reconcile-data/plan-2026-03.csv --bank-account "Business Current Account" --commit
 ```
 
+Add `--stripe` to the plan command to split Stripe payouts.
+
 Then in Xero open the bank account's **Reconcile** tab: each posted transaction appears
 as the suggested match for its statement line - click **OK**.
 
@@ -61,8 +63,11 @@ When you find yourself coding the same thing by hand twice, add a rule instead.
 2. **Unpaid bills** - a bill whose amount due equals the charge, dated up to 7 days after / 120 days
    before the bank line. A bill number or the supplier's name on the statement settles ties.
    Posted as a *payment against the bill*, so the cost is never counted twice.
-3. **Marketplace orders** - itemised spend money, with the order details attached as a text file.
-4. **Rules** - `rules.json`, first match wins.
+3. **Stripe payouts** (`--stripe`, needs `STRIPE_API_KEY` with read access to Balance and Payouts) -
+   one receipt split into gross sales, refunds and fees using the rules file's `stripe` coding.
+   Anything unexpected in a payout (disputes, adjustments) or a breakdown that doesn't add up → review.
+4. **Marketplace orders** - itemised spend money, with the order details attached as a text file.
+5. **Rules** - `rules.json`, first match wins.
 
 `--bank-account` is needed for 1 and 2 (it reads Xero); without it only 3 and 4 run.
 
