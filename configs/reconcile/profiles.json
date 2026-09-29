@@ -1,0 +1,43 @@
+{
+  "statements": {
+    "xero": {
+      "date_column": "Date",
+      "amount_column": "Amount",
+      "payee_column": "Payee",
+      "description_column": "Description",
+      "reference_column": "Reference"
+    },
+    "debit-credit": {
+      "date_column": "Date",
+      "debit_column": "Debit",
+      "credit_column": "Credit",
+      "description_column": "Description"
+    }
+  },
+  "purchases": {
+    "amazon": {
+      "source": "amazon",
+      "order_id_column": "Order ID",
+      "date_column": "Order Date",
+      "item_total_column": "Total Owed",
+      "description_column": "Product Name",
+      "quantity_column": "Quantity",
+      "exclude_column": "Order Status",
+      "exclude_pattern": "(?i)cancel",
+      "bank_payee_pattern": "(?i)amzn|amazon",
+      "days_before": 2,
+      "days_after": 21
+    },
+    "generic": {
+      "source": "supplier",
+      "order_id_column": "Order ID",
+      "date_column": "Date",
+      "item_total_column": "Total",
+      "description_column": "Description",
+      "quantity_column": "Quantity",
+      "bank_payee_pattern": "(?i)CHANGE-ME",
+      "days_before": 2,
+      "days_after": 14
+    }
+  }
+}

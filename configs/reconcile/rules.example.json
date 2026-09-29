@@ -1,0 +1,46 @@
+{
+  "default_purchase_account_code": "310",
+  "default_purchase_tax_type": "INPUT2",
+  "rules": [
+    {
+      "name": "Amazon items for resale",
+      "item": "(?i)graphics card|motherboard|laptop",
+      "text": "(?i)amzn|amazon",
+      "account_code": "310",
+      "tax_type": "INPUT2"
+    },
+    {
+      "name": "Amazon (fallback for itemised orders)",
+      "text": "(?i)amzn|amazon",
+      "direction": "out",
+      "contact": "Amazon",
+      "account_code": "429",
+      "tax_type": "INPUT2"
+    },
+    {
+      "name": "eBay payouts",
+      "text": "(?i)ebay",
+      "direction": "in",
+      "contact": "eBay",
+      "account_code": "200",
+      "tax_type": "OUTPUT2",
+      "review": true
+    },
+    {
+      "name": "Royal Mail postage",
+      "text": "(?i)royal ?mail",
+      "direction": "out",
+      "contact": "Royal Mail",
+      "account_code": "425",
+      "tax_type": "EXEMPTINPUT"
+    },
+    {
+      "name": "Bank charges",
+      "text": "(?i)monthly fee|account fee|service charge",
+      "direction": "out",
+      "contact": "Bank",
+      "account_code": "404",
+      "tax_type": "NONE"
+    }
+  ]
+}

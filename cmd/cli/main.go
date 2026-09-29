@@ -133,6 +133,9 @@ func run() int {
 	cmdFreeagent.AddCommand(cmdFreeagentGetContact)
 	cmdFreeagent.AddCommand(cmdFreeagentListContacts)
 
+	registerXeroCommands()
+	registerReconcileCommands()
+
 	cmdRoot.AddCommand(cmdItem)
 
 	cmdItemMove.Flags().StringVar(&itemID, "item-id", "", "Item ID")

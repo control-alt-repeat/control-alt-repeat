@@ -63,3 +63,8 @@ override.tf.json
 terraform.rc
 
 # End of https://www.toptal.com/developers/gitignore/api/terraform,go
+
+### Xero reconciliation ###
+# Bank statements, order exports and plans contain personal financial data.
+reconcile-data/
+plan*.csv
