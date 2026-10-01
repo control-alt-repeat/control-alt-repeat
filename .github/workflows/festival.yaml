@@ -1,0 +1,88 @@
+name: Lancaster Music Festival planner
+on:
+  schedule:
+    # Daily at 05:17 UTC.
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+    inputs:
+      use_committed_data:
+        description: Skip scraping and publish festival/data/gigs.json as committed
+        type: boolean
+        default: false
+  push:
+    branches:
+      - main
+    paths:
+      - 'festival/**'
+      - '.github/workflows/festival.yaml'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: festival-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: festival
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Install Playwright
+        if: ${{ !inputs.use_committed_data }}
+        run: |
+          npm install --no-save --no-package-lock
+          npx playwright install --with-deps chromium
+
+      - name: Scrape official schedule
+        id: scrape
+        if: ${{ !inputs.use_committed_data }}
+        continue-on-error: true
+        run: node scripts/scrape.mjs data/gigs.json
+
+      - name: Warn if scrape failed
+        if: ${{ steps.scrape.outcome == 'failure' }}
+        run: |
+          echo "::warning::Scraping the official schedule failed; publishing the committed festival/data/gigs.json instead."
+          echo "> [!WARNING]" >> "$GITHUB_STEP_SUMMARY"
+          echo "> Scrape failed — published the committed copy of the data." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Build data.json and summarise changes
+        run: node scripts/build.mjs data/gigs.json site/data.json "${{ steps.pages.outputs.base_url }}/data.json"
+
+      - name: Keep raw data
+        uses: actions/upload-artifact@v4
+        with:
+          name: gigs-raw
+          path: festival/data/gigs.json
+          retention-days: 30
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: festival/site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

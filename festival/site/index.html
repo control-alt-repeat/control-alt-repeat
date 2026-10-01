@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LMF Planner</title>
+  <meta name="description" content="Search the Lancaster Music Festival line-up, pick the bands you want to see and share your list by QR code.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎸</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="bar">
+      <h1>LMF Planner</h1>
+      <div class="actions">
+        <button id="share-btn" class="btn" type="button" title="Share my picks">Share</button>
+        <button id="ics-btn" class="btn" type="button" title="Download my picks as a calendar file">.ics</button>
+      </div>
+    </div>
+    <div class="search">
+      <input id="q" type="search" placeholder="Just start typing — band, venue, genre…" autocomplete="off" autofocus aria-label="Search">
+    </div>
+    <div class="filters">
+      <div id="days" class="chips" role="group" aria-label="Day"></div>
+      <div class="chips" role="group" aria-label="Show">
+        <button id="f-picks" class="chip" type="button" aria-pressed="false">★ My picks <span id="picks-count" class="n"></span></button>
+        <button id="f-shared" class="chip" type="button" aria-pressed="false" hidden>♥ Shared <span id="shared-count" class="n"></span></button>
+        <button id="f-hide-past" class="chip" type="button" aria-pressed="false">Hide finished</button>
+      </div>
+    </div>
+    <div id="shared-banner" class="banner" hidden></div>
+  </header>
+
+  <main>
+    <p id="status" class="status" aria-live="polite">Loading schedule…</p>
+    <div id="list"></div>
+  </main>
+
+  <footer class="foot">
+    <span id="meta"></span>
+    · <a href="https://lancastermusicfestival.com/schedule.html" target="_blank" rel="noopener">Official schedule</a>
+  </footer>
+
+  <dialog id="share-dialog">
+    <form method="dialog" class="share">
+      <h2>Share my picks</h2>
+      <label>Your name <input id="share-name" type="text" maxlength="30" placeholder="optional"></label>
+      <div id="qr" class="qr"></div>
+      <input id="share-url" type="text" readonly aria-label="Share link">
+      <div class="row">
+        <button id="copy-btn" class="btn" type="button">Copy link</button>
+        <button id="native-share-btn" class="btn" type="button" hidden>Share…</button>
+        <button class="btn" value="close">Close</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="vendor/qrcode.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
